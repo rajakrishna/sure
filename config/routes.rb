@@ -452,7 +452,7 @@ Rails.application.routes.draw do
   resource :wealth, only: :show, controller: :wealth
 
   resources :advisor_invites, only: %i[create destroy]
-  get "advisor/:token", to: "advisor_portals#show", as: :advisor_portal
+  get "advisor/:id", to: "advisor_portals#show", as: :advisor_portal
 
   # Hub page fronting budgets + goals under a single "Plan" nav entry.
   resource :plan, only: :show

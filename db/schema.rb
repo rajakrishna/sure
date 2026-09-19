@@ -189,12 +189,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_160000) do
     t.datetime "last_viewed_at"
     t.string "name"
     t.datetime "revoked_at"
-    t.string "token_digest", null: false
     t.datetime "updated_at", null: false
     t.index ["family_id", "revoked_at"], name: "index_advisor_invites_on_family_id_and_revoked_at"
     t.index ["family_id"], name: "index_advisor_invites_on_family_id"
     t.index ["created_by_id"], name: "index_advisor_invites_on_created_by_id"
-    t.index ["token_digest"], name: "index_advisor_invites_on_token_digest", unique: true
   end
 
   create_table "ai_proposals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

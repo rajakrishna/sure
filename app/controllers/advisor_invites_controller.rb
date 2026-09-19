@@ -9,7 +9,7 @@ class AdvisorInvitesController < ApplicationController
       email: params.dig(:advisor_invite, :email),
       name: params.dig(:advisor_invite, :name)
     )
-    redirect_to settings_profile_path, notice: t(".created", url: advisor_portal_url(invite.raw_token))
+    redirect_to settings_profile_path, notice: t(".created", url: advisor_portal_url(invite))
   end
 
   def destroy

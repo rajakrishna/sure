@@ -5,7 +5,7 @@ class AdvisorPortalsController < ApplicationController
   layout "auth"
 
   def show
-    @invite = AdvisorInvite.lookup(params[:token])
+    @invite = AdvisorInvite.lookup(params[:id])
     raise ActiveRecord::RecordNotFound unless @invite
 
     @invite.touch_viewed!

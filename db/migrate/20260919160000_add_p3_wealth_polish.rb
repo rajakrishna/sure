@@ -16,13 +16,11 @@ class AddP3WealthPolish < ActiveRecord::Migration[8.1]
       t.references :created_by, type: :uuid, foreign_key: { to_table: :users, on_delete: :nullify }
       t.string :email
       t.string :name
-      t.string :token_digest, null: false
       t.datetime :expires_at, null: false
       t.datetime :last_viewed_at
       t.datetime :revoked_at
       t.timestamps
     end
-    add_index :advisor_invites, :token_digest, unique: true
     add_index :advisor_invites, [ :family_id, :revoked_at ]
 
     create_table :financial_health_scores, id: :uuid, default: -> { "gen_random_uuid()" } do |t|
