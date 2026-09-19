@@ -2,7 +2,6 @@
 pl:
   messages:
     chat_form:
-      coming_soon: Wkrótce
       disclaimer: Odpowiedzi AI mają charakter wyłącznie informacyjny. To nie są porady
         finansowe!
       placeholder: Zapytaj o cokolwiek...
