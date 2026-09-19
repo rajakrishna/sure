@@ -38,9 +38,29 @@ class PagesController < ApplicationController
       redirect_to chats_path and return
     end
 
+    @balance_sheet = Current.family.balance_sheet
+    @investment_statement = Current.family.investment_statement
+    @accounts = Current.user.accessible_accounts.visible.with_attached_logo
+
+    income_statement = Current.family.income_statement
+    income_totals = income_statement.income_totals(period: @period)
+    expense_totals = income_statement.expense_totals(period: @period)
+    net_totals = income_statement.net_category_totals(period: @period)
+
+    @outflows_data = build_outflows_donut_data(net_totals)
     @feed_insights = Current.family.insights.visible.ordered.limit(Insight::FEED_LIMIT)
+
+    @money_flow_accounts = income_statement.eligible_accounts
+    @money_flow_accessible_account_ids = Current.user.accessible_accounts.pluck(:id).map(&:to_s)
+    @money_flow_month = money_flow_month_param
+    @money_flow_account_ids = money_flow_account_ids_param
+    @money_flow_data = build_money_flow_data(income_statement, @money_flow_month, @money_flow_account_ids)
+
+    @spending_trend_month = spending_trend_month_param
+    @spending_trend_data = build_spending_trend_data(income_statement, @spending_trend_month)
+
     @home_snapshot = Family::HomeSnapshot.new(Current.family, user: Current.user)
-    @dashboard_sections = []
+    @dashboard_sections = build_dashboard_sections
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.dashboard"), nil ] ]
   end
@@ -102,13 +122,7 @@ class PagesController < ApplicationController
       end
     end
 
-    # Preview-gated, and omitted from the section list entirely rather than
-    # left in it with `visible: false`. Dropping it here means the two
-    # downstream behaviors fall out for free: the saved-order lookup finds
-    # nothing to map, and the insights_feed unshift special-case never fires.
     def insights_feed_section
-      return nil
-
       {
         key: "insights_feed",
         title: "pages.dashboard.insights_feed.title",
@@ -123,15 +137,6 @@ class PagesController < ApplicationController
     def build_dashboard_sections
       all_sections = [
         insights_feed_section,
-        {
-          key: "cashflow_sankey",
-          title: "pages.dashboard.cashflow_sankey.title",
-          partial: "pages/dashboard/cashflow_sankey",
-          layout: section_layout("cashflow_sankey"),
-          locals: { sankey_data: @cashflow_sankey_data, period: @period },
-          visible: @accounts.any?,
-          collapsible: true
-        },
         {
           key: "money_flow",
           title: "pages.dashboard.money_flow.title",
