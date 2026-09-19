@@ -28,11 +28,15 @@ This is Raja’s fork of [we-promise/sure](https://github.com/we-promise/sure) (
 - Goal show menu: **Ask in chat** seeds the composer with that goal
 - `GET /holdings/new` redirects to the trade form instead of a “Coming soon” stub
 
+### Categorize helpers (was `zz_mcp_finance_extras`)
+- `get_categorization_status`, `bootstrap_categories`, `list_uncategorized_transactions`, `apply_category_updates`, and `enqueue_auto_categorize` are first-class assistant/MCP tools
+- No host mount of extras is required for Cursor-driven categorization
+
 ## Deploy plan (when ready)
 1. CI: GitHub Actions → build Dockerfile → push `ghcr.io/rajakrishna/sure:stable` (and git sha tags). Repo must allow GHCR packages for this account.
 2. On CT 104: snapshot DB (or Sure backup), change `compose.yml` web+worker `image:` to our GHCR image, `docker compose pull && up -d`.
 3. Smoke: login, MCP, chat “biggest expense in August”, Sidekiq worker healthy, + / @ / file attach on the chat form, Goals via Plan (preview on).
-4. After cutover, remove `/opt/sure/overrides/` mounts (`zz_get_transactions_month_compat.rb`, `zz_ollama_chat_tools.rb`, `zz_ollama_think_false.rb`) — that logic now lives in the app.
+4. After cutover, remove `/opt/sure/overrides/` mounts (`zz_get_transactions_month_compat.rb`, `zz_ollama_chat_tools.rb`, `zz_ollama_think_false.rb`, `zz_mcp_finance_extras.rb`) — that logic now lives in the app.
 5. Keep `upstream` remote to `we-promise/sure` and rebase/merge periodically (AGPL + security).
 
 ## Public URL
