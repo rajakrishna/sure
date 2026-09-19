@@ -155,6 +155,16 @@ class Assistant::Function::GetTransactionsTest < ActiveSupport::TestCase
     assert result[:transactions].all? { |t| t[:classification] == "income" }
   end
 
+  test "month accepts Month YYYY format" do
+    result = @function.call("month" => Date.current.strftime("%B %Y"), "page_size" => 5)
+
+    assert result[:transactions].any?
+    assert result[:transactions].all? { |t|
+      date = Date.iso8601(t[:date].to_s)
+      date.month == Date.current.month && date.year == Date.current.year
+    }
+  end
+
   test "month sets a calendar start and end date" do
     result = @function.call("month" => Date.current.strftime("%Y-%m"), "page_size" => 5)
 

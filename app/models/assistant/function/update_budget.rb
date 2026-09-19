@@ -19,7 +19,7 @@ class Assistant::Function::UpdateBudget < Assistant::Function
         spending.
 
         Parameters:
-        - `month` (optional): "YYYY-MM" or "MMM-YYYY". Defaults to the current month.
+        - `month` (optional): YYYY-MM, MMM-YYYY, or Month YYYY. Defaults to the current month.
         - `budgeted_spending` (optional): total planned spending for the month.
         - `expected_income` (optional): expected income for the month.
         - `categories` (optional): array of { category: <name or id>, amount: <number> }.
@@ -51,7 +51,7 @@ class Assistant::Function::UpdateBudget < Assistant::Function
       properties: {
         month: {
           type: "string",
-          description: "Target month in YYYY-MM or MMM-YYYY format. Defaults to the current month."
+          description: "Target month in YYYY-MM, MMM-YYYY, or Month YYYY format. Defaults to the current month."
         },
         budgeted_spending: {
           type: "number",

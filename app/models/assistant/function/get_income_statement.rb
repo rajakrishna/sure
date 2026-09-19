@@ -1,5 +1,6 @@
 class Assistant::Function::GetIncomeStatement < Assistant::Function
   include ActiveSupport::NumberHelper
+  include Assistant::Function::MonthResolvable
 
   class << self
     def name
@@ -14,6 +15,9 @@ class Assistant::Function::GetIncomeStatement < Assistant::Function
         - What is the user's net income for the current month?
         - What are the user's spending habits?
         - How much income or spending did the user have over a specific time period?
+
+        Pass month (YYYY-MM, MMM-YYYY, or Month YYYY such as August 2026) or
+        start_date and end_date. Never call this with empty arguments.
 
         Spending trends and comparisons:
         - Month over month: pass group_by: "month" for a monthly_series
@@ -30,6 +34,12 @@ class Assistant::Function::GetIncomeStatement < Assistant::Function
           end_date: "2024-12-31"
         })
         ```
+
+        Month example:
+
+        ```
+        get_income_statement({ month: "August 2026" })
+        ```
       INSTRUCTIONS
     end
   end
@@ -41,6 +51,18 @@ class Assistant::Function::GetIncomeStatement < Assistant::Function
   end
 
   def call(params = {})
+    params = params.stringify_keys
+    month_error = apply_month_window!(params, params["month"])
+    return { error: "invalid_month", hint: month_error } if month_error
+
+    if params["start_date"].blank? || params["end_date"].blank?
+      return {
+        error: "missing_period",
+        message: "Provide month (YYYY-MM or Month YYYY) or start_date and end_date (YYYY-MM-DD).",
+        hint: "Provide month (YYYY-MM or Month YYYY) or start_date and end_date (YYYY-MM-DD)."
+      }
+    end
+
     period = Period.custom(start_date: Date.parse(params["start_date"]), end_date: Date.parse(params["end_date"]))
 
     account_ids = params["account_ids"].presence
@@ -82,8 +104,12 @@ class Assistant::Function::GetIncomeStatement < Assistant::Function
 
   def params_schema
     build_schema(
-      required: [ "start_date", "end_date" ],
+      required: [],
       properties: {
+        month: {
+          type: "string",
+          description: "Optional month: YYYY-MM, MMM-YYYY, or Month YYYY (e.g. August 2026). Fills start_date and end_date when omitted."
+        },
         start_date: {
           type: "string",
           description: "Start date for aggregation period in YYYY-MM-DD format"

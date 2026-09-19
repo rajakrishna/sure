@@ -22,7 +22,8 @@ class Assistant::Function::GetTransactions < Assistant::Function
         For ranking questions you MUST pass sort_by: "amount", order "desc"
         (biggest/largest/top/max) or "asc" (smallest/min), page_size 5 (or N,
         capped at 5), types ["expense"] or ["income"] as appropriate, and
-        either month (YYYY-MM) or start_date and end_date. Then answer with
+        either month (YYYY-MM, MMM-YYYY, or Month YYYY) or start_date and
+        end_date. Then answer with
         row #1 only unless the user asked for top N.
 
         This function is not great for:
@@ -90,7 +91,7 @@ class Assistant::Function::GetTransactions < Assistant::Function
         },
         month: {
           type: "string",
-          description: "Calendar month in YYYY-MM or MMM-YYYY. Sets start_date and end_date for that month when those are omitted."
+          description: "Calendar month in YYYY-MM, MMM-YYYY, or Month YYYY (e.g. August 2026). Sets start_date and end_date for that month when those are omitted."
         },
         start_date: {
           type: "string",
@@ -226,18 +227,6 @@ class Assistant::Function::GetTransactions < Assistant::Function
   end
 
   private
-    def apply_month_window!(search_params, month)
-      return if month.blank?
-      return if search_params["start_date"].present? && search_params["end_date"].present?
-
-      start_date, end_date = resolve_month_range(month)
-      search_params["start_date"] = start_date.iso8601 if search_params["start_date"].blank?
-      search_params["end_date"] = end_date.iso8601 if search_params["end_date"].blank?
-      nil
-    rescue Assistant::Error => e
-      e.message
-    end
-
     def ordered(query, params)
       if params["sort_by"] == "amount"
         # Fully literal order strings; nothing user-provided reaches Arel.sql

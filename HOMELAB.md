@@ -12,7 +12,7 @@ This is Raja’s fork of [we-promise/sure](https://github.com/we-promise/sure) (
 ## Shipped in this fork (in-repo, no host mounts required)
 
 ### Assistant / Ollama
-- `get_transactions` accepts `month` (`YYYY-MM` or `MMM-YYYY`) and maps it to start/end dates (honors a custom family month-start day).
+- `get_transactions` and `get_income_statement` accept `month` (`YYYY-MM`, `MMM-YYYY`, `Month YYYY` such as `August 2026`, or `YYYY/MM`) and map it to start/end dates (honors a custom family month-start day). `get_income_statement` returns `missing_period` if neither month nor dates are given.
 - System prompt + session reminder: biggest / largest / top / max / smallest / min questions **must** call `get_transactions` with `sort_by: amount`, `order` desc|asc, `page_size` 5, `month` or dates, and `types` expense|income. Answer **#1 only** (merchant, amount, date, account). Never narrate an unsorted page row. Keep answers short with real dollar figures.
 - OpenAI-compatible Ollama hosts (`:11434` or hostname containing `ollama`): `tool_choice: required` when tools are present (still `none` on the final responder round). Qwen models also send `think: false`.
 
