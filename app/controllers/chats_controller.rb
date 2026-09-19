@@ -4,6 +4,12 @@ class ChatsController < ApplicationController
   before_action :set_chat, only: [ :show, :edit, :update, :destroy ]
 
   def index
+    if turbo_frame_request?
+      @chat = nil
+      @chats = Current.user.chats.order(created_at: :desc)
+      return
+    end
+
     recent = Current.user.last_viewed_chat || Current.user.chats.order(updated_at: :desc).first
     if recent
       redirect_to chat_path(recent)

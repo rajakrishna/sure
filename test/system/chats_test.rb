@@ -16,7 +16,7 @@ class ChatsTest < ApplicationSystemTestCase
     end
   end
 
-  test "sidebar shows index when enabled and chats are empty" do
+  test "sidebar shows a ready composer when enabled and chats are empty" do
     with_env_overrides OPENAI_ACCESS_TOKEN: "test-token" do
       @user.update!(ai_enabled: true)
       @user.chats.destroy_all
@@ -24,7 +24,8 @@ class ChatsTest < ApplicationSystemTestCase
       visit root_url
 
       within "#chat-container" do
-        assert_selector "h1", text: "Chats"
+        assert_selector "#chat-form"
+        assert_field "chat[content]"
       end
     end
   end

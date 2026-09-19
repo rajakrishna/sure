@@ -25,6 +25,16 @@ class ChatsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_chat_path
   end
 
+  test "index lists chats inside the sidebar frame" do
+    chat = chats(:one)
+
+    get chats_url, headers: { "Turbo-Frame" => "sidebar_chat" }
+
+    assert_response :success
+    assert_select "h1", text: I18n.t("chats.index.chats")
+    assert_select "a[href=?]", chat_path(chat)
+  end
+
   test "gets new chat with a localized German default title" do
     @user.update!(locale: "de")
 

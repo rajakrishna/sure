@@ -104,13 +104,18 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     # with viewport and font metrics (they differ between local and CI headless
     # Chrome), and a start point outside the element never begins the gesture.
     def drag_across(element)
+      page.scroll_to(element, align: :center)
       inset = 20
       width = element.native.rect.width
+      travel = (width - (2 * inset)).round
 
+      # move_to(element) lands on the center in both Selenium origin models.
+      # Offsets on move_to do not — W3C is top-left, older drivers are center.
       page.driver.browser.action
-        .move_to(element.native, -(width / 2 - inset).round, 0)
+        .move_to(element.native)
+        .move_by(-(travel / 2.0).round, 0)
         .click_and_hold
-        .move_by((width - (2 * inset)).round, 0)
+        .move_by(travel, 0)
         .release
         .perform
     end
