@@ -58,6 +58,8 @@ class AiProposalsControllerTest < ActionDispatch::IntegrationTest
     get ai_proposals_url
     assert_response :success
     assert_match @proposal.summary, response.body
+    assert_select "[data-testid=proposal-quality]"
+    assert_match I18n.t("ai_proposals.quality.empty"), response.body
   end
 
   test "bulk approve writes selected proposals" do

@@ -1,0 +1,15 @@
+<%# locals: (compact: false) %>
+<button type="button"
+        class="<%= class_names(
+          "items-center rounded-lg text-secondary hover:text-primary hover:bg-container-inset-hover transition-colors focus-ring",
+          compact ? "inline-flex justify-center w-9 h-9 pointer-coarse:w-11 pointer-coarse:h-11 lg:hidden" : "hidden lg:inline-flex gap-2 h-9 px-3 text-sm"
+        ) %>"
+        data-action="command-palette#open"
+        data-testid="<%= compact ? "command-palette-trigger-mobile" : "command-palette-trigger" %>"
+        aria-label="<%= t("command_palette.open") %>">
+  <%= icon("search", size: "sm") %>
+  <% unless compact %>
+    <span><%= t("command_palette.open") %></span>
+    <kbd class="text-xs text-subdued">⌘K</kbd>
+  <% end %>
+</button>

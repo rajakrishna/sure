@@ -1,5 +1,6 @@
 <%= render "layouts/shared/htmldoc", sidebar_aware: true do %>
-  <div class="flex flex-col md:flex-row h-full bg-surface pt-[env(safe-area-inset-top)]">
+  <div class="flex flex-col md:flex-row h-full bg-surface pt-[env(safe-area-inset-top)]"
+       data-controller="command-palette">
     <%= link_to t("layouts.application.skip_to_main"), "#main",
         class: "sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-2 focus:rounded-lg focus:bg-container focus:text-primary focus:shadow-border-xs" %>
 
@@ -27,11 +28,13 @@
               <% else %>
                 <div></div>
               <% end %>
-              <% if content_for?(:page_actions) %>
-                <div class="flex items-center gap-2 shrink-0">
+              <div class="flex items-center gap-2 shrink-0">
+                <%= render "layouts/shared/command_palette_trigger", compact: true %>
+                <%= render "layouts/shared/command_palette_trigger" %>
+                <% if content_for?(:page_actions) %>
                   <%= yield :page_actions %>
-                </div>
-              <% end %>
+                <% end %>
+              </div>
             </div>
           </div>
 
@@ -46,5 +49,6 @@
         </div>
       </div>
     </main>
+    <%= render "layouts/shared/command_palette_dialog" %>
   </div>
 <% end %>

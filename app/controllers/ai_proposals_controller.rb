@@ -9,6 +9,7 @@ class AiProposalsController < ApplicationController
     scope = scope.where(source: @source) if @source.present?
     @ai_proposals = scope.limit(100)
     @kinds = Current.family.ai_proposals.pending.distinct.pluck(:kind)
+    @quality_stats = AiProposal.quality_stats(Current.family)
     @breadcrumbs = [
       [ t("breadcrumbs.home"), root_path ],
       [ t("breadcrumbs.transactions"), transactions_path ],

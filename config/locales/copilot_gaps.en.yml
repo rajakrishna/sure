@@ -29,6 +29,14 @@ en:
       bulk_approve: Accept selected
       bulk_dismiss: Dismiss selected
       select: Select
+    quality:
+      title: Suggestion quality
+      counts: "%{accepted} accepted · %{dismissed} dismissed"
+      accept_rate: "%{percent}% accepted"
+      pending:
+        one: "%{count} waiting"
+        other: "%{count} waiting"
+      empty: No reviewed suggestions yet
     reasons:
       bayes: Learned from your past categories for similar payees
       llm: Suggested from the transaction description

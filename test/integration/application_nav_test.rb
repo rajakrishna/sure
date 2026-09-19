@@ -13,11 +13,25 @@ class ApplicationNavTest < ActionDispatch::IntegrationTest
 
     assert_select "nav[aria-label=?] a[href=?]", I18n.t("layouts.application.sidebar_aria"), chats_path, count: 0
     assert_select "#chat-container turbo-frame#sidebar_chat"
+    assert_select "#chat-container [data-testid=ds-skeleton]"
 
     assert_select "nav.fixed.bottom-0 a[href=?]", chats_path do |links|
       assert links.any? { |link| link.text.include?(label) },
         "expected mobile bottom nav to include #{label}"
     end
+  end
+
+  test "mobile bottom nav includes wealth and a command palette trigger" do
+    get root_path
+    assert_response :ok
+
+    wealth_label = I18n.t("layouts.application.nav.wealth")
+    assert_select "nav.fixed.bottom-0 a[href=?]", wealth_path do |links|
+      assert links.any? { |link| link.text.include?(wealth_label) },
+        "expected mobile bottom nav to include #{wealth_label}"
+    end
+    assert_select "[data-testid=command-palette-trigger-mobile]"
+    assert_select "[data-testid=command-palette]"
   end
 
   test "combined left rail lists workspace destinations with nested plan children" do

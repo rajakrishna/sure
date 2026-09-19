@@ -119,6 +119,9 @@
         </div>
       <% end %>
     <% end %>
+    <div class="mt-4">
+      <%= render "ai_proposals/quality", stats: @proposal_quality %>
+    </div>
   </div>
 <% end %>
 <% if Current.user.admin? %>

@@ -7,6 +7,8 @@
     <%= ask_chip t("pages.dashboard.home.ask_review"), hint: t("pages.dashboard.home.ask_review_hint") %>
   </header>
 
+  <%= render "ai_proposals/quality", stats: @quality_stats %>
+
   <%= form_with url: ai_proposals_path, method: :get, class: "flex flex-wrap items-end gap-3" do %>
     <div>
       <label class="text-sm text-secondary" for="kind"><%= t(".filter_kind") %></label>

@@ -5,6 +5,7 @@ class Settings::PreferencesController < ApplicationController
     @user = Current.user
     @family_members = Current.family.users.where.not(id: @user.id).where(active: true)
     @budget_shares = @user.budget_shares_given.index_by(&:viewer_id)
+    @proposal_quality = AiProposal.quality_stats(Current.family)
   end
 
   # Writes per-user boolean preferences stored in the JSONB `users.preferences`

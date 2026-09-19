@@ -184,6 +184,21 @@ class AiProposal < ApplicationRecord
     update!(status: "dismissed", reviewed_at: Time.current, reviewed_by: actor)
   end
 
+  def self.quality_stats(family)
+    approved = family.ai_proposals.where(status: "approved").count
+    dismissed = family.ai_proposals.where(status: "dismissed").count
+    pending = family.ai_proposals.pending.count
+    reviewed = approved + dismissed
+
+    {
+      pending: pending,
+      approved: approved,
+      dismissed: dismissed,
+      reviewed: reviewed,
+      accept_rate: reviewed.zero? ? 0.0 : (approved.to_f / reviewed)
+    }
+  end
+
   def update_payload!(attributes)
     raise ArgumentError, "Proposal is not pending" unless pending?
 

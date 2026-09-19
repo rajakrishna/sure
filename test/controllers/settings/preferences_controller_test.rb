@@ -60,6 +60,8 @@ class Settings::PreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, I18n.t("settings.preferences.show.intelligence_title")
     assert_includes response.body, I18n.t("settings.preferences.show.high_confidence_auto_apply")
+    assert_select "[data-testid=proposal-quality]"
+    assert_select "[data-testid=command-palette-trigger]"
     assert_not users(:family_admin).family.high_confidence_auto_apply?
   end
 
