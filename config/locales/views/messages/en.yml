@@ -6,7 +6,6 @@ en:
     chat_form:
       placeholder: "Ask anything ..."
       disclaimer: "AI responses are informational only. Not financial advice!"
-      coming_soon: Coming soon
       add_context: Add context
       attach_file: Attach file
       mention: Mention an account or transaction
