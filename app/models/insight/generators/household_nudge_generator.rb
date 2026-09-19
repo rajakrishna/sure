@@ -26,9 +26,6 @@ class Insight::Generators::HouseholdNudgeGenerator < Insight::Generator
 
   private
     def assigned_count(member)
-      family.transactions
-        .where(assignee_id: member.id)
-        .merge(Entry.uncategorized_transactions)
-        .count
+      Transaction::Inbox.uncategorized_for(family).where(assignee_id: member.id).count
     end
 end

@@ -7,22 +7,36 @@ class Transaction::Inbox
   end
 
   def transactions
-    scope = family.transactions.merge(Entry.uncategorized_transactions)
-    scope = scope.where(entries: { account_id: account_ids }) if account_ids
-    accessible = user.accessible_accounts.select(:id)
-    scope = scope.where(entries: { account_id: accessible })
+    scope = uncategorized
     scope = scope.where(assignee_id: assignee_id) if assignee_id.present?
     scope.reverse_chronological.includes({ entry: :account }, :category, :merchant, :assignee)
   end
 
   def assigned_to_user_count
-    family.transactions
-      .where(assignee_id: user.id)
-      .merge(Entry.uncategorized_transactions)
-      .where(entries: { account_id: user.accessible_accounts.select(:id) })
-      .count
+    uncategorized.where(assignee_id: user.id).count
+  end
+
+  def self.uncategorized_for(family, account_ids: nil)
+    scope = family.transactions
+      .where(category_id: nil)
+      .where.not(kind: Transaction::UNCATEGORIZED_EXCLUDED_KINDS)
+      .where(entries: { excluded: false })
+      .where(accounts: { status: %w[draft active] })
+    scope = scope.where(entries: { account_id: account_ids }) if account_ids.present?
+    scope
   end
 
   private
     attr_reader :family, :user, :assignee_id, :account_ids
+
+    def uncategorized
+      self.class.uncategorized_for(family, account_ids: filtered_account_ids)
+    end
+
+    def filtered_account_ids
+      accessible = user.accessible_accounts.select(:id)
+      return accessible if account_ids.blank?
+
+      user.accessible_accounts.where(id: account_ids).select(:id)
+    end
 end
