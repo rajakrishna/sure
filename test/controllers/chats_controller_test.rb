@@ -99,6 +99,10 @@ class ChatsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "/categorize", response.body
     assert_match "/recurring", response.body
+    assert_match "/rule", response.body
+    assert_match "/split", response.body
+    assert_match "/report", response.body
+    assert_match "/debt", response.body
   end
 
   test "destroys chat" do

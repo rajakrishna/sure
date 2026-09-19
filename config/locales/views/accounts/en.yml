@@ -38,6 +38,8 @@ en:
       empty_message: Add an account either via connection, importing or entering manually.
       new_account: New account
       no_accounts: No accounts yet
+      ask_start: What should I add first?
+      ask_start_hint: I have no accounts yet. What should I add first so home, plan, and reports are useful?
     form:
       balance: "Balance on date:"
       opening_balance_date_label: Opening balance date

@@ -7,7 +7,10 @@
       <p class="text-sm text-secondary mt-1"><%= t(".subtitle") %></p>
     </div>
 
-    <%= render "insights/refresh_button", pending: false %>
+    <div class="flex flex-wrap items-center gap-2">
+      <%= ask_chip t(".ask"), hint: t(".ask_hint") %>
+      <%= render "insights/refresh_button", pending: false %>
+    </div>
   </header>
 
   <%= render "insights/list", insights: @insights, unread_ids: @unread_ids %>

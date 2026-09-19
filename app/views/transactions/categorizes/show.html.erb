@@ -12,11 +12,14 @@
         <%= t(".remaining", count: @total_uncategorized) %>
       </span>
     <% end %>
-    <%= link_to transactions_categorize_path(position: @position + 1),
-          class: "flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-primary" do %>
-      <%= t(".skip") %>
-      <%= icon("arrow-right", size: "sm") %>
-    <% end %>
+    <div class="flex items-center gap-3">
+      <%= ask_chip t(".ask_suggest"), hint: t(".ask_suggest_hint") %>
+      <%= link_to transactions_categorize_path(position: @position + 1),
+            class: "flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-primary" do %>
+        <%= t(".skip") %>
+        <%= icon("arrow-right", size: "sm") %>
+      <% end %>
+    </div>
   </div>
 
   <%# Group identity — above columns %>

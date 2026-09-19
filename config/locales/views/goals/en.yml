@@ -10,6 +10,8 @@ en:
     index:
       title: Goals
       subtitle: Save toward what matters.
+      ask: How are my goals tracking?
+      ask_hint: How are my goals tracking, and should I adjust any monthly pledge? Leave changes as proposals.
       new_goal: New goal
       empty_filtered: No goals match.
       pending_pledges_callout: You have pending pledges. Sure will confirm them on the next sync.

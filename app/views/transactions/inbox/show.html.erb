@@ -7,6 +7,7 @@
     <div class="flex flex-wrap items-center gap-3">
       <%= render "shared/shared_view_switcher", path: transactions_inbox_path %>
       <%= ask_chip t(".ask_bulk"), hint: t(".ask_bulk_hint") %>
+      <%= ask_chip t(".ask_rules"), hint: t(".ask_rules_hint") %>
       <%= render DS::Link.new(text: t(".all_transactions"), href: transactions_path, variant: "outline") %>
     </div>
   </header>

@@ -71,13 +71,18 @@
     <div class="space-y-2">
       <h4 class="text-sm font-medium text-primary"><%= t(".files", count: transaction.attachments.count) %></h4>
       <% if transaction.splittable? && transaction.attachments.any? { |attachment| attachment.image? } %>
-        <%= render DS::Button.new(
-          text: t(".parse_receipt"),
-          href: parse_receipt_transaction_path(transaction),
-          method: :post,
-          variant: "secondary",
-          icon: "scan-line"
-        ) %>
+        <div class="flex flex-wrap items-center gap-2">
+          <%= render DS::Button.new(
+            text: t(".parse_receipt"),
+            href: parse_receipt_transaction_path(transaction),
+            method: :post,
+            variant: "secondary",
+            icon: "scan-line"
+          ) %>
+          <%= ask_chip t(".ask_receipt"),
+                hint: t(".ask_receipt_hint"),
+                context: [ { type: "transaction", id: transaction.id } ] %>
+        </div>
       <% end %>
       <div class="space-y-2">
         <% transaction.attachments.each do |attachment| %>

@@ -1,9 +1,6 @@
 class PlansController < ApplicationController
   include BudgetOwnership
 
-  # Plan is the GA planning spine (Budget tab). Goals, Bills, Debt and
-  # Forecast stay behind the per-user preview toggle — see PlanHub::PREVIEW_TABS.
-  # Spending plan, flex, cash-flow calendar, and debt payoff are preview too.
   def show
     @active_tab = PlanHub.tab_for(params[:tab], preview: preview_features_enabled?)
     @budget_mode = PlanHub.budget_mode_for(params[:budget_mode])

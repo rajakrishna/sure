@@ -61,6 +61,9 @@ en:
     show:
       ask_in_chat: Ask in chat
       ask_hint: What can you tell me about this transaction?
+      ask_merchant_hint: What do you know about this merchant, and does the charge look like a subscription or a spike? Propose a rule only if it repeats.
+      ask_split_hint: Draft a split for this transaction if it looks mixed. Do not write it — leave it as a proposal I can approve, edit, or dismiss.
+      ask_rule_hint: Draft a rule from this merchant or name. Do not apply it — leave it as a proposal I can approve, edit, or dismiss.
       keep_both: No, keep both
       loan_payment: Loan Payment
       mark_recurring: Mark as Recurring
@@ -210,6 +213,8 @@ en:
       show:
         exit: "Exit"
         skip: "Skip"
+        ask_suggest: Suggest a category
+        ask_suggest_hint: Suggest a category for this group. Leave it as a proposal I can approve, edit, or dismiss.
         remaining:
           one: "1 uncategorized transaction remaining"
           other: "%{count} uncategorized transactions remaining"
@@ -367,4 +372,6 @@ en:
         one: "File (1)"
         other: "Files (%{count})"
       browse_to_add: "Browse to add files"
+      ask_receipt: Explain this receipt
+      ask_receipt_hint: Read this receipt and draft a split if it has mixed lines. Do not write it — leave it as a proposal I can approve, edit, or dismiss.
       max_reached: "Maximum file limit reached (%{count}/%{max}). Delete an existing file to upload another."

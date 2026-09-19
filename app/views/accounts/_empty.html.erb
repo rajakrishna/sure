@@ -3,10 +3,13 @@
     <%= tag.p t(".no_accounts"), class: "text-primary mb-1 font-medium" %>
     <%= tag.p t(".empty_message"), class: "text-secondary mb-4" %>
 
-    <%= render DS::Link.new(
-      text: t(".new_account"),
-      href: new_account_path,
-      frame: :modal
-    ) %>
+    <div class="flex flex-col items-center gap-2">
+      <%= render DS::Link.new(
+        text: t(".new_account"),
+        href: new_account_path,
+        frame: :modal
+      ) %>
+      <%= ask_chip t(".ask_start"), hint: t(".ask_start_hint") %>
+    </div>
   </div>
 </div>
