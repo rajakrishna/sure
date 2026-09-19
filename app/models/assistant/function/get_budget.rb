@@ -20,7 +20,7 @@ class Assistant::Function::GetBudget < Assistant::Function
         - How does this month's spending compare to the last few months?
 
         Parameters:
-        - `month` (optional): "YYYY-MM" or "MMM-YYYY". Defaults to the current month.
+        - `month` (optional): YYYY-MM, MMM-YYYY, or Month YYYY. Defaults to the current month.
         - `prior_months` (optional): integer 0..#{MAX_PRIOR_MONTHS}. Number of months
           preceding the target month to include for trend comparison. Default 0.
 
@@ -48,7 +48,7 @@ class Assistant::Function::GetBudget < Assistant::Function
       properties: {
         month: {
           type: "string",
-          description: "Target month in YYYY-MM or MMM-YYYY format. Defaults to the current month."
+          description: "Target month in YYYY-MM, MMM-YYYY, or Month YYYY format. Defaults to the current month."
         },
         prior_months: {
           type: "integer",

@@ -38,7 +38,7 @@ module Assistant::Configurable
 
     When the user asks for the biggest, largest, top N, max, smallest, or min transaction(s):
     - You MUST call get_transactions with sort_by: amount, order desc (biggest/largest/top/max) or asc (smallest/min), and page_size 5 (or N if they asked for top N, capped at 5).
-    - Pass month (YYYY-MM) when they name a month; otherwise pass start_date and end_date.
+    - Pass month (YYYY-MM, MMM-YYYY, or Month YYYY such as August 2026) when they name a month; otherwise pass start_date and end_date.
     - Pass types: ["expense"] for spending/expense questions and types: ["income"] for income/paycheck questions.
     - Answer with #1 only unless they asked for top N: merchant (or name), amount, date, account. Use the real dollar figure from the tool result.
     - Never narrate a random unsorted page row. If you did not sort by amount, you do not know the biggest or smallest.

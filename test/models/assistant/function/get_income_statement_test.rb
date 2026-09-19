@@ -118,6 +118,74 @@ class Assistant::Function::GetIncomeStatementTest < ActiveSupport::TestCase
     assert_equal "invalid_date", result[:error]
   end
 
+  test "params_schema includes optional month and does not require dates" do
+    schema = @fn.params_schema
+
+    assert schema[:properties].key?(:month)
+    assert_match(/Month YYYY/, schema[:properties][:month][:description])
+    refute_includes Array(schema[:required]).map(&:to_s), "start_date"
+    refute_includes Array(schema[:required]).map(&:to_s), "end_date"
+  end
+
+  test "month fills start and end dates when omitted" do
+    result = @fn.call("month" => "August 2026")
+
+    assert_equal Date.new(2026, 8, 1), result[:period][:start_date]
+    assert_equal Date.new(2026, 8, 31), result[:period][:end_date]
+    assert result[:income][:total].present?
+    assert result[:expense][:total].present?
+  end
+
+  test "month YYYY-MM fills the period" do
+    result = @fn.call("month" => "2026-08")
+
+    assert_equal Date.new(2026, 8, 1), result[:period][:start_date]
+    assert_equal Date.new(2026, 8, 31), result[:period][:end_date]
+  end
+
+  test "month honors custom month_start_day" do
+    @family.update!(month_start_day: 15)
+
+    result = @fn.call("month" => "2026-08")
+
+    assert_equal Date.new(2026, 8, 15), result[:period][:start_date]
+    assert_equal Date.new(2026, 9, 14), result[:period][:end_date]
+  end
+
+  test "explicit start and end dates win over month" do
+    result = @fn.call(
+      "month" => "2026-08",
+      "start_date" => "2025-01-01",
+      "end_date" => "2025-01-31"
+    )
+
+    assert_equal Date.new(2025, 1, 1), result[:period][:start_date]
+    assert_equal Date.new(2025, 1, 31), result[:period][:end_date]
+  end
+
+  test "month fills only the missing bound when one date is given" do
+    result = @fn.call("month" => "2026-08", "start_date" => "2026-08-10")
+
+    assert_equal Date.parse("2026-08-10"), result[:period][:start_date]
+    assert_equal Date.new(2026, 8, 31), result[:period][:end_date]
+  end
+
+  test "missing start and end without month returns missing_period" do
+    result = @fn.call({})
+
+    assert_equal "missing_period", result[:error]
+    assert_match(/month/i, result[:message])
+    assert_match(/start_date/, result[:message])
+    assert_equal result[:message], result[:hint]
+  end
+
+  test "invalid month returns an invalid_month error" do
+    result = @fn.call("month" => "not-a-month")
+
+    assert_equal "invalid_month", result[:error]
+    assert_match(/Month YYYY/, result[:hint])
+  end
+
   # The assistant and MCP paths run without a session, so Current.user is nil
   # and an unscoped IncomeStatement reports family-wide totals. Every read in
   # this tool must resolve through the user-scoped statement, or the numbers it
