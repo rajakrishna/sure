@@ -1,6 +1,12 @@
 module Assistant::Function::Presentable
   include Rails.application.routes.url_helpers
 
+  def default_url_options
+    Rails.application.config.action_controller.default_url_options.presence ||
+      Rails.application.config.action_mailer.default_url_options ||
+      { only_path: true }
+  end
+
   def with_presentation(result, chart: nil, deep_links: [])
     return result unless result.is_a?(Hash)
     return result if result[:error] || result["error"]

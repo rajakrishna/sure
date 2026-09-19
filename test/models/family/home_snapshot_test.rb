@@ -8,7 +8,8 @@ class Family::HomeSnapshotTest < ActiveSupport::TestCase
   end
 
   test "counts uncategorized transactions as needs review" do
-    assert_equal @user.accessible_entries.uncategorized_transactions.count, @snapshot.needs_review_count
+    expected = @family.entries.joins(:account).merge(Account.accessible_by(@user)).uncategorized_transactions.count
+    assert_equal expected, @snapshot.needs_review_count
   end
 
   test "hides bills and briefing without preview" do

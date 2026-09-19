@@ -35,7 +35,7 @@ class Family::RuleSuggestFromCorrection
     attr_reader :family
 
     def payee_for(transaction)
-      transaction.merchant_id.presence || transaction.entry&.name.to_s.strip.downcase
+      transaction.merchant_id.presence || transaction.entry&.name.to_s.strip
     end
 
     def propose_for(payee, category)
@@ -67,7 +67,10 @@ class Family::RuleSuggestFromCorrection
         family.merchants.find_by(id: payee)&.name.presence ||
           Merchant.find_by(id: payee)&.name
       else
-        payee.to_s.strip
+        name = payee.to_s.strip
+        return name if name != name.downcase
+
+        family.entries.where("LOWER(entries.name) = ?", name).order(date: :desc).limit(1).pick(:name).presence || name
       end
     end
 

@@ -79,14 +79,17 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
       category_totals: []
     )
 
+    # Dashboard widgets share one IncomeStatement per request. Home leftover
+    # may add a second call for the current budget month when that period
+    # differs from the dashboard chart period.
     income_statement.expects(:build_period_total)
       .with(classification: "expense", period: kind_of(Period))
-      .once
+      .at_most(2)
       .returns(fake_expense_period_total)
 
     income_statement.expects(:build_period_total)
       .with(classification: "income", period: kind_of(Period))
-      .once
+      .at_most(2)
       .returns(fake_income_period_total)
 
     get root_path
