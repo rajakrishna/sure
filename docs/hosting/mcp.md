@@ -148,6 +148,11 @@ At the time of writing, `tools/list` includes:
 | `create_goal` | Create a savings goal linked to depository accounts |
 | `create_tag` / `update_tag` | Manage tags |
 | `create_category` / `update_category` | Manage categories |
+| `get_categorization_status` | Categorized vs uncategorized counts and top category totals |
+| `bootstrap_categories` | Create Sure's default categories if they are missing (idempotent) |
+| `list_uncategorized_transactions` | Paginated uncategorized transactions for classification |
+| `apply_category_updates` | Batch-assign categories by id or name (max 100 per call) |
+| `enqueue_auto_categorize` | Queue built-in auto-categorize jobs for uncategorized transactions |
 | `update_transaction` | Edit a transaction's metadata (name, notes, category, merchant, tags) |
 | `update_budget` | Update budget allocations for a month |
 | `import_bank_statement` | Import bank statement data |

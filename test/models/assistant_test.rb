@@ -8,6 +8,11 @@ class AssistantTest < ActiveSupport::TestCase
 
     assert_includes default_classes, Assistant::Function::GetMerchants
     assert_includes default_classes, Assistant::Function::GetRecurringTransactions
+    assert_includes default_classes, Assistant::Function::GetCategorizationStatus
+    assert_includes default_classes, Assistant::Function::BootstrapCategories
+    assert_includes default_classes, Assistant::Function::ListUncategorizedTransactions
+    assert_includes default_classes, Assistant::Function::ApplyCategoryUpdates
+    assert_includes default_classes, Assistant::Function::EnqueueAutoCategorize
     assert_not_includes default_classes, Assistant::Function::GetInsights
     assert_not_includes default_classes, Assistant::Function::GetValuations
 
