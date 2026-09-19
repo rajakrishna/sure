@@ -1124,6 +1124,6 @@ class GoalsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match I18n.t("goals.show.budget_funding.heading"), response.body
-    assert_match categories(:food_and_drink).name, response.body
+    assert_match ERB::Util.html_escape(categories(:food_and_drink).name), response.body
   end
 end

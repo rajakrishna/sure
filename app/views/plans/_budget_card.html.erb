@@ -130,7 +130,7 @@
   <%= render DS::Link.new(
     text: t(".view_budget"),
     variant: "secondary",
-    href: budget_path(budget, **budget_owner_query.merge(budget_mode: budget_mode)),
+    href: budget_path(budget, **budget_owner_query.merge(budget_mode == "spending_plan" ? { budget_mode: budget_mode } : {})),
     icon: "chevron-right",
     icon_position: :right,
     full_width: true,

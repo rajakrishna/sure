@@ -194,7 +194,7 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
     get plan_url(tab: "goals")
 
     assert_response :success
-    assert_match I18n.t("plans.goals_card.funded_from", category: categories(:food_and_drink).name), response.body
+    assert_match ERB::Util.html_escape(I18n.t("plans.goals_card.funded_from", category: categories(:food_and_drink).name)), response.body
   end
 end
 

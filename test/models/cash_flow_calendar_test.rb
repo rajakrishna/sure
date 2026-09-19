@@ -31,6 +31,7 @@ class CashFlowCalendarTest < ActiveSupport::TestCase
     @family.recurring_transactions.create!(
       name: "To savings",
       account: @account,
+      destination_account: accounts(:connected),
       amount: 100,
       currency: "USD",
       bill_type: "transfer",
