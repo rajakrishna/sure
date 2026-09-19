@@ -344,6 +344,129 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/Insight"
+    WealthSnapshot:
+      type: object
+      required:
+      - net_worth
+      - assets
+      - liabilities
+      - allocation
+      properties:
+        net_worth:
+          "$ref": "#/components/schemas/Money"
+        assets:
+          "$ref": "#/components/schemas/Money"
+        liabilities:
+          "$ref": "#/components/schemas/Money"
+        allocation:
+          type: array
+          items:
+            type: object
+    FinancialHealth:
+      type: object
+      required:
+      - score
+      - components
+      - actions
+      properties:
+        score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        components:
+          type: array
+          items:
+            type: object
+        actions:
+          type: array
+          items:
+            type: object
+    InboxCollection:
+      type: object
+      required:
+      - assigned_to_me
+      - transactions
+      properties:
+        assigned_to_me:
+          type: integer
+        transactions:
+          type: array
+          items:
+            type: object
+    SavedReport:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        period_type:
+          type: string
+        sections:
+          type: array
+          items:
+            type: string
+        grouping:
+          type: string
+        shared_view:
+          type: string
+    SavedReportCollection:
+      type: object
+      required:
+      - saved_reports
+      properties:
+        saved_reports:
+          type: array
+          items:
+            "$ref": "#/components/schemas/SavedReport"
+    SavedReportResponse:
+      type: object
+      required:
+      - saved_report
+      properties:
+        saved_report:
+          "$ref": "#/components/schemas/SavedReport"
+    AiProposal:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+        source:
+          type: string
+        status:
+          type: string
+        summary:
+          type: string
+        payload:
+          type: object
+    AiProposalCollection:
+      type: object
+      required:
+      - ai_proposals
+      properties:
+        ai_proposals:
+          type: array
+          items:
+            "$ref": "#/components/schemas/AiProposal"
+    AiProposalDraft:
+      type: object
+      properties:
+        pending_approval:
+          type: boolean
+        proposal_id:
+          type: string
+          format: uuid
+        summary:
+          type: string
+        message:
+          type: string
     PushSubscriptionRegistration:
       type: object
       required:
@@ -3706,6 +3829,20 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorResponse"
+  "/api/v1/ai_proposals":
+    get:
+      summary: List pending AI proposals
+      tags:
+      - AI Proposals
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: proposals listed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AiProposalCollection"
   "/api/v1/auth/signup":
     post:
       summary: Sign up a new user
@@ -5188,6 +5325,20 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorResponse"
+  "/api/v1/financial_health":
+    get:
+      summary: Show financial health score
+      tags:
+      - Financial Health
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: health score
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/FinancialHealth"
   "/api/v1/holdings":
     get:
       summary: List holdings
@@ -6232,6 +6383,20 @@ paths:
                   type: string
                   description: CSV imports only. Column value that marks an amount
                     as an inflow when using custom_column strategy
+  "/api/v1/inbox":
+    get:
+      summary: Show transaction inbox
+      tags:
+      - Inbox
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: inbox listed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/InboxCollection"
   "/api/v1/insights":
     get:
       summary: List proactive insights
@@ -7061,6 +7226,47 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorResponse"
+  "/api/v1/saved_reports":
+    get:
+      summary: List saved reports
+      tags:
+      - Saved Reports
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: saved reports listed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SavedReportCollection"
+    post:
+      summary: Create a saved report
+      tags:
+      - Saved Reports
+      security:
+      - apiKeyAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: saved report created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/SavedReportResponse"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                saved_report:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    config:
+                      type: object
   "/api/v1/securities":
     get:
       summary: List securities referenced by family investment data
@@ -8595,3 +8801,23 @@ paths:
                       type: string
                       description: Additional notes
         required: true
+  "/api/v1/wealth":
+    get:
+      summary: Show wealth snapshot
+      tags:
+      - Wealth
+      security:
+      - apiKeyAuth: []
+      responses:
+        '200':
+          description: wealth snapshot
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WealthSnapshot"
+        '403':
+          description: preview features disabled
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"

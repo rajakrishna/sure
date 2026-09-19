@@ -14,6 +14,7 @@ class Transaction::Search
   attribute :categories, array: true
   attribute :merchants, array: true
   attribute :tags, array: true
+  attribute :assignee_id, :string
   attribute :active_accounts_only, :boolean, default: true
 
   attr_reader :family, :accessible_account_ids
@@ -40,6 +41,7 @@ class Transaction::Search
       query = apply_status_filter(query, status)
       query = apply_merchant_filter(query, merchants)
       query = apply_tag_filter(query, tags)
+      query = apply_assignee_filter(query, assignee_id)
       query = EntrySearch.apply_search_filter(query, search)
       query = EntrySearch.apply_date_filters(query, start_date, end_date)
       query = EntrySearch.apply_amount_filter(query, amount, amount_operator)
@@ -251,5 +253,11 @@ class Transaction::Search
       else
         query
       end
+    end
+
+    def apply_assignee_filter(query, assignee_id)
+      return query if assignee_id.blank?
+
+      query.where(assignee_id: assignee_id)
     end
 end

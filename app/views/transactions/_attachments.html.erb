@@ -70,6 +70,15 @@
   <% if transaction.attachments.any? %>
     <div class="space-y-2">
       <h4 class="text-sm font-medium text-primary"><%= t(".files", count: transaction.attachments.count) %></h4>
+      <% if preview_features_enabled? && transaction.splittable? && transaction.attachments.any? { |attachment| attachment.image? } %>
+        <%= render DS::Button.new(
+          text: t(".parse_receipt"),
+          href: parse_receipt_transaction_path(transaction),
+          method: :post,
+          variant: "secondary",
+          icon: "scan-line"
+        ) %>
+      <% end %>
       <div class="space-y-2">
         <% transaction.attachments.each do |attachment| %>
           <div class="flex items-center justify-between p-3 border border-primary rounded-lg bg-container">

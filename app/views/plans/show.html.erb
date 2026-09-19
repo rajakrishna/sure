@@ -17,6 +17,11 @@
       <% end %>
 
       <% tabs.with_panel(tab_id: "budget") do %>
+        <% if @budget_nudges.present? %>
+          <div class="mb-4">
+            <%= render "shared/budget_nudges", nudges: @budget_nudges %>
+          </div>
+        <% end %>
         <%= render "plans/budget_card", budget: @budget, top_budget_categories: @top_budget_categories, editable: @editable, switch_options: @switch_options, budget_mode: @budget_mode, spending_plan: @spending_plan %>
       <% end %>
 
@@ -33,7 +38,7 @@
       <% end %>
 
       <% tabs.with_panel(tab_id: "forecast") do %>
-        <%= render "plans/forecast_card", hub: @plan_hub, budget: @budget, calendar: @cash_flow_calendar %>
+        <%= render "plans/forecast_card", hub: @plan_hub, budget: @budget, calendar: @cash_flow_calendar, forecast_explain: @forecast_explain %>
       <% end %>
     <% end %>
   <% else %>

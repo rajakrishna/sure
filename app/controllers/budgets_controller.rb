@@ -21,6 +21,7 @@ class BudgetsController < ApplicationController
         user: Current.user,
         hub: hub
       )
+      @budget_nudges = Family::BudgetNudge.new(@budget).items
     end
     @breadcrumbs = plan_breadcrumb_prefix + [ [ t("breadcrumbs.budgets"), nil ] ]
   end

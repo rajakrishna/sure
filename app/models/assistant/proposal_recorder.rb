@@ -1,15 +1,18 @@
 class Assistant::ProposalRecorder
-  def initialize(chat)
+  def initialize(chat = nil, user: nil, source: "chat")
     @chat = chat
+    @user = user || chat&.user
+    @source = source
   end
 
   def record(function, arguments)
     proposal = AiProposal.record_from_tool!(
-      family: chat.user.family,
-      user: chat.user,
+      family: user.family,
+      user: user,
       chat: chat,
       function: function,
-      arguments: arguments
+      arguments: arguments,
+      source: source
     )
 
     {
@@ -22,5 +25,5 @@ class Assistant::ProposalRecorder
   end
 
   private
-    attr_reader :chat
+    attr_reader :chat, :user, :source
 end

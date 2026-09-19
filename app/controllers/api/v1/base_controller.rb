@@ -199,10 +199,12 @@ class Api::V1::BaseController < ApplicationController
 
       case required_scope.to_s
       when "read"
-        # Read access requires either "read" or "read_write" scope
-        has_access = scopes.include?("read") || scopes.include?("read_write")
+        # Read access requires read, draft_write, or read_write
+        has_access = scopes.include?("read") || scopes.include?("draft_write") || scopes.include?("read_write")
+      when "draft_write"
+        has_access = scopes.include?("draft_write") || scopes.include?("read_write")
       when "write"
-        # Write access requires "read_write" scope
+        # Live writes still require read_write
         has_access = scopes.include?("read_write")
       else
         # For any other scope, check exact match (backward compatibility)

@@ -12,20 +12,33 @@ class Insight::Generators::IdleCashGenerator < Insight::Generator
 
   def generate
     idle_accounts.first(MAX_INSIGHTS).map do |account|
+      goal = underfunded_goal
+      facts = {
+        account: account.name,
+        balance: format_money(account.balance),
+        idle_days: IDLE_DAYS
+      }
+      metadata = {
+        account_id: account.id,
+        balance: round(account.balance, 0)
+      }
+      template_key = "idle_cash"
+      if goal
+        suggested = [ account.balance.to_d, goal.remaining_amount.to_d ].min
+        facts[:goal] = goal.name
+        facts[:suggested_move] = format_money(suggested)
+        metadata[:goal_id] = goal.id
+        metadata[:suggested_move] = round(suggested, 0)
+        template_key = "idle_cash_goal"
+      end
+
       build_insight(
         insight_type: "idle_cash",
-        priority: "low",
+        priority: goal ? "medium" : "low",
         title: I18n.t("insights.titles.idle_cash", account: account.name),
-        template_key: "idle_cash",
-        facts: {
-          account: account.name,
-          balance: format_money(account.balance),
-          idle_days: IDLE_DAYS
-        },
-        metadata: {
-          account_id: account.id,
-          balance: round(account.balance, 0)
-        },
+        template_key: template_key,
+        facts: facts,
+        metadata: metadata,
         dedup_key: "idle_cash:#{account.id}:#{month_token}"
       )
     end
@@ -40,5 +53,9 @@ class Insight::Generators::IdleCashGenerator < Insight::Generator
         .where("balance >= ?", MIN_BALANCE)
         .where.not(id: Entry.where("date >= ?", IDLE_DAYS.days.ago.to_date).select(:account_id))
         .order(balance: :desc)
+    end
+
+    def underfunded_goal
+      family.goals.where(state: "active").order(:target_date, :created_at).find { |goal| goal.remaining_amount.to_d.positive? }
     end
 end

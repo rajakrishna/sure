@@ -11,6 +11,7 @@ class PlansController < ApplicationController
     @editable = @budget.editable_by?(Current.user)
     @switch_options = budget_switch_options(@budget)
     @top_budget_categories = @budget.initialized? ? @budget.top_spending_categories : []
+    @budget_nudges = Family::BudgetNudge.new(@budget).items if preview_features_enabled?
 
     if preview_features_enabled?
       load_preview_tabs
@@ -49,6 +50,7 @@ class PlansController < ApplicationController
         strategy: params[:strategy],
         extra_payment: params[:extra_payment]
       ).result
+      @forecast_explain = Current.family.forecast_explains.order(generated_at: :desc).first
     end
 
     def calendar_month

@@ -245,6 +245,86 @@ RSpec.configure do |config|
               insights: { type: :array, items: { '$ref' => '#/components/schemas/Insight' } }
             }
           },
+          WealthSnapshot: {
+            type: :object,
+            required: %w[net_worth assets liabilities allocation],
+            properties: {
+              net_worth: { '$ref' => '#/components/schemas/Money' },
+              assets: { '$ref' => '#/components/schemas/Money' },
+              liabilities: { '$ref' => '#/components/schemas/Money' },
+              allocation: { type: :array, items: { type: :object } }
+            }
+          },
+          FinancialHealth: {
+            type: :object,
+            required: %w[score components actions],
+            properties: {
+              score: { type: :integer, minimum: 0, maximum: 100 },
+              components: { type: :array, items: { type: :object } },
+              actions: { type: :array, items: { type: :object } }
+            }
+          },
+          InboxCollection: {
+            type: :object,
+            required: %w[assigned_to_me transactions],
+            properties: {
+              assigned_to_me: { type: :integer },
+              transactions: { type: :array, items: { type: :object } }
+            }
+          },
+          SavedReport: {
+            type: :object,
+            required: %w[id name],
+            properties: {
+              id: { type: :string, format: :uuid },
+              name: { type: :string },
+              period_type: { type: :string },
+              sections: { type: :array, items: { type: :string } },
+              grouping: { type: :string },
+              shared_view: { type: :string }
+            }
+          },
+          SavedReportCollection: {
+            type: :object,
+            required: %w[saved_reports],
+            properties: {
+              saved_reports: { type: :array, items: { '$ref' => '#/components/schemas/SavedReport' } }
+            }
+          },
+          SavedReportResponse: {
+            type: :object,
+            required: %w[saved_report],
+            properties: {
+              saved_report: { '$ref' => '#/components/schemas/SavedReport' }
+            }
+          },
+          AiProposal: {
+            type: :object,
+            properties: {
+              id: { type: :string, format: :uuid },
+              kind: { type: :string },
+              source: { type: :string },
+              status: { type: :string },
+              summary: { type: :string },
+              payload: { type: :object }
+            }
+          },
+          AiProposalCollection: {
+            type: :object,
+            required: %w[ai_proposals],
+            properties: {
+              ai_proposals: { type: :array, items: { '$ref' => '#/components/schemas/AiProposal' } }
+            }
+          },
+          AiProposalDraft: {
+            type: :object,
+            properties: {
+              pending_approval: { type: :boolean },
+              proposal_id: { type: :string, format: :uuid },
+              summary: { type: :string },
+              message: { type: :string }
+            }
+          },
           PushSubscriptionRegistration: {
             type: :object, required: %w[token environment platform],
             properties: {

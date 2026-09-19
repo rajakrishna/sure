@@ -99,7 +99,7 @@ class McpControllerTest < ActionDispatch::IntegrationTest
     assert_mcp_initialize_response(JSON.parse(response.body)["result"])
   end
 
-  test "rejects token with read-only scope" do
+  test "authenticates a read-only token" do
     app = Doorkeeper::Application.create!(
       name: "Test MCP Client #{SecureRandom.hex(4)}",
       redirect_uri: "https://claude.ai/callback",
@@ -115,7 +115,7 @@ class McpControllerTest < ActionDispatch::IntegrationTest
     post "/mcp", params: jsonrpc_request("initialize").to_json,
          headers: mcp_headers(token.token)
 
-    assert_response :unauthorized
+    assert_response :ok
   end
 
   test "rejects expired Doorkeeper token" do
@@ -634,6 +634,35 @@ class McpControllerTest < ActionDispatch::IntegrationTest
       body = JSON.parse(response.body)
       assert_equal "req-abc-123", body["id"]
     end
+  end
+
+  test "draft_write token drafts mutating tools instead of writing" do
+    app = Doorkeeper::Application.create!(
+      name: "Draft MCP #{SecureRandom.hex(4)}",
+      redirect_uri: "https://claude.ai/callback",
+      confidential: false
+    )
+    token = Doorkeeper::AccessToken.create!( # pipelock:ignore
+      application: app,
+      resource_owner_id: @user.id,
+      scopes: "draft_write",
+      expires_in: 1.year
+    )
+    transaction = transactions(:one)
+    original_category_id = transaction.category_id
+    category = categories(:subcategory)
+
+    assert_difference "AiProposal.count", 1 do
+      post "/mcp", params: jsonrpc_request("tools/call", {
+        name: "update_transaction",
+        arguments: { id: transaction.id, category_id: category.id }
+      }).to_json, headers: mcp_headers(token.token)
+    end
+
+    assert_response :ok
+    inner = JSON.parse(JSON.parse(response.body).dig("result", "content", 0, "text"))
+    assert inner["pending_approval"]
+    assert_equal original_category_id, transaction.reload.category_id
   end
 
   private

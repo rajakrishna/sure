@@ -47,6 +47,10 @@ class Family < ApplicationRecord
   has_many :transactions, through: :accounts
   has_many :rules, dependent: :destroy
   has_many :ai_proposals, dependent: :destroy
+  has_many :saved_reports, dependent: :destroy
+  has_many :advisor_invites, dependent: :destroy
+  has_many :financial_health_scores, dependent: :destroy
+  has_many :forecast_explains, dependent: :destroy
   has_many :trades, through: :accounts
   has_many :holdings, through: :accounts
 

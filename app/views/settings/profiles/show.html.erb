@@ -124,6 +124,34 @@
   <% end %>
 <% end %>
 
+<% if preview_features_enabled? && Current.user.admin? %>
+  <%= settings_section title: t(".advisor_title"), subtitle: t(".advisor_subtitle") do %>
+    <div class="space-y-4">
+      <%= render DS::Pill.new(label: t("shared.preview")) %>
+      <p class="text-sm text-secondary"><%= t(".advisor_help") %></p>
+      <%= form_with url: advisor_invites_path, class: "flex flex-wrap items-end gap-3" do %>
+        <%= text_field_tag "advisor_invite[name]", nil, placeholder: t(".advisor_name"), class: "rounded-lg border border-primary bg-container-inset text-primary text-sm px-3 py-2" %>
+        <%= email_field_tag "advisor_invite[email]", nil, placeholder: t(".advisor_email"), class: "rounded-lg border border-primary bg-container-inset text-primary text-sm px-3 py-2" %>
+        <%= render DS::Button.new(text: t(".advisor_create"), type: :submit, variant: "secondary") %>
+      <% end %>
+      <% Array(@advisor_invites).each do |invite| %>
+        <div class="flex items-center justify-between gap-3 bg-container p-4 shadow-border-xs rounded-lg">
+          <div>
+            <p class="text-sm text-primary"><%= invite.name.presence || invite.email.presence || t(".advisor_unnamed") %></p>
+            <p class="text-xs text-secondary"><%= t(".advisor_expires", date: l(invite.expires_at.to_date)) %></p>
+          </div>
+          <%= render DS::Button.new(
+            text: t(".advisor_revoke"),
+            href: advisor_invite_path(invite),
+            method: :delete,
+            variant: "ghost"
+          ) %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
 <%= settings_section title: t(".danger_zone_title") do %>
   <div class="space-y-4">
     <% if Current.user.admin? %>

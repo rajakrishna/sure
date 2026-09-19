@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_19_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_19_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -178,6 +178,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_150000) do
     t.string "region"
     t.datetime "updated_at", null: false
     t.index ["addressable_type", "addressable_id"], name: "index_addresses_on_addressable"
+  end
+
+  create_table "advisor_invites", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.uuid "created_by_id"
+    t.string "email"
+    t.datetime "expires_at", null: false
+    t.uuid "family_id", null: false
+    t.datetime "last_viewed_at"
+    t.string "name"
+    t.datetime "revoked_at"
+    t.datetime "updated_at", null: false
+    t.index ["family_id", "revoked_at"], name: "index_advisor_invites_on_family_id_and_revoked_at"
+    t.index ["family_id"], name: "index_advisor_invites_on_family_id"
+    t.index ["created_by_id"], name: "index_advisor_invites_on_created_by_id"
   end
 
   create_table "ai_proposals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -904,6 +919,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_150000) do
     t.index ["family_id", "merchant_id"], name: "idx_on_family_id_merchant_id_23e883e08f", unique: true
     t.index ["family_id"], name: "index_family_merchant_associations_on_family_id"
     t.index ["merchant_id"], name: "index_family_merchant_associations_on_merchant_id"
+  end
+
+  create_table "financial_health_scores", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.jsonb "actions", default: [], null: false
+    t.jsonb "components", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.uuid "family_id", null: false
+    t.datetime "generated_at", null: false
+    t.integer "score", null: false
+    t.datetime "updated_at", null: false
+    t.index ["family_id", "generated_at"], name: "index_financial_health_scores_on_family_id_and_generated_at"
+    t.index ["family_id"], name: "index_financial_health_scores_on_family_id"
+  end
+
+  create_table "forecast_explains", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.uuid "family_id", null: false
+    t.datetime "generated_at", null: false
+    t.integer "horizon_days", default: 30, null: false
+    t.text "narration"
+    t.jsonb "projection", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.index ["family_id", "generated_at"], name: "index_forecast_explains_on_family_id_and_generated_at"
+    t.index ["family_id"], name: "index_forecast_explains_on_family_id"
   end
 
   create_table "fio_accounts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2123,6 +2162,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_150000) do
     t.index ["family_id"], name: "index_rules_on_family_id"
   end
 
+  create_table "saved_reports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.jsonb "config", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.uuid "family_id", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
+    t.index ["family_id", "name"], name: "index_saved_reports_on_family_id_and_name"
+    t.index ["family_id"], name: "index_saved_reports_on_family_id"
+    t.index ["user_id"], name: "index_saved_reports_on_user_id"
+  end
+
   create_table "securities", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "country_code"
     t.datetime "created_at", null: false
@@ -2565,10 +2616,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_150000) do
     t.string "investment_activity_label"
     t.string "kind", default: "standard", null: false
     t.jsonb "locked_attributes", default: {}
+    t.uuid "assignee_id"
     t.uuid "merchant_id"
     t.uuid "transfer_id"
     t.datetime "updated_at", null: false
     t.index "(((extra -> 'goal'::text) ->> 'pledge_id'::text))", name: "ix_transactions_extra_goal_pledge_id", unique: true, where: "(((extra -> 'goal'::text) ->> 'pledge_id'::text) IS NOT NULL)"
+    t.index ["assignee_id"], name: "index_transactions_on_assignee_id"
     t.index ["category_id"], name: "index_transactions_on_category_id"
     t.index ["external_id"], name: "index_transactions_on_external_id"
     t.index ["extra"], name: "index_transactions_on_extra", using: :gin
@@ -2917,9 +2970,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_150000) do
   add_foreign_key "trades", "securities"
   add_foreign_key "trading212_accounts", "trading212_items"
   add_foreign_key "trading212_items", "families"
+  add_foreign_key "advisor_invites", "families", on_delete: :cascade
+  add_foreign_key "advisor_invites", "users", column: "created_by_id", on_delete: :nullify
+  add_foreign_key "financial_health_scores", "families", on_delete: :cascade
+  add_foreign_key "forecast_explains", "families", on_delete: :cascade
+  add_foreign_key "saved_reports", "families", on_delete: :cascade
+  add_foreign_key "saved_reports", "users", on_delete: :cascade
   add_foreign_key "transactions", "categories", on_delete: :nullify
   add_foreign_key "transactions", "merchants"
   add_foreign_key "transactions", "transfers"
+  add_foreign_key "transactions", "users", column: "assignee_id", on_delete: :nullify
   add_foreign_key "transfers", "transactions", column: "inflow_transaction_id", on_delete: :cascade
   add_foreign_key "transfers", "transactions", column: "outflow_transaction_id", on_delete: :cascade
   add_foreign_key "up_accounts", "up_items"

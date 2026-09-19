@@ -29,12 +29,27 @@ class Assistant::Function
     update_transaction
   ].freeze
 
+  DRAFT_NAMES = %w[
+    create_rule_draft
+    split_transaction_draft
+    propose_budget_adjust
+    parse_receipt_draft
+  ].freeze
+
   def self.mutating?
     MUTATING_NAMES.include?(name)
   end
 
+  def self.draft?
+    DRAFT_NAMES.include?(name)
+  end
+
   def mutating?
     self.class.mutating?
+  end
+
+  def draft?
+    self.class.draft?
   end
 
   def initialize(user)

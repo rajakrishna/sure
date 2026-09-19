@@ -85,6 +85,30 @@ weekly_briefing:
   queue: "scheduled"
   description: "Builds the weekly home briefing card for preview families"
 
+subscription_watch:
+  cron: "0 9 * * *" # daily at 9:00 AM UTC
+  class: "SubscriptionWatchJob"
+  queue: "scheduled"
+  description: "Alerts preview families about subscriptions due in the next N days"
+
+household_nudge:
+  cron: "30 9 * * *" # daily at 9:30 AM UTC
+  class: "HouseholdNudgeJob"
+  queue: "scheduled"
+  description: "Nudges household members about assigned inbox transactions"
+
+forecast_explain:
+  cron: "0 10 * * *" # daily at 10:00 AM UTC
+  class: "ForecastExplainJob"
+  queue: "scheduled"
+  description: "Stores a deterministic cash forecast plus optional LLM narration"
+
+idle_cash_insight:
+  cron: "30 10 * * *" # daily at 10:30 AM UTC
+  class: "IdleCashInsightJob"
+  queue: "scheduled"
+  description: "Surfaces idle cash versus underfunded goals for preview families"
+
 sweep_expired_goal_pledges:
   cron: "*/15 * * * *" # every 15 minutes
   class: "SweepExpiredGoalPledgesJob"

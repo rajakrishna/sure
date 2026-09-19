@@ -55,6 +55,14 @@ namespace :evals do
     puts "  By difficulty: #{stats[:by_difficulty].map { |k, v| "#{k}=#{v}" }.join(', ')}"
   end
 
+  desc "Import the P3 golden categorize harness and print a summary"
+  task golden_categorize: :environment do
+    report = Eval::GoldenHarness.report
+    puts "Dataset: #{report.dataset.name}"
+    puts "Samples: #{report.sample_count}"
+    puts "By difficulty: #{report.by_difficulty}"
+  end
+
   desc "Run evaluation against a model"
   task :run, [ :dataset_name, :model ] => :environment do |_t, args|
     dataset_name = args[:dataset_name] || ENV["DATASET"]

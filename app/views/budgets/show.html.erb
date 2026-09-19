@@ -5,6 +5,12 @@
             next_budget: @next_budget,
             latest_budget: @latest_budget %>
 
+  <% if preview_features_enabled? && @budget_nudges.present? %>
+    <div class="mb-4">
+      <%= render "shared/budget_nudges", nudges: @budget_nudges %>
+    </div>
+  <% end %>
+
   <div class="space-y-4">
     <%# Top Section: Donut and Summary side by side %>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

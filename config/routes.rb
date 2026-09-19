@@ -448,6 +448,12 @@ Rails.application.routes.draw do
     get :picker, on: :collection
   end
 
+  resources :saved_reports, only: %i[create destroy]
+  resource :wealth, only: :show, controller: :wealth
+
+  resources :advisor_invites, only: %i[create destroy]
+  get "advisor/:id", to: "advisor_portals#show", as: :advisor_portal
+
   # Hub page fronting budgets + goals under a single "Plan" nav entry.
   resource :plan, only: :show
 
@@ -540,6 +546,7 @@ Rails.application.routes.draw do
   namespace :transactions do
     resource :bulk_deletion, only: :create
     resource :bulk_update, only: %i[new create]
+    resource :inbox, only: :show, controller: "inbox"
     resource :categorize, only: %i[show create] do
       patch :assign_entry, on: :collection
       get :preview_rule, on: :collection
@@ -565,6 +572,7 @@ Rails.application.routes.draw do
       post :dismiss_duplicate
       post :unlock
       patch :tags, action: :update_tags
+      post :parse_receipt
     end
   end
 
@@ -772,6 +780,16 @@ Rails.application.routes.draw do
       resource :usage, only: [ :show ], controller: :usage
       resource :cash_flow, only: [ :show ], controller: :cash_flows
       resource :balance_sheet, only: [ :show ], controller: :balance_sheet
+      resource :wealth, only: [ :show ], controller: :wealth
+      resource :financial_health, only: [ :show ], controller: :financial_health
+      resource :inbox, only: [ :show ], controller: :inbox
+      resources :saved_reports, only: [ :index, :create ]
+      resources :ai_proposals, only: [ :index, :create, :update ] do
+        member do
+          post :approve
+          post :dismiss
+        end
+      end
       resources :insights, only: [ :index ]
       resources :push_subscriptions, only: [ :create, :destroy ]
       resource :family_settings, only: [ :show ], controller: :family_settings

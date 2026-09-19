@@ -34,6 +34,8 @@ class User < ApplicationRecord
   has_many :oidc_identities, dependent: :destroy
   has_many :sso_audit_logs, dependent: :nullify
   has_many :owned_accounts, class_name: "Account", foreign_key: :owner_id
+  has_many :assigned_transactions, class_name: "Transaction", foreign_key: :assignee_id, dependent: :nullify
+  has_many :saved_reports, dependent: :destroy
   has_many :account_shares, dependent: :destroy
   has_many :shared_accounts, through: :account_shares, source: :account
   has_many :budget_shares_given, class_name: "BudgetShare", foreign_key: :owner_id, inverse_of: :owner, dependent: :destroy
