@@ -9,18 +9,31 @@ This is Raja’s fork of [we-promise/sure](https://github.com/we-promise/sure) (
 2. Build and publish our own image: `ghcr.io/rajakrishna/sure:<tag>`.
 3. Cut CT 104 over to that image; keep Postgres/Redis volumes untouched.
 
-## Deploy plan (when ready)
-1. Develop on a branch (e.g. `homelab/ai-tools`) — port logic from CT 104 `/opt/sure/overrides/*.rb` into proper initializers / assistant config.
-2. CI: GitHub Actions → build Dockerfile → push `ghcr.io/rajakrishna/sure:stable` (and git sha tags). Repo must allow GHCR packages for this account.
-3. On CT 104: snapshot DB (or Sure backup), change `compose.yml` web+worker `image:` to our GHCR image, `docker compose pull && up -d`.
-4. Smoke: login, MCP, chat “biggest expense in August”, Sidekiq worker healthy.
-5. Keep `upstream` remote to `we-promise/sure` and rebase/merge periodically (AGPL + security).
+## Shipped in this fork (in-repo, no host mounts required)
 
-## Current production overrides (reference — migrate into this repo)
-On CT 104 `/opt/sure/overrides/`:
-- `zz_get_transactions_month_compat.rb` — month arg + local tool rules
-- `zz_ollama_chat_tools.rb` / `zz_ollama_think_false.rb` — Ollama tools + `think:false`
-- `zz_mcp_finance_extras.rb` — extra MCP tools
+### Assistant / Ollama
+- `get_transactions` accepts `month` (`YYYY-MM` or `MMM-YYYY`) and maps it to start/end dates (honors a custom family month-start day).
+- System prompt + session reminder: biggest / largest / top / max / smallest / min questions **must** call `get_transactions` with `sort_by: amount`, `order` desc|asc, `page_size` 5, `month` or dates, and `types` expense|income. Answer **#1 only** (merchant, amount, date, account). Never narrate an unsorted page row. Keep answers short with real dollar figures.
+- OpenAI-compatible Ollama hosts (`:11434` or hostname containing `ollama`): `tool_choice: required` when tools are present (still `none` on the final responder round). Qwen models also send `think: false`.
+
+### Chat composer (was “Coming soon”)
+- **+** add account / transaction / goal context, or attach a file
+- **/** slash commands (`/biggest`, `/smallest`, `/income`, `/budget`, `/networth`, `/goals` when preview is on)
+- **@** mention picker (same catalog)
+- Click-pointer adds the current page’s account, transaction, or goal when the URL matches
+- Selected context is prepended to the user message so local models see names and amounts
+
+### Preview / Goals
+- `get_goals` + `create_goal` are preview-gated (Settings → Preferences) and available on MCP for opted-in users
+- Goal show menu: **Ask in chat** seeds the composer with that goal
+- `GET /holdings/new` redirects to the trade form instead of a “Coming soon” stub
+
+## Deploy plan (when ready)
+1. CI: GitHub Actions → build Dockerfile → push `ghcr.io/rajakrishna/sure:stable` (and git sha tags). Repo must allow GHCR packages for this account.
+2. On CT 104: snapshot DB (or Sure backup), change `compose.yml` web+worker `image:` to our GHCR image, `docker compose pull && up -d`.
+3. Smoke: login, MCP, chat “biggest expense in August”, Sidekiq worker healthy, + / @ / file attach on the chat form, Goals via Plan (preview on).
+4. After cutover, remove `/opt/sure/overrides/` mounts (`zz_get_transactions_month_compat.rb`, `zz_ollama_chat_tools.rb`, `zz_ollama_think_false.rb`) — that logic now lives in the app.
+5. Keep `upstream` remote to `we-promise/sure` and rebase/merge periodically (AGPL + security).
 
 ## Public URL
 https://sure.zerotoidea.com (TinyAuth / gateway — see homelab-docs inventory).
