@@ -106,6 +106,7 @@ class AssistantConfigurableTest < ActiveSupport::TestCase
 
     assert_includes config[:instructions],
       "Never mention internal tool or function names in your responses"
+    assert_includes config[:instructions], "pending_approval"
   end
 
   test "instructions require sorted get_transactions for ranking questions" do

@@ -1,0 +1,10 @@
+<%# locals: (proposals:) %>
+<% if proposals.any? %>
+  <div id="ai-proposals" class="space-y-3">
+    <div class="mb-2">
+      <h2 class="text-primary text-lg font-medium"><%= t("ai_proposals.list.title") %></h2>
+      <p class="text-sm text-secondary"><%= t("ai_proposals.list.description") %></p>
+    </div>
+    <%= render partial: "ai_proposals/card", collection: proposals, as: :proposal %>
+  </div>
+<% end %>

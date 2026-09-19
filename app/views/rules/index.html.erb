@@ -38,6 +38,12 @@
   ) %>
 <% end %>
 
+<% if @ai_proposals.any? %>
+  <div class="mb-6">
+    <%= render "ai_proposals/list", proposals: @ai_proposals %>
+  </div>
+<% end %>
+
 <% if self_hosted? %>
   <div class="flex items-center gap-2 mb-2 py-4">
     <%= icon("circle-alert", size: "sm") %>
@@ -59,7 +65,7 @@
           <span class="text-secondary"><%= t(".sort_by") %></span>
           <%= form_with url: rules_path, method: :get, local: true, class: "flex items-center", data: { controller: "auto-submit-form" } do |form| %>
             <%= form.select :sort_by,
-                      options_for_select([[t(".sort_name"), "name"], [t(".sort_updated_at"), "updated_at"]], @sort_by),
+                      options_for_select([[t(".sort_priority"), "position"], [t(".sort_name"), "name"], [t(".sort_updated_at"), "updated_at"]], @sort_by),
                       {},
                       class: "min-w-[120px] bg-transparent rounded border-none cursor-pointer text-primary uppercase text-xs w-auto",
                       data: { auto_submit_form_target: "auto", autosubmit_trigger_event: "change" } %>
@@ -75,7 +81,11 @@
         </div>
       </div>
       <div class="p-1">
-        <div class="flex flex-col bg-container rounded-lg shadow-border-xs">
+        <p class="px-3 pb-2 text-xs text-secondary"><%= t(".priority_hint") %></p>
+        <div class="flex flex-col bg-container rounded-lg shadow-border-xs"
+             data-controller="rules-sortable"
+             data-rules-sortable-url-value="<%= reorder_rules_path %>"
+             data-action="dragover->rules-sortable#dragOver drop->rules-sortable#drop">
           <%= render partial: "rule", collection: @rules, spacer_template: "shared/ruler" %>
         </div>
       </div>

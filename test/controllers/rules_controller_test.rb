@@ -2,6 +2,7 @@ require "test_helper"
 
 class RulesControllerTest < ActionDispatch::IntegrationTest
   setup do
+    ensure_tailwind_build
     sign_in @user = users(:family_admin)
   end
 
@@ -295,4 +296,50 @@ class RulesControllerTest < ActionDispatch::IntegrationTest
     assert_match "connection refused", entry.message
     assert_equal "connection refused", entry.metadata["error_message"]
   end
+
+  test "index defaults to priority order" do
+    get rules_url
+    assert_response :success
+    assert_select "[data-controller='rules-sortable']"
+    assert_includes response.body, I18n.t("rules.index.priority_hint")
+  end
+
+  test "reorder updates positions" do
+    first = create_controller_rule("Alpha")
+    second = create_controller_rule("Beta")
+
+    post reorder_rules_url, params: { rule_ids: [ second.id, first.id ] }, as: :json
+    assert_response :success
+
+    assert_equal [ second.id, first.id ], @user.family.rules.where(id: [ first.id, second.id ]).by_priority.pluck(:id)
+  end
+
+  test "move changes priority" do
+    first = create_controller_rule("Alpha")
+    second = create_controller_rule("Beta")
+
+    post move_rule_url(second, direction: "up")
+    assert_redirected_to rules_url
+    ordered_ids = @user.family.rules.where(id: [ first.id, second.id ]).by_priority.pluck(:id)
+    assert_equal [ second.id, first.id ], ordered_ids
+  end
+
+  test "test_example reports a name match" do
+    rule = rules(:one)
+    rule.conditions.first.update!(condition_type: "transaction_name", operator: "like", value: "starbucks")
+
+    post test_example_rule_url(rule), params: { example: { name: "Starbucks Reserve", amount: 8 } }
+    assert_response :success
+    assert_includes response.body, I18n.t("rules.test.matched")
+  end
+
+  private
+    def create_controller_rule(name)
+      @user.family.rules.create!(
+        name: name,
+        resource_type: "transaction",
+        conditions: [ Rule::Condition.new(condition_type: "transaction_name", operator: "like", value: name) ],
+        actions: [ Rule::Action.new(action_type: "exclude_transaction") ]
+      )
+    end
 end

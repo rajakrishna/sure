@@ -23,7 +23,7 @@ class Family::Syncer
     family.auto_match_transfers!
 
     Rails.logger.info("Applying rules for family #{family.id}")
-    family.rules.where(active: true).each do |rule|
+    family.rules.where(active: true).sort_by { |rule| [ rule.position.to_i, rule.created_at ] }.each do |rule|
       rule.apply_later
     end
   end

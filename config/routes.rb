@@ -645,6 +645,8 @@ Rails.application.routes.draw do
     member do
       get :confirm
       post :apply
+      post :test_example
+      post :move
     end
 
     collection do
@@ -652,6 +654,15 @@ Rails.application.routes.draw do
       get :confirm_all
       post :apply_all
       post :clear_ai_cache
+      post :reorder
+      post :test_example
+    end
+  end
+
+  resources :ai_proposals, only: [ :update ] do
+    member do
+      post :approve
+      post :dismiss
     end
   end
 

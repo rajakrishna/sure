@@ -60,14 +60,13 @@ class Family::AutoCategorizer
 
       if category_id.present?
         categorized_transaction_ids << transaction.id
-        was_modified = transaction.enrich_attribute(
-          :category_id,
-          category_id,
-          source: "ai"
+        was_proposed = AiProposal.propose_categorize!(
+          family: family,
+          transaction: transaction,
+          category_id: category_id,
+          source: "auto_categorize"
         )
-        transaction.lock_attr!(:category_id)
-        # enrich_attribute returns true if the transaction was actually modified
-        modified_count += 1 if was_modified
+        modified_count += 1 if was_proposed
       end
     end
 

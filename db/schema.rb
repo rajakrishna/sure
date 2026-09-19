@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_16_220129) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_19_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -178,6 +178,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_16_220129) do
     t.string "region"
     t.datetime "updated_at", null: false
     t.index ["addressable_type", "addressable_id"], name: "index_addresses_on_addressable"
+  end
+
+  create_table "ai_proposals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "chat_id"
+    t.datetime "created_at", null: false
+    t.uuid "family_id", null: false
+    t.string "function_name"
+    t.string "kind", null: false
+    t.jsonb "payload", default: {}, null: false
+    t.datetime "reviewed_at"
+    t.uuid "reviewed_by_id"
+    t.string "source", null: false
+    t.string "status", default: "pending", null: false
+    t.uuid "target_id"
+    t.string "target_type"
+    t.datetime "updated_at", null: false
+    t.uuid "user_id"
+    t.index ["chat_id", "status"], name: "index_ai_proposals_on_chat_id_and_status"
+    t.index ["chat_id"], name: "index_ai_proposals_on_chat_id"
+    t.index ["family_id", "kind", "target_id"], name: "index_ai_proposals_unique_pending_target", unique: true, where: "((status)::text = 'pending'::text AND (target_id IS NOT NULL))"
+    t.index ["family_id", "status"], name: "index_ai_proposals_on_family_id_and_status"
+    t.index ["family_id"], name: "index_ai_proposals_on_family_id"
+    t.index ["user_id"], name: "index_ai_proposals_on_user_id"
   end
 
   create_table "akahu_accounts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2089,8 +2112,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_16_220129) do
     t.date "effective_date"
     t.uuid "family_id", null: false
     t.string "name"
+    t.integer "position", null: false
     t.string "resource_type", null: false
     t.datetime "updated_at", null: false
+    t.index ["family_id", "position"], name: "index_rules_on_family_id_and_position"
     t.index ["family_id"], name: "index_rules_on_family_id"
   end
 
@@ -2733,6 +2758,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_16_220129) do
   add_foreign_key "accounts", "users", column: "owner_id", on_delete: :nullify
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ai_proposals", "chats", on_delete: :nullify
+  add_foreign_key "ai_proposals", "families"
+  add_foreign_key "ai_proposals", "users"
+  add_foreign_key "ai_proposals", "users", column: "reviewed_by_id"
   add_foreign_key "akahu_accounts", "akahu_items"
   add_foreign_key "akahu_items", "families"
   add_foreign_key "api_keys", "users"

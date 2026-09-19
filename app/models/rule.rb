@@ -10,10 +10,15 @@ class Rule < ApplicationRecord
   accepts_nested_attributes_for :actions, allow_destroy: true
 
   before_validation :normalize_name
+  before_create :assign_position
 
   validates :resource_type, presence: true
   validates :name, length: { minimum: 1 }, allow_nil: true
+  validates :position, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validate :no_nested_compound_conditions
+
+  scope :by_priority, -> { order(position: :asc, created_at: :asc, id: :asc) }
+  scope :active, -> { where(active: true) }
 
   # Every rule must have at least 1 action
   validate :min_actions
@@ -45,7 +50,47 @@ class Rule < ApplicationRecord
   # notification baseline pre-seed). Mirrors total_affected_resource_count,
   # which also reaches matching_resources_scope.
   def matching_transaction_ids
-    matching_resources_scope.pluck(:id)
+    matching_scope.pluck(:id)
+  end
+
+  def matching_scope
+    matching_resources_scope
+  end
+
+  def move!(direction)
+    siblings = family.rules.by_priority.to_a
+    index = siblings.index(self)
+    return self if index.nil?
+
+    swap_with = case direction.to_s
+    when "up"
+      index.positive? ? siblings[index - 1] : nil
+    when "down"
+      siblings[index + 1]
+    end
+    return self unless swap_with
+
+    Rule.transaction do
+      other_position = swap_with.position
+      swap_with.update_columns(position: position, updated_at: Time.current)
+      update_columns(position: other_position, updated_at: Time.current)
+    end
+
+    self
+  end
+
+  def self.reorder!(family, rule_ids)
+    ids = Array(rule_ids).map(&:to_s).uniq
+    rules = family.rules.where(id: ids).index_by { |rule| rule.id.to_s }
+
+    Rule.transaction do
+      ids.each_with_index do |id, index|
+        rule = rules[id]
+        next unless rule
+
+        rule.update_columns(position: index + 1, updated_at: Time.current)
+      end
+    end
   end
 
   # Creates a categorization rule for the Quick Categorize Wizard.
@@ -69,7 +114,7 @@ class Rule < ApplicationRecord
     # Collect all unique transaction IDs matched by any rule
     transaction_ids = Set.new
     rules.each do |rule|
-      transaction_ids.merge(rule.send(:matching_resources_scope).pluck(:id))
+      transaction_ids.merge(rule.matching_scope.pluck(:id))
     end
 
     transaction_ids.size
@@ -173,5 +218,11 @@ class Rule < ApplicationRecord
 
     def normalize_name
       self.name = nil if name.is_a?(String) && name.strip.empty?
+    end
+
+    def assign_position
+      return if position.present? && position.positive?
+
+      self.position = (family.rules.maximum(:position) || 0) + 1
     end
 end

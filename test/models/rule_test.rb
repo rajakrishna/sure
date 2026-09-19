@@ -348,4 +348,39 @@ class RuleTest < ActiveSupport::TestCase
     assert_nil transaction_entry2.transaction.category,
       "Transaction on other account should not be categorized"
   end
+
+  test "assigns increasing positions and reorders" do
+    first = create_named_rule("First")
+    second = create_named_rule("Second")
+
+    assert_equal 1, first.position
+    assert_equal 2, second.position
+    assert_equal [ first, second ], @family.rules.by_priority.to_a
+
+    Rule.reorder!(@family, [ second.id, first.id ])
+
+    assert_equal [ second, first ], @family.rules.by_priority.to_a
+    assert_equal 1, second.reload.position
+    assert_equal 2, first.reload.position
+  end
+
+  test "move swaps adjacent priorities" do
+    first = create_named_rule("First")
+    second = create_named_rule("Second")
+
+    second.move!("up")
+
+    assert_equal [ second, first ], @family.rules.by_priority.to_a
+  end
+
+  private
+    def create_named_rule(name)
+      Rule.create!(
+        family: @family,
+        name: name,
+        resource_type: "transaction",
+        conditions: [ Rule::Condition.new(condition_type: "transaction_name", operator: "like", value: name) ],
+        actions: [ Rule::Action.new(action_type: "set_transaction_category", value: @groceries_category.id) ]
+      )
+    end
 end

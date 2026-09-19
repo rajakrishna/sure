@@ -1,0 +1,40 @@
+<%# locals: (rule:, example: nil, matched: nil, preview: nil) %>
+<% example ||= Rule::ExampleMatcher::Example.from_params({}) %>
+<% test_url = rule.persisted? ? test_example_rule_path(rule) : test_example_rules_path %>
+
+<section class="space-y-3" data-controller="rules-test">
+  <div class="flex items-center gap-1 text-secondary">
+    <%= icon "search", size: "sm" %>
+    <h3 class="text-sm font-medium text-primary"><%= t("rules.test.title") %></h3>
+  </div>
+  <p class="text-xs text-secondary ml-6"><%= t("rules.test.description") %></p>
+
+  <%= styled_form_with url: test_url, method: :post, class: "ml-6 space-y-3",
+                       data: { turbo_stream: true } do |f| %>
+    <% unless rule.persisted? %>
+      <%= hidden_field_tag "rule[resource_type]", rule.resource_type || "transaction" %>
+    <% end %>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <%= f.text_field :name, name: "example[name]", value: example.name, label: t("rules.test.name_label"), placeholder: t("rules.test.name_placeholder") %>
+      <%= f.number_field :amount, name: "example[amount]", value: example.amount, label: t("rules.test.amount_label"), placeholder: "12.00", step: "0.01" %>
+    </div>
+    <%= f.select :transaction_type,
+          options_for_select([
+            [ t("rules.test.any_type"), "" ],
+            [ t("rules.condition_filters.transaction_type.expense"), "expense" ],
+            [ t("rules.condition_filters.transaction_type.income"), "income" ],
+            [ t("rules.condition_filters.transaction_type.transfer"), "transfer" ]
+          ], example.transaction_type),
+          { label: t("rules.test.type_label") },
+          { name: "example[transaction_type]" } %>
+
+    <%= render DS::Button.new(text: t("rules.test.run"), type: "submit", variant: "secondary") %>
+  <% end %>
+
+  <div id="<%= rule.persisted? ? dom_id(rule, :test_result) : "rule_test_result" %>">
+    <% if !matched.nil? %>
+      <%= render "rules/test_result", matched: matched, preview: preview %>
+    <% end %>
+  </div>
+</section>
