@@ -1,4 +1,6 @@
 class CustomAlertsController < ApplicationController
+  layout "settings"
+
   before_action :set_alert, only: %i[update destroy]
 
   def index

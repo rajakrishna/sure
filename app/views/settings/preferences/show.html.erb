@@ -100,6 +100,27 @@
     <% end %>
   <% end %>
 <% end %>
+<%= settings_section title: t(".intelligence_title"), subtitle: t(".intelligence_subtitle") do %>
+  <div>
+    <%= styled_form_with model: @user, class: "space-y-4", data: { controller: "auto-submit-form" } do |form| %>
+      <%= form.hidden_field :redirect_to, value: "preferences" %>
+      <%= form.fields_for :family do |family_form| %>
+        <%= family_form.text_field :investment_benchmark_symbol,
+            label: t(".investment_benchmark"),
+            placeholder: "SPY",
+            data: { auto_submit_form_target: "auto" } %>
+        <div class="flex items-center justify-between">
+          <div class="space-y-1">
+            <p class="text-sm"><%= t(".high_confidence_auto_apply") %></p>
+            <p class="text-secondary text-sm"><%= t(".high_confidence_auto_apply_hint") %></p>
+          </div>
+          <%= family_form.toggle :high_confidence_auto_apply,
+              data: { auto_submit_form_target: "auto" } %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
 <% if Current.user.admin? %>
   <%= settings_section title: t(".currencies_title", moniker: family_moniker), subtitle: t(".currencies_subtitle", moniker: family_moniker_downcase) do %>
     <% selected_count_translations = t(".selected_currencies_count") %>

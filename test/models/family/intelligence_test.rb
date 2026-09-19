@@ -22,4 +22,10 @@ class Family::IntelligenceTest < ActiveSupport::TestCase
     assert family.intelligence_unlocked?
     assert_equal 0.5, family.bayes_confidence_threshold
   end
+
+  test "high confidence auto-apply stays off by default" do
+    family = families(:dylan_family)
+
+    assert_equal false, family.high_confidence_auto_apply?
+  end
 end

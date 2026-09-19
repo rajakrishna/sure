@@ -8,6 +8,6 @@ class RecurringTransactionsBoardTest < ActionDispatch::IntegrationTest
   test "board renders this month's recurrings" do
     get board_recurring_transactions_url
     assert_response :success
-    assert_match I18n.t("recurring_transactions.board.title"), response.body
+    assert_select "h1", text: I18n.t("recurring_transactions.board.title")
   end
 end

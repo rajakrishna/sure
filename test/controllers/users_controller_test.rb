@@ -32,6 +32,26 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "es", @user.reload.locale
   end
 
+  test "admin can opt into high-confidence auto-apply" do
+    assert_not @user.family.high_confidence_auto_apply?
+
+    patch user_url(@user), params: {
+      user: {
+        redirect_to: "preferences",
+        family_attributes: {
+          id: @user.family.id,
+          high_confidence_auto_apply: "1",
+          investment_benchmark_symbol: "QQQ"
+        }
+      }
+    }
+
+    assert_redirected_to settings_preferences_url
+    @user.family.reload
+    assert @user.family.high_confidence_auto_apply?
+    assert_equal "QQQ", @user.family.investment_benchmark_symbol
+  end
+
   test "admin can update enabled family currencies" do
     patch user_url(@user), params: {
       user: {

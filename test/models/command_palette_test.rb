@@ -7,5 +7,6 @@ class CommandPaletteTest < ActiveSupport::TestCase
     assert items.any? { |item| item.path == "/ai_proposals" }
     assert items.any? { |item| item.path == "/chats/new" }
     assert items.any? { |item| item.path == "/plan?tab=cash_flow" }
+    assert items.any? { |item| item.path == "/recurring_transactions/board" }
   end
 end

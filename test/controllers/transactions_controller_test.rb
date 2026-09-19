@@ -15,6 +15,20 @@ class TransactionsControllerTest < ActionDispatch::IntegrationTest
     assert_match I18n.t("transactions.show.ask_in_chat"), response.body
   end
 
+  test "transaction drawer shows the Intelligence badge after Bayes enrichment" do
+    @entry.transaction.data_enrichments.create!(
+      attribute_name: "category_id",
+      source: "bayes",
+      value: @entry.transaction.category_id
+    )
+
+    get transaction_url(@entry), headers: { "Turbo-Frame" => "drawer" }
+
+    assert_response :success
+    assert_match I18n.t("transactions.transaction.intelligence"), response.body
+    assert_match I18n.t("transactions.show.explain"), response.body
+  end
+
   test "index surfaces pending category suggestions as accept cards" do
     ensure_tailwind_build
     transaction = @entry.transaction

@@ -54,6 +54,15 @@ class Settings::PreferencesControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, I18n.t("settings.preferences.show.budget_sharing_title")
   end
 
+  test "intelligence settings render and stay off by default" do
+    get settings_preferences_url
+
+    assert_response :success
+    assert_includes response.body, I18n.t("settings.preferences.show.intelligence_title")
+    assert_includes response.body, I18n.t("settings.preferences.show.high_confidence_auto_apply")
+    assert_not users(:family_admin).family.high_confidence_auto_apply?
+  end
+
   test "shows the sharing card when personal_budgets is on" do
     user = users(:family_admin)
     user.family.update!(personal_budgets: true)

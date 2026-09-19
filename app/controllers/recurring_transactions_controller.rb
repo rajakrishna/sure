@@ -45,13 +45,6 @@ class RecurringTransactionsController < ApplicationController
     ]
   end
 
-  def calendar_month
-    Date.strptime(params[:month].to_s, "%Y-%m")
-  rescue ArgumentError, TypeError
-    Date.current.beginning_of_month
-  end
-  private :calendar_month
-
   # Detection proposes, the user disposes: confirming makes the suggestion a
   # real, active bill; dismissing tombstones it as `ended`, which the
   # Identifier treats as "never suggest this again".
@@ -282,6 +275,12 @@ class RecurringTransactionsController < ApplicationController
     end
 
   private
+
+    def calendar_month
+      Date.strptime(params[:month].to_s, "%Y-%m")
+    rescue ArgumentError, TypeError
+      Date.current.beginning_of_month
+    end
 
     # Sign-filtered detected patterns not yet covered by any series, mapped
     # to what the picker renders. Each candidate carries its latest entry's

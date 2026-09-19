@@ -215,6 +215,11 @@ en:
           none: No access
           read_only: View only
           read_write: Can edit
+        intelligence_title: Intelligence
+        intelligence_subtitle: Review stays first. Auto-apply is off unless you turn it on.
+        investment_benchmark: Investment benchmark ticker
+        high_confidence_auto_apply: Auto-apply high-confidence categories
+        high_confidence_auto_apply_hint: Only after you have accepted enough suggestions. Off by default.
         currencies_title: "%{moniker} Currencies"
         currencies_subtitle: Choose which currencies appear in money fields for your %{moniker}
         base_currency_label: Base currency
