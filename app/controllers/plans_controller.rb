@@ -3,8 +3,10 @@ class PlansController < ApplicationController
 
   # Plan is the GA planning spine (Budget tab). Goals, Bills, Debt and
   # Forecast stay behind the per-user preview toggle — see PlanHub::PREVIEW_TABS.
+  # Spending plan, flex, cash-flow calendar, and debt payoff are preview too.
   def show
     @active_tab = PlanHub.tab_for(params[:tab], preview: preview_features_enabled?)
+    @budget_mode = PlanHub.budget_mode_for(params[:budget_mode])
     @budget = resolve_budget(Date.current)
     @editable = @budget.editable_by?(Current.user)
     @switch_options = budget_switch_options(@budget)
@@ -30,5 +32,28 @@ class PlansController < ApplicationController
                                        .visible
                                        .count
       @plan_hub = PlanHub.new(family: Current.family, user: Current.user)
+      @spending_plan = Budget::SpendingPlan.new(
+        budget: @budget,
+        family: Current.family,
+        user: Current.user,
+        hub: @plan_hub
+      )
+      @cash_flow_calendar = CashFlowCalendar.new(
+        family: Current.family,
+        user: Current.user,
+        month: calendar_month
+      )
+      @debt_planner = Debt::PayoffPlanner.new(
+        accounts: @plan_hub.debt_accounts,
+        currency: Current.family.currency,
+        strategy: params[:strategy],
+        extra_payment: params[:extra_payment]
+      ).result
+    end
+
+    def calendar_month
+      Date.strptime(params[:month].to_s, "%Y-%m")
+    rescue ArgumentError, TypeError
+      Date.current.beginning_of_month
     end
 end

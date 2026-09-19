@@ -1,4 +1,4 @@
-<%# locals: (hub:) %>
+<%# locals: (hub:, planner: nil) %>
 
 <%= render DS::Card.new do %>
   <div class="flex flex-wrap items-center gap-2 mb-4">
@@ -50,5 +50,9 @@
         <% end %>
       <% end %>
     </div>
+
+    <% if planner && planner.rows.any? %>
+      <%= render "plans/debt_planner", planner: planner %>
+    <% end %>
   <% end %>
 <% end %>

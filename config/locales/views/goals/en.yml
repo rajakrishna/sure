@@ -139,6 +139,9 @@ en:
       pledge_just_transferred: Log a transfer you made
       pledge_just_saved: Log money you set aside
       funding_accounts_heading: Funding accounts
+      budget_funding:
+        heading: Budget category
+        body: Funded from %{category} in this month's budget.
       funding_accounts:
         earmarked_of: "%{earmarked} earmarked of %{balance}"
         empty:
@@ -335,6 +338,9 @@ en:
         notes_placeholder: A reminder for future you…
         funding_accounts: Funding accounts
         funding_accounts_hint: This goal's balance is the balance (or earmarked portion) of these accounts.
+        funding_category: Fund from a budget category
+        funding_category_blank: Not funded from a category
+        funding_category_hint: That category's monthly budget is this goal's planned contribution.
         whole_balance: Whole balance
         earmark_for: Earmark amount for %{account}
         earmark_hint: Leave an amount blank to dedicate that account's whole balance.

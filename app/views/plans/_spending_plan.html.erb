@@ -1,0 +1,32 @@
+<%# locals: (plan:, budget_mode:) %>
+
+<div data-testid="spending-plan">
+  <div class="flex items-baseline gap-2">
+    <span class="text-3xl font-medium tabular-nums privacy-sensitive <%= plan.safe_to_spend.negative? ? "text-destructive" : "text-primary" %>">
+      <%= format_money(plan.safe_to_spend) %>
+    </span>
+    <span class="text-sm text-subdued"><%= t("plans.spending_plan.safe_to_spend") %></span>
+  </div>
+  <p class="text-xs text-subdued mt-1 mb-4"><%= t("plans.spending_plan.subtitle") %></p>
+
+  <div class="space-y-0">
+    <% plan.lines.each_with_index do |line, index| %>
+      <% row = capture do %>
+        <span class="text-sm text-secondary"><%= t("plans.spending_plan.lines.#{line.key}") %></span>
+        <span class="text-sm tabular-nums text-primary privacy-sensitive">
+          <% if %w[bills goals spent].include?(line.key) %>
+            −<%= format_money(line.amount.abs) %>
+          <% else %>
+            <%= format_money(line.amount) %>
+          <% end %>
+        </span>
+      <% end %>
+      <% classes = class_names("flex items-center justify-between gap-3 py-2.5", ("border-b border-divider" unless index == plan.lines.size - 1)) %>
+      <% if line.href.present? %>
+        <%= link_to line.href, class: classes do %><%= row %><% end %>
+      <% else %>
+        <div class="<%= classes %>"><%= row %></div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

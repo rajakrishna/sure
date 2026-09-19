@@ -480,6 +480,26 @@ class BudgetTest < ActiveSupport::TestCase
     assert_equal 120, budget.total_rolled_over
   end
 
+  test "flex envelope reduces available_to_allocate and copies with the budget" do
+    family = families(:dylan_family)
+    budget = Budget.find_or_bootstrap(family, start_date: Date.current)
+    budget.update!(budgeted_spending: 4000, expected_income: 6000, flex_budgeted: 300)
+
+    leftover_without_flex = (budget.budgeted_spending || 0) - budget.allocated_spending
+    assert_equal leftover_without_flex - 300, budget.available_to_allocate
+    assert_equal 300, budget.flex_envelope
+
+    source = budget
+    target = Budget.find_or_bootstrap(family, start_date: 1.month.from_now)
+    target.copy_from!(source)
+    assert_equal 300, target.reload.flex_budgeted
+
+    budget.update!(flex_budgeted: 0)
+    leftover = (budget.budgeted_spending || 0) - budget.allocated_spending
+    assert_equal leftover, budget.flex_envelope
+    assert_equal leftover - budget.flex_actual_spending, budget.flex_available
+  end
+
   test "copy_from skips categories that dont exist in target" do
     family = families(:dylan_family)
 

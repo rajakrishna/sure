@@ -21,6 +21,7 @@ class Goal < ApplicationRecord
   validates :color, format: { with: /\A#[0-9A-Fa-f]{6}\z/ }, allow_nil: true
 
   belongs_to :family
+  belongs_to :funding_category, class_name: "Category", optional: true
   # autosave so earmark (allocated_amount) edits on already-linked accounts
   # persist through goal.save! — without it Rails only saves newly built
   # children, silently dropping changes to existing goal_accounts.
@@ -66,6 +67,7 @@ class Goal < ApplicationRecord
   validate :linked_accounts_must_be_fundable
   validate :linked_accounts_must_match_goal_currency
   validate :linked_accounts_must_belong_to_family
+  validate :funding_category_must_belong_to_family
   validate :currency_locked_once_linked
   validate :restore_must_not_recreate_whole_account_conflict
   validate :kind_locked_while_released
@@ -283,7 +285,7 @@ class Goal < ApplicationRecord
   # narrower scope to limit which of the family's goals are loaded.
   def self.prepared_for(family, scope: family.goals)
     goals = scope.alphabetically
-                 .includes(:open_pledges, :goal_accounts, linked_accounts: :account_providers)
+                 .includes(:open_pledges, :goal_accounts, :funding_category, linked_accounts: :account_providers)
                  .to_a
     inject_backing_math!(goals, family)
     goals
@@ -700,6 +702,21 @@ class Goal < ApplicationRecord
     else
       (remaining_amount.to_d / months_remaining.to_d).ceil(2)
     end
+  end
+
+  def monthly_budget_funding(budget)
+    return 0.to_d if funding_category_id.blank? || budget.nil?
+
+    budget_category = budget.budget_categories.find { |bc| bc.category_id == funding_category_id }
+    budget_category&.budgeted_spending.to_d
+  end
+
+  def monthly_budget_funding_money(budget)
+    Money.new(monthly_budget_funding(budget), currency)
+  end
+
+  def funded_from_budget_category?
+    funding_category_id.present?
   end
 
   # 90-day rolling monthly pace: net inflow into linked accounts divided by
@@ -1331,6 +1348,13 @@ class Goal < ApplicationRecord
       return if foreign.empty?
 
       errors.add(:linked_accounts, :must_belong_to_family)
+    end
+
+    def funding_category_must_belong_to_family
+      return if funding_category_id.blank? || family.nil?
+      return if funding_category&.family_id == family_id
+
+      errors.add(:funding_category, :must_belong_to_family)
     end
 
     # Switching a released goal to `maintained` would leave a reserve sitting in

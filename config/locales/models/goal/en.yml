@@ -11,6 +11,7 @@ en:
         notes: Notes
         state: State
         linked_accounts: Linked accounts
+        funding_category: Funding category
     errors:
       models:
         goal:
@@ -27,6 +28,8 @@ en:
               must_be_fundable: All linked accounts must be cash or investment accounts.
               currency_mismatch: All linked accounts must share the same currency.
               must_belong_to_family: Linked accounts must belong to the same family as the goal.
+            funding_category:
+              must_belong_to_family: Funding category must belong to this household.
             kind:
               locked_while_released: Reopen this goal before turning it into a reserve.
               locked_once_consumed: This goal has already recorded money as spent, so it cannot become a reserve.

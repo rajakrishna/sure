@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_19_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_19_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -415,6 +415,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_140000) do
     t.string "currency", null: false
     t.date "end_date", null: false
     t.decimal "expected_income", precision: 19, scale: 4
+    t.decimal "flex_budgeted", precision: 19, scale: 4, default: "0.0", null: false
     t.uuid "family_id", null: false
     t.date "start_date", null: false
     t.datetime "updated_at", null: false
@@ -423,6 +424,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_140000) do
     t.index ["family_id", "start_date", "end_date"], name: "index_budgets_shared_unique", unique: true, where: "(user_id IS NULL)"
     t.index ["family_id"], name: "index_budgets_on_family_id"
     t.index ["user_id"], name: "index_budgets_on_user_id"
+    t.check_constraint "flex_budgeted >= 0::numeric", name: "chk_budgets_flex_budgeted_non_negative"
   end
 
   create_table "categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -987,6 +989,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_140000) do
     t.datetime "created_at", null: false
     t.string "currency", null: false
     t.uuid "family_id", null: false
+    t.uuid "funding_category_id"
     t.string "icon"
     t.string "kind", default: "one_off", null: false
     t.string "name", null: false
@@ -1000,6 +1003,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_140000) do
     t.datetime "updated_at", null: false
     t.index ["family_id", "state"], name: "index_goals_on_family_id_and_state"
     t.index ["family_id"], name: "index_goals_on_family_id"
+    t.index ["funding_category_id"], name: "index_goals_on_funding_category_id"
     t.check_constraint "char_length(name::text) <= 255", name: "chk_savings_goals_name_length"
     t.check_constraint "consumed_amount >= 0::numeric", name: "chk_goals_consumed_amount_non_negative"
     t.check_constraint "kind::text = ANY (ARRAY['one_off'::character varying::text, 'maintained'::character varying::text])", name: "chk_goals_kind_enum"
@@ -2820,6 +2824,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_140000) do
   add_foreign_key "goal_pledges", "accounts", on_delete: :restrict
   add_foreign_key "goal_pledges", "goals", on_delete: :cascade
   add_foreign_key "goal_pledges", "transactions", column: "matched_transaction_id", on_delete: :nullify
+  add_foreign_key "goals", "categories", column: "funding_category_id", on_delete: :nullify
   add_foreign_key "goals", "families", on_delete: :cascade
   add_foreign_key "holdings", "account_providers"
   add_foreign_key "holdings", "accounts", on_delete: :cascade

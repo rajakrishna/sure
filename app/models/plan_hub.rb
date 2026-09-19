@@ -4,6 +4,7 @@
 class PlanHub
   TABS = %w[budget goals bills debt forecast].freeze
   PREVIEW_TABS = %w[goals bills debt forecast].freeze
+  BUDGET_MODES = %w[categories spending_plan].freeze
   DEBT_ACCOUNT_TYPES = %w[CreditCard Loan].freeze
   FORECAST_HORIZON_DAYS = 30
   NEXT_UP_LIMIT = 4
@@ -14,6 +15,11 @@ class PlanHub
     return "budget" if PREVIEW_TABS.include?(candidate) && !preview
 
     candidate
+  end
+
+  def self.budget_mode_for(mode)
+    candidate = mode.to_s
+    BUDGET_MODES.include?(candidate) ? candidate : "categories"
   end
 
   def initialize(family:, user:)

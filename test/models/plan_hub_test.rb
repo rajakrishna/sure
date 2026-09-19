@@ -14,6 +14,12 @@ class PlanHubTest < ActiveSupport::TestCase
     assert_equal "budget", PlanHub.tab_for("budget", preview: false)
   end
 
+  test "budget_mode_for defaults unknown modes to categories" do
+    assert_equal "categories", PlanHub.budget_mode_for(nil)
+    assert_equal "categories", PlanHub.budget_mode_for("nope")
+    assert_equal "spending_plan", PlanHub.budget_mode_for("spending_plan")
+  end
+
   test "sums visible credit card and loan balances" do
     hub = PlanHub.new(family: @family, user: @user)
 
