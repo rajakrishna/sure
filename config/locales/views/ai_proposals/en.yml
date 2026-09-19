@@ -8,10 +8,17 @@ en:
       categorize: Category
       create_rule: Rule
       mutation: Change
+      refund_match: Refund
+      set_merchant: Merchant
     sources:
       chat: From chat
       auto_categorize: AI categorize
       bayes: Suggested
+      rule_suggest: From your edits
+      refund_match: Refund match
+      merchant_detect: Merchant detect
+    refund_tag: Refund
+    refund_note: "Matched refund with %{counterpart}"
     statuses:
       pending: Pending
       approved: Approved
@@ -19,6 +26,8 @@ en:
     summaries:
       categorize: "Categorize %{name} as %{category}"
       create_rule: "Create rule “%{name}”"
+      refund_match: "Match %{expense} with refund %{refund}"
+      set_merchant: "Set merchant on %{name} to %{merchant}"
       unnamed_transaction: this transaction
       unnamed_rule: new rule
       mutation: "Apply “%{function}”"

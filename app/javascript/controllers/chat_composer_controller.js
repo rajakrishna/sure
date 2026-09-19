@@ -105,6 +105,7 @@ export default class extends Controller {
     const matchers = [
       [ /\/accounts\/([0-9a-f-]+)/i, "account" ],
       [ /\/transactions\/([0-9a-f-]+)/i, "transaction" ],
+      [ /\/bills\/([0-9a-f-]+)/i, "bill" ],
       [ /\/goals\/([0-9a-f-]+)/i, "goal" ],
     ];
 
@@ -242,6 +243,7 @@ export default class extends Controller {
     return [
       ...(catalog.accounts || []),
       ...(catalog.transactions || []),
+      ...(catalog.bills || []),
       ...(catalog.goals || []),
     ];
   }

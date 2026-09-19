@@ -1,6 +1,7 @@
 class Assistant::Function::GetIncomeStatement < Assistant::Function
   include ActiveSupport::NumberHelper
   include Assistant::Function::MonthResolvable
+  include Assistant::Function::Presentable
 
   class << self
     def name
@@ -97,7 +98,16 @@ class Assistant::Function::GetIncomeStatement < Assistant::Function
 
     result[:previous_period] = previous_period_comparison(period, account_ids) if params["compare_previous_period"]
 
-    result
+    with_presentation(
+      result,
+      chart: income_chart(result),
+      deep_links: [
+        deep_link(I18n.t("assistant.deep_links.transactions"), transactions_path(q: {
+          start_date: period.start_date, end_date: period.end_date
+        })),
+        deep_link(I18n.t("assistant.deep_links.reports"), reports_path)
+      ]
+    )
   rescue Date::Error
     { error: "invalid_date", message: "Dates must be valid and in YYYY-MM-DD format." }
   end
@@ -280,6 +290,25 @@ class Assistant::Function::GetIncomeStatement < Assistant::Function
           end
         }
       end
+    end
+
+    def income_chart(result)
+      if result[:monthly_series].present?
+        points = result[:monthly_series].map { |bucket| [ bucket[:end_date], parse_chart_amount(bucket[:expenses]) ] }
+        return sparkline_chart(points, aria_label: I18n.t("assistant.charts.spending"))
+      end
+
+      categories = result.dig(:expense, :by_category)
+      return nil unless categories.is_a?(Array)
+
+      breakdown_chart(
+        categories.first(6).map { |category| { label: category[:name], formatted: category[:total] } },
+        aria_label: I18n.t("assistant.charts.spending")
+      )
+    end
+
+    def parse_chart_amount(formatted)
+      formatted.to_s.gsub(/[^\d.-]/, "").to_f
     end
 
     def get_insights(income_data, expense_data)

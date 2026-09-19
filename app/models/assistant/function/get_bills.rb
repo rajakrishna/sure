@@ -1,5 +1,6 @@
 class Assistant::Function::GetBills < Assistant::Function
   include Assistant::Function::BillsSupport
+  include Assistant::Function::Presentable
 
   MAX_RESULTS = 100
 
@@ -109,14 +110,17 @@ class Assistant::Function::GetBills < Assistant::Function
 
     shown = rows.first(MAX_RESULTS)
 
-    {
-      as_of_date: Date.current.iso8601,
-      total_results: rows.size,
-      truncated: rows.size > shown.size,
-      family_currency: family.currency,
-      bills: shown.map { |series| serialize_series(series).merge(current_occurrence: serialize_occurrence(currents[series])) },
-      totals: totals_over(rows, currents)
-    }.merge(rows.empty? ? { hint: other_status_hint(params) }.compact : {})
+    with_presentation(
+      {
+        as_of_date: Date.current.iso8601,
+        total_results: rows.size,
+        truncated: rows.size > shown.size,
+        family_currency: family.currency,
+        bills: shown.map { |series| serialize_series(series).merge(current_occurrence: serialize_occurrence(currents[series])) },
+        totals: totals_over(rows, currents)
+      }.merge(rows.empty? ? { hint: other_status_hint(params) }.compact : {}),
+      deep_links: [ deep_link(I18n.t("assistant.deep_links.bills"), bills_path) ]
+    )
   end
 
   private

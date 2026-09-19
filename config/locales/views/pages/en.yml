@@ -41,6 +41,25 @@ en:
       welcome: "Welcome back, %{name}"
       subtitle: "Here's what's happening with your finances"
       new: "New"
+      home:
+        safe_to_spend: Safe to spend
+        left_to_allocate: Left to allocate
+        not_enough_data: Add a budget or paycheck to see this
+        budget_pace: "%{percent}% of the month used · %{days} days left"
+        needs_review: Needs review
+        review_transactions: Review transactions
+        pending_proposals:
+          one: "1 suggestion waiting"
+          other: "%{count} suggestions waiting"
+        budget_hot: Budget watch
+        budget_on_track: Categories are on track
+        no_budget: Set a budget to see pressure here
+        open_budget: Open budget
+        chip: "%{name} %{percent}%"
+        bills_next_seven: Due in the next 7 days
+        bill_item: "%{name} · %{amount} · %{date}"
+        view_bills: View bills
+        briefing: Weekly briefing
       sections_aria_label: "Dashboard sections"
       drag_to_reorder: "Drag to reorder section"
       toggle_section: "Toggle section visibility"

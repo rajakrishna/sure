@@ -1,0 +1,97 @@
+class Assistant::Function::EnqueueDetectMerchants < Assistant::Function
+  include Assistant::Function::CategorizeSupport
+  include Assistant::Function::Presentable
+
+  DEFAULT_LIMIT = 100
+  MAX_LIMIT = 1000
+  DEFAULT_BATCH_SIZE = 8
+  MAX_BATCH_SIZE = 25
+
+  class << self
+    def name
+      "enqueue_detect_merchants"
+    end
+
+    def description
+      <<~INSTRUCTIONS
+        Enqueues merchant detection for recent transactions missing a merchant.
+        Results wait for Approve / Edit / Dismiss — this does not assign merchants itself.
+
+        Optional limit (default #{DEFAULT_LIMIT}, max #{MAX_LIMIT}) and batch_size
+        (default #{DEFAULT_BATCH_SIZE}, max #{MAX_BATCH_SIZE}).
+      INSTRUCTIONS
+    end
+  end
+
+  def strict_mode?
+    false
+  end
+
+  def params_schema
+    build_schema(
+      required: [],
+      properties: {
+        limit: {
+          type: "integer",
+          minimum: 1,
+          maximum: MAX_LIMIT,
+          description: "Max transactions to enqueue (defaults to #{DEFAULT_LIMIT})"
+        },
+        batch_size: {
+          type: "integer",
+          minimum: 1,
+          maximum: MAX_BATCH_SIZE,
+          description: "Per-job batch size (defaults to #{DEFAULT_BATCH_SIZE})"
+        }
+      }
+    )
+  end
+
+  def call(params = {})
+    limit = integer_param(params["limit"], DEFAULT_LIMIT).clamp(1, MAX_LIMIT)
+    batch_size = integer_param(params["batch_size"], DEFAULT_BATCH_SIZE).clamp(1, MAX_BATCH_SIZE)
+
+    transaction_ids = family.transactions
+      .joins(:entry)
+      .merge(Entry.where(account_id: user.accessible_accounts.visible.select(:id), excluded: false))
+      .where(merchant_id: nil)
+      .enrichable(:merchant_id)
+      .order("entries.date DESC", "entries.id DESC")
+      .limit(limit)
+      .pluck(:id)
+
+    if transaction_ids.empty?
+      return {
+        success: true,
+        enqueued_count: 0,
+        batches: 0,
+        message: "No transactions need merchant detection."
+      }
+    end
+
+    batches = 0
+    transaction_ids.each_slice(batch_size) do |ids|
+      family.auto_detect_transaction_merchants_later(family.transactions.where(id: ids))
+      batches += 1
+    end
+
+    with_presentation(
+      {
+        success: true,
+        enqueued_count: transaction_ids.size,
+        batches: batches,
+        limit: limit,
+        batch_size: batch_size,
+        message: "Enqueued merchant detection for #{transaction_ids.size} transactions. Suggestions will wait for approval."
+      },
+      deep_links: [ deep_link(I18n.t("assistant.deep_links.transactions"), transactions_path) ]
+    )
+  end
+
+  private
+    def integer_param(value, default)
+      return default if value.blank?
+
+      value.to_i
+    end
+end

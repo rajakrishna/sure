@@ -11,24 +11,7 @@
     <div class="space-y-3">
       <p><%= t(".questions_intro") %></p>
 
-      <% questions = [
-        {
-          icon: "chart-area",
-          text: t(".evaluate_portfolio")
-        },
-        {
-          icon: "wallet-minimal",
-          text: t(".spending_insights")
-        },
-        {
-          icon: "arrow-up-right",
-          text: t(".biggest_expense")
-        },
-        {
-          icon: "alert-triangle",
-          text: t(".unusual_patterns")
-        }
-      ] %>
+      <% questions = chat_greeting_questions %>
 
       <div class="space-y-2.5">
         <% questions.each do |question| %>

@@ -128,6 +128,8 @@ en:
         manage: Manage accounts
         sharing: Sharing
         statements: Statements
+        ask_in_chat: Ask in chat
+        ask_hint: What should I know about %{name}?
         exclude_from_reports: Exclude from all reports
         include_in_reports: Include in reports
     update:

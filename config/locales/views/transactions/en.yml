@@ -59,6 +59,8 @@ en:
     new:
       new_transaction: New transaction
     show:
+      ask_in_chat: Ask in chat
+      ask_hint: What can you tell me about this transaction?
       keep_both: No, keep both
       loan_payment: Loan Payment
       mark_recurring: Mark as Recurring

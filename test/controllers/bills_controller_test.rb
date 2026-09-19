@@ -469,6 +469,7 @@ class BillsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "main h1", text: "Power Co"
     assert_match I18n.t("bills.detail.history"), response.body
+    assert_match I18n.t("bills.show.ask_in_chat"), response.body
     assert_match I18n.t("bills.detail.ytd"), response.body
     assert_match "$78.50", response.body
   end

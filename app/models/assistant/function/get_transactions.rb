@@ -1,5 +1,6 @@
 class Assistant::Function::GetTransactions < Assistant::Function
   include Assistant::Function::MonthResolvable
+  include Assistant::Function::Presentable
 
   class << self
     def default_page_size
@@ -215,15 +216,24 @@ class Assistant::Function::GetTransactions < Assistant::Function
       }
     end
 
-    {
-      transactions: normalized_transactions,
-      total_results: pagy.count,
-      page: pagy.page,
-      page_size: page_size,
-      total_pages: pagy.pages,
-      total_income: totals.income_money.format,
-      total_expenses: totals.expense_money.format
-    }
+    with_presentation(
+      {
+        transactions: normalized_transactions,
+        total_results: pagy.count,
+        page: pagy.page,
+        page_size: page_size,
+        total_pages: pagy.pages,
+        total_income: totals.income_money.format,
+        total_expenses: totals.expense_money.format
+      },
+      deep_links: [
+        deep_link(I18n.t("assistant.deep_links.transactions"), transactions_path(q: {
+          search: params["search"],
+          start_date: params["start_date"],
+          end_date: params["end_date"]
+        }.compact))
+      ]
+    )
   end
 
   private

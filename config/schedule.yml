@@ -67,6 +67,24 @@ generate_insights:
   queue: "scheduled"
   description: "Generates proactive financial insights for families with preview features enabled"
 
+nightly_categorize:
+  cron: "30 6 * * *" # daily at 6:30 AM UTC, after rules/insights have a fresh day
+  class: "CategorizeJob"
+  queue: "scheduled"
+  description: "Applies rules then queues categorize and rule-suggest proposals for preview families"
+
+refund_match:
+  cron: "0 7 * * *" # daily at 7:00 AM UTC
+  class: "RefundMatchJob"
+  queue: "scheduled"
+  description: "Proposes likely expense/refund pairs for preview families"
+
+weekly_briefing:
+  cron: "0 8 * * 1" # Mondays at 8:00 AM UTC
+  class: "WeeklyBriefingJob"
+  queue: "scheduled"
+  description: "Builds the weekly home briefing card for preview families"
+
 sweep_expired_goal_pledges:
   cron: "*/15 * * * *" # every 15 minutes
   class: "SweepExpiredGoalPledgesJob"

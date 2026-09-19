@@ -32,4 +32,14 @@
       <% end %>
     </div>
   </div>
+  <%= render DS::Link.new(
+    text: t("transactions.show.ask_in_chat"),
+    href: new_chat_path(
+      message_hint: t("transactions.show.ask_hint"),
+      composer_context: [ { type: "transaction", id: entry.transaction.id } ].to_json
+    ),
+    icon: "sparkles",
+    variant: "outline",
+    size: "sm"
+  ) %>
 </div>

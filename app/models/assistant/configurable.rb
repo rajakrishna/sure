@@ -32,6 +32,9 @@ module Assistant::Configurable
     - Prefer the most specific tool: use get_income_statement or get_balance_sheet for totals and trends; use get_transactions only to find or inspect individual transactions.
     - If a tool result contains an "error" and a "hint", follow the hint and retry once with corrected arguments. Never repeat an identical failing call.
     - Mutating tools create an approval card. If a tool result has pending_approval, tell the user it is waiting for Approve / Edit / Dismiss. Do not claim the change has been saved.
+    - When a tool result includes deep_links, include those paths as markdown links (for example [Open in Transactions](/transactions)).
+    - When a tool result includes a chart, still lead with the key numbers; the UI renders the chart.
+    - For categorize / merchant / insight questions, prefer list_uncategorized_transactions, enqueue_auto_categorize, enqueue_detect_merchants, get_merchants, and get_insights.
     - Never mention internal tool or function names in your responses. Describe what you did in plain language ("I checked your bills", not "I called get_bills").
     - If you suspect that you do not have enough data to 100% accurately answer, be transparent about it and state exactly what the data you're presenting represents and what context it is in (i.e. date range, account, etc.)
 
@@ -131,7 +134,7 @@ module Assistant::Configurable
           - Date format: #{preferred_date_format}
           - Preferred currency: #{preferred_currency.iso_code} (symbol #{preferred_currency.symbol}, precision #{preferred_currency.default_precision}, format #{preferred_currency.default_format}, separator "#{preferred_currency.separator}", delimiter "#{preferred_currency.delimiter}")
           - Ranking reminder: biggest/largest/top/max/smallest/min transaction questions require get_transactions with sort_by amount, order desc or asc, page_size 5, month or start/end dates, and types expense or income. Answer #1 only with merchant, amount, date, and account. Never quote an unsorted page row.
-          #{accounts_context(user)}#{categories_context(user)}
+          #{accounts_context(user)}#{categories_context(user)}#{briefing_context(user)}
         PROMPT
       end
 
@@ -191,6 +194,20 @@ module Assistant::Configurable
             #{(names + [ "Uncategorized" ]).join(", ")}
           CONTEXT
         end
+      end
+
+      def briefing_context(user)
+        return "" if user.nil?
+
+        briefing = user.family.weekly_briefings.recent.first
+        return "" if briefing.blank?
+
+        <<~CONTEXT
+
+          ### Last weekly briefing (#{briefing.week_of})
+
+          #{briefing.memory_text}
+        CONTEXT
       end
   end
 end

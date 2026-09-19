@@ -1,5 +1,6 @@
 class Assistant::Function::GetBalanceSheet < Assistant::Function
   include ActiveSupport::NumberHelper
+  include Assistant::Function::Presentable
 
   MAX_SERIES_POINTS = 400
   INTERVALS = [ "1 day", "1 week", "1 month" ].freeze
@@ -64,24 +65,28 @@ class Assistant::Function::GetBalanceSheet < Assistant::Function
       return error("too_many_points", "That period and interval combination produces too many data points. Use a coarser interval or a shorter period.")
     end
 
-    {
-      as_of_date: Date.current,
-      oldest_account_start_date: family.oldest_entry_date,
-      currency: family.currency,
-      net_worth: {
-        current: balance_sheet.net_worth_money.format,
-        monthly_history: historical_data(period, interval)
+    with_presentation(
+      {
+        as_of_date: Date.current,
+        oldest_account_start_date: family.oldest_entry_date,
+        currency: family.currency,
+        net_worth: {
+          current: balance_sheet.net_worth_money.format,
+          monthly_history: historical_data(period, interval)
+        },
+        assets: {
+          current: balance_sheet.assets.total_money.format,
+          monthly_history: historical_data(period, interval, classification: "asset")
+        },
+        liabilities: {
+          current: balance_sheet.liabilities.total_money.format,
+          monthly_history: historical_data(period, interval, classification: "liability")
+        },
+        insights: insights_data
       },
-      assets: {
-        current: balance_sheet.assets.total_money.format,
-        monthly_history: historical_data(period, interval, classification: "asset")
-      },
-      liabilities: {
-        current: balance_sheet.liabilities.total_money.format,
-        monthly_history: historical_data(period, interval, classification: "liability")
-      },
-      insights: insights_data
-    }
+      chart: chart_from_ai_series(historical_data(period, interval), aria_label: I18n.t("assistant.charts.net_worth")),
+      deep_links: [ deep_link(I18n.t("assistant.deep_links.accounts"), accounts_path) ]
+    )
   end
 
   private

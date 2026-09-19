@@ -14,6 +14,10 @@ en:
       spending_insights: "Show spending insights"
       unusual_patterns: "Find unusual patterns"
       biggest_expense: "What was my biggest expense this month?"
+      categorize: "Help me categorize recent transactions"
+      merchants: "Detect merchants on recent transactions"
+      insights: "What should I know about my finances?"
+      bills: "What bills are due soon?"
     chat:
       edit_chat_title: "Edit chat title"
       delete_chat: "Delete chat"

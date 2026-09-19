@@ -80,6 +80,14 @@ class ChatsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/Coming soon/i, response.body)
   end
 
+  test "slash commands include categorize and recurring" do
+    get new_chat_url
+
+    assert_response :success
+    assert_match "/categorize", response.body
+    assert_match "/recurring", response.body
+  end
+
   test "destroys chat" do
     assert_difference("Chat.count", -1) do
       delete chat_url(chats(:one))

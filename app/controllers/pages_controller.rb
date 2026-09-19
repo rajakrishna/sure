@@ -68,6 +68,7 @@ class PagesController < ApplicationController
     @spending_trend_month = spending_trend_month_param
     @spending_trend_data = build_spending_trend_data(income_statement, @spending_trend_month)
 
+    @home_snapshot = Family::HomeSnapshot.new(Current.family, user: Current.user)
     @dashboard_sections = build_dashboard_sections
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.dashboard"), nil ] ]

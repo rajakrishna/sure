@@ -1,0 +1,16 @@
+---
+en:
+  assistant:
+    deep_links:
+      transactions: Open in Transactions
+      reports: Open reports
+      budget: Open budget
+      bills: Open bills
+      insights: Open insights
+      accounts: Open accounts
+      recurring: Open recurring
+      categorize: Review uncategorized
+    charts:
+      spending: Spending
+      budget: Budget
+      net_worth: Net worth

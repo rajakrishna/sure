@@ -1,5 +1,6 @@
 class Assistant::Function::ListUncategorizedTransactions < Assistant::Function
   include Assistant::Function::CategorizeSupport
+  include Assistant::Function::Presentable
 
   class << self
     def default_page_size
@@ -70,13 +71,16 @@ class Assistant::Function::ListUncategorizedTransactions < Assistant::Function
       .includes(:merchant)
       .index_by(&:id)
 
-    {
-      transactions: entries.map { |entry| serialize_uncategorized(entry, merchants_by_transaction_id[entry.entryable_id]) },
-      total_results: pagy.count,
-      page: pagy.page,
-      page_size: page_size,
-      total_pages: pagy.pages
-    }
+    with_presentation(
+      {
+        transactions: entries.map { |entry| serialize_uncategorized(entry, merchants_by_transaction_id[entry.entryable_id]) },
+        total_results: pagy.count,
+        page: pagy.page,
+        page_size: page_size,
+        total_pages: pagy.pages
+      },
+      deep_links: [ deep_link(I18n.t("assistant.deep_links.categorize"), transactions_categorize_path) ]
+    )
   end
 
   private
