@@ -442,6 +442,30 @@ class Provider::OpenaiTest < ActiveSupport::TestCase
     end
   end
 
+  test "ollama_compatible? detects local Ollama hosts" do
+    ollama = Provider::Openai.new("test-token", uri_base: "http://ollama:11434/v1", model: "qwen3.5:9b")
+    custom = Provider::Openai.new("test-token", uri_base: "https://custom-api.example.com/v1", model: "custom-model")
+
+    assert ollama.ollama_compatible?
+    assert ollama.qwen_model?("qwen3.5:9b")
+    assert_not custom.ollama_compatible?
+    assert_not @subject.ollama_compatible?
+  end
+
+  test "local Ollama chat params require tools and disable Qwen thinking" do
+    ollama = Provider::Openai.new("test-token", uri_base: "http://127.0.0.1:11434/v1", model: "qwen3.5:9b")
+    params = {}
+
+    ollama.send(:apply_local_llm_chat_params!, params, tools: [ { type: "function" } ], tool_choice: nil, model: "qwen3.5:9b")
+
+    assert_equal "required", params[:tool_choice]
+    assert_equal false, params[:think]
+
+    final = {}
+    ollama.send(:apply_local_llm_chat_params!, final, tools: [ { type: "function" } ], tool_choice: :none, model: "qwen3.5:9b")
+    assert_equal "none", final[:tool_choice]
+  end
+
   test "provider_name returns OpenAI for standard provider" do
     assert_equal "OpenAI", @subject.provider_name
   end

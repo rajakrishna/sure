@@ -113,11 +113,80 @@ class Assistant::Function::GetTransactionsTest < ActiveSupport::TestCase
     assert_equal amounts.sort.reverse, amounts
   end
 
+  test "ranking query returns the largest expense first" do
+    account = accounts(:depository)
+    month = Date.current.strftime("%Y-%m")
+
+    small = Entry.create!(
+      account: account,
+      name: "Coffee ranking",
+      date: Date.current,
+      amount: 8,
+      currency: "USD",
+      entryable: Transaction.new
+    )
+    large = Entry.create!(
+      account: account,
+      name: "Rent ranking",
+      date: Date.current,
+      amount: 2_400,
+      currency: "USD",
+      entryable: Transaction.new
+    )
+
+    result = @function.call(
+      "month" => month,
+      "sort_by" => "amount",
+      "order" => "desc",
+      "page_size" => 5,
+      "types" => [ "expense" ]
+    )
+
+    first = result[:transactions].first
+    assert_equal large.entryable.id, first[:id]
+    assert_equal 2_400, first[:amount]
+    assert_includes result[:transactions].map { |t| t[:id] }, small.entryable.id
+  end
+
   test "filters by type" do
     result = @function.call("types" => [ "income" ])
 
     assert result[:transactions].any?
     assert result[:transactions].all? { |t| t[:classification] == "income" }
+  end
+
+  test "month sets a calendar start and end date" do
+    result = @function.call("month" => Date.current.strftime("%Y-%m"), "page_size" => 5)
+
+    assert result[:transactions].any?
+    assert result[:transactions].all? { |t|
+      date = Date.iso8601(t[:date].to_s)
+      date.month == Date.current.month && date.year == Date.current.year
+    }
+  end
+
+  test "invalid month returns an error hint" do
+    result = @function.call("month" => "not-a-month")
+
+    assert_equal "invalid_month", result[:error]
+    assert_match(/YYYY-MM/, result[:hint])
+  end
+
+  test "explicit start and end dates win over month" do
+    start_date = 2.days.ago.to_date
+    end_date = Date.current
+
+    result = @function.call(
+      "month" => "2000-01",
+      "start_date" => start_date.iso8601,
+      "end_date" => end_date.iso8601
+    )
+
+    assert result[:transactions].any?
+    assert result[:transactions].all? { |t|
+      date = Date.iso8601(t[:date].to_s)
+      date >= start_date && date <= end_date
+    }
   end
 
   test "filters by account_ids and ignores inaccessible ids" do

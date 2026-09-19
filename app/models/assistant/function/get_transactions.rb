@@ -1,4 +1,6 @@
 class Assistant::Function::GetTransactions < Assistant::Function
+  include Assistant::Function::MonthResolvable
+
   class << self
     def default_page_size
       50
@@ -15,6 +17,13 @@ class Assistant::Function::GetTransactions < Assistant::Function
         This function is great for things like:
         - Finding specific transactions
         - Getting basic stats about a small group of transactions
+        - Ranking: biggest / largest / top N / max / smallest / min in a month
+
+        For ranking questions you MUST pass sort_by: "amount", order "desc"
+        (biggest/largest/top/max) or "asc" (smallest/min), page_size 5 (or N,
+        capped at 5), types ["expense"] or ["income"] as appropriate, and
+        either month (YYYY-MM) or start_date and end_date. Then answer with
+        row #1 only unless the user asked for top N.
 
         This function is not great for:
         - Large time periods (use the get_income_statement function for this)
@@ -27,7 +36,6 @@ class Assistant::Function::GetTransactions < Assistant::Function
         Note on pagination:
 
         This function can be paginated.  You can expect the following properties in the response:
-
         - `total_pages`: The total number of pages of results
         - `page`: The current page of results
         - `page_size`: The number of results per page (defaults to #{default_page_size})
@@ -79,6 +87,10 @@ class Assistant::Function::GetTransactions < Assistant::Function
           type: "string",
           description: "Operator for amount (must be used with amount)",
           enum: [ "equal", "less", "greater" ]
+        },
+        month: {
+          type: "string",
+          description: "Calendar month in YYYY-MM or MMM-YYYY. Sets start_date and end_date for that month when those are omitted."
         },
         start_date: {
           type: "string",
@@ -142,7 +154,10 @@ class Assistant::Function::GetTransactions < Assistant::Function
   end
 
   def call(params = {})
-    search_params = params.except("order", "page", "page_size", "sort_by")
+    search_params = params.except("order", "page", "page_size", "sort_by", "month")
+    month_error = apply_month_window!(search_params, params["month"])
+    return { error: "invalid_month", hint: month_error } if month_error
+
     search_params["status"] = search_params.delete("statuses") if search_params.key?("statuses")
 
     # The categories filter now matches Category::UNCATEGORIZED_FILTER_VALUE, a stable
@@ -211,6 +226,18 @@ class Assistant::Function::GetTransactions < Assistant::Function
   end
 
   private
+    def apply_month_window!(search_params, month)
+      return if month.blank?
+      return if search_params["start_date"].present? && search_params["end_date"].present?
+
+      start_date, end_date = resolve_month_range(month)
+      search_params["start_date"] = start_date.iso8601 if search_params["start_date"].blank?
+      search_params["end_date"] = end_date.iso8601 if search_params["end_date"].blank?
+      nil
+    rescue Assistant::Error => e
+      e.message
+    end
+
     def ordered(query, params)
       if params["sort_by"] == "amount"
         # Fully literal order strings; nothing user-provided reaches Arel.sql

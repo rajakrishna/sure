@@ -11,6 +11,16 @@ module Assistant::Function::MonthResolvable
       base ? Date.new(base.year, base.month, family.month_start_day) : family.custom_month_start_for(Date.current)
     end
 
+    def resolve_month_range(raw)
+      start_date = resolve_month_start(raw)
+      end_date = if family.uses_custom_month_start?
+        family.custom_month_end_for(start_date)
+      else
+        start_date.end_of_month
+      end
+      [ start_date, end_date ]
+    end
+
     def parse_month(raw)
       return nil if raw.blank?
 

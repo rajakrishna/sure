@@ -107,4 +107,13 @@ class AssistantConfigurableTest < ActiveSupport::TestCase
     assert_includes config[:instructions],
       "Never mention internal tool or function names in your responses"
   end
+
+  test "instructions require sorted get_transactions for ranking questions" do
+    config = Assistant.config_for(chats(:one))
+
+    assert_includes config[:instructions], "sort_by: amount"
+    assert_includes config[:instructions], "page_size 5"
+    assert_includes config[:instructions], "Never narrate a random unsorted page row"
+    assert_includes config[:instructions], "Ranking reminder"
+  end
 end

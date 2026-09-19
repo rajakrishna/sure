@@ -117,6 +117,22 @@ class Provider::Openai < Provider
     @uri_base.present?
   end
 
+  # Local Ollama (and similarly named hosts) need tools forced on — small
+  # Qwen-class models otherwise answer from an unsorted first page.
+  def ollama_compatible?
+    return false unless custom_provider?
+
+    uri = URI.parse(@uri_base.to_s)
+    host = uri.host.to_s.downcase
+    uri.port == 11_434 || host == "ollama" || host.end_with?(".ollama") || host.include?("ollama")
+  rescue URI::InvalidURIError
+    @uri_base.to_s.downcase.include?("ollama")
+  end
+
+  def qwen_model?(model)
+    model.to_s.downcase.include?("qwen")
+  end
+
   # Token-budget knobs. Precedence: ENV > Setting > default. Defaults match
   # Ollama's historical 2048-token baseline so local small-context models work
   # out of the box. Users on larger-context cloud models can raise via ENV or
@@ -593,7 +609,7 @@ class Provider::Openai < Provider
           messages: messages
         }
         params[:tools] = tools if tools.present?
-        params[:tool_choice] = "none" if tool_choice == :none && tools.present?
+        apply_local_llm_chat_params!(params, tools: tools, tool_choice: tool_choice, model: model)
         params[:max_tokens] = explicit_max_response_tokens if explicit_max_response_tokens
 
         begin
@@ -711,6 +727,16 @@ class Provider::Openai < Provider
       end
 
       payload
+    end
+
+    def apply_local_llm_chat_params!(params, tools:, tool_choice:, model:)
+      if tool_choice == :none && tools.present?
+        params[:tool_choice] = "none"
+      elsif tools.present? && ollama_compatible?
+        params[:tool_choice] = "required"
+      end
+
+      params[:think] = false if ollama_compatible? && qwen_model?(model)
     end
 
     def build_generic_tools(functions)
