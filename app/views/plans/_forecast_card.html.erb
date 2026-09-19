@@ -1,4 +1,4 @@
-<%# locals: (hub:, budget:, calendar: nil) %>
+<%# locals: (hub:, budget:, calendar: nil, forecast_explain: nil) %>
 
 <%= render DS::Card.new do %>
   <div class="flex flex-wrap items-center gap-2 mb-4">
@@ -28,9 +28,8 @@
       </span>
       <span class="text-sm text-subdued"><%= t(".after_bills") %></span>
     </div>
-    <% if local_assigns[:forecast_explain]&.narration.present? || defined?(@forecast_explain) && @forecast_explain&.narration.present? %>
-      <% narration = local_assigns[:forecast_explain]&.narration || @forecast_explain.narration %>
-      <p class="text-sm text-secondary mt-3"><%= narration %></p>
+    <% if forecast_explain&.narration.present? %>
+      <p class="text-sm text-secondary mt-3"><%= forecast_explain.narration %></p>
     <% end %>
     <p class="text-xs text-subdued mt-1 mb-4">
       <%= t(".horizon", days: PlanHub::FORECAST_HORIZON_DAYS) %>
