@@ -3,6 +3,9 @@
 <%= render DS::Card.new do %>
   <div class="flex flex-wrap items-center gap-2 mb-4">
     <%= render "plans/card_heading", icon_name: "receipt", title: t(".title") %>
+    <div class="ml-auto">
+      <%= ask_chip t(".ask_due"), hint: t(".ask_due_hint") %>
+    </div>
   </div>
 
   <% if hub.recurring_disabled? %>

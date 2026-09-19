@@ -27,6 +27,8 @@ en:
       view_budget: View full budget
       empty_body: Set a monthly spending target and per-category limits to see how this month is tracking.
       set_up: Set up this month's budget
+      ask: Adjust this budget
+      ask_hint: Draft a budget adjustment for categories that are over or near their limit. Leave it as a proposal I can approve, edit, or dismiss.
       mode_aria: Budget view
       mode_categories: Categories
       mode_spending_plan: Spending plan
@@ -83,6 +85,8 @@ en:
       funded_from: "from %{category}"
       runway: "%{months} mo runway · %{pace}/mo"
       all_goals: All goals
+      ask: How should I fund this?
+      ask_hint: How should I fund my goals this month without overdrawing cash? Leave any transfer as a proposal.
     bills_card:
       title: Bills & Recurrings
       left_to_pay: left to pay this month
@@ -96,6 +100,8 @@ en:
       view_bills: View bills
       disabled_title: Recurring bills are off
       disabled_body: This household turned off recurring detection, so there is nothing to list here.
+      ask_due: What's due soon?
+      ask_due_hint: What bills are due soon, and which subscriptions look safe to cancel? Do not change any bill.
     debt_card:
       title: Debt
       total_owed: total owed

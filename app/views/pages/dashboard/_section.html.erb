@@ -1,0 +1,114 @@
+<%# locals: (section:, two_column:) %>
+<section
+  class="bg-container rounded-xl shadow-border-xs transition-all group focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2<%= " 2xl:col-span-2" if two_column && section[:layout][:col_span] == "full" %>"
+  style="<%= "--dash-widget-h: #{section[:layout][:height_px]}px;" if section[:layout][:grow] %>"
+  data-dashboard-sortable-target="section"
+  data-section-key="<%= section[:key] %>"
+  data-controller="dashboard-section"
+  data-dashboard-section-section-key-value="<%= section[:key] %>"
+  data-dashboard-section-collapsed-value="<%= Current.user.dashboard_section_collapsed?(section[:key]) %>"
+  draggable="true"
+  tabindex="0"
+  role="listitem"
+  aria-grabbed="false"
+  aria-label="<%= t(section[:title]) %> section. Press Enter or Space to grab for reordering, then use arrow keys to move."
+  data-action="
+    dragstart->dashboard-sortable#dragStart
+    dragend->dashboard-sortable#dragEnd
+    touchstart->dashboard-sortable#touchStart
+    touchmove->dashboard-sortable#touchMove
+    touchend->dashboard-sortable#touchEnd
+    touchcancel->dashboard-sortable#touchEnd
+    keydown->dashboard-sortable#handleKeyDown">
+  <div class="px-4 py-2 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        class="flex items-center justify-center w-6 h-6 rounded-md text-secondary hover:text-primary hover:bg-container-inset-hover transition-colors"
+        data-action="click->dashboard-section#toggle keydown->dashboard-section#handleToggleKeydown"
+        data-dashboard-section-target="button"
+        aria-label="<%= t("pages.dashboard.toggle_section") %>"
+        aria-expanded="<%= !Current.user.dashboard_section_collapsed?(section[:key]) %>">
+        <%= icon("chevron-down", size: "sm", class: "transition-transform", data: { dashboard_section_target: "chevron" }) %>
+      </button>
+      <h2 class="text-base font-medium">
+        <%= t(section[:title]) %>
+      </h2>
+    </div>
+    <div class="flex items-center gap-1">
+      <% if section[:key] == "balance_sheet" && @balance_sheet.classification_groups.any? { |cg| cg.account_groups.any? } %>
+        <button
+          type="button"
+          class="flex items-center justify-center w-6 h-6 rounded-md text-secondary hover:text-primary hover:bg-container-inset-hover transition-colors opacity-0 group-hover:opacity-100"
+          data-balance-sheet-expand-all="true"
+          data-expand-label="<%= t("pages.dashboard.balance_sheet.expand_all") %>"
+          data-collapse-label="<%= t("pages.dashboard.balance_sheet.collapse_all") %>"
+          aria-expanded="false"
+          aria-label="<%= t("pages.dashboard.balance_sheet.expand_all") %>">
+          <span data-icon="expand" aria-hidden="true"><%= icon("chevrons-up-down", size: "sm", class: "!w-3.5 !h-3.5") %></span>
+          <span data-icon="collapse" aria-hidden="true" style="display:none"><%= icon("chevrons-down-up", size: "sm", class: "!w-3.5 !h-3.5") %></span>
+        </button>
+      <% end %>
+      <% layout = section[:layout] %>
+      <% show_width = layout[:width_toggle] && two_column %>
+      <% if layout[:grow] || show_width %>
+        <details
+          class="relative hidden lg:block"
+          data-controller="dashboard-widget-size"
+          data-dashboard-widget-size-section-key-value="<%= section[:key] %>"
+          data-action="keydown->dashboard-widget-size#stopKeydown">
+          <summary
+            class="focus-ring list-none cursor-pointer flex items-center justify-center w-6 h-6 rounded-md text-secondary hover:text-primary hover:bg-container-inset-hover transition-colors opacity-0 group-hover:opacity-100 [&::-webkit-details-marker]:hidden"
+            aria-label="<%= t("pages.dashboard.widget_size.label") %>">
+            <%= icon("sliders-horizontal", size: "sm", class: "!w-3.5 !h-3.5") %>
+          </summary>
+          <div class="absolute right-0 top-full mt-1.5 z-10 w-48 p-2.5 space-y-2.5 bg-surface rounded-xl shadow-border-xs border border-primary">
+            <% if show_width %>
+              <div class="space-y-1.5">
+                <p class="flex items-center gap-1.5 text-xs font-medium text-secondary">
+                  <%= icon("move-horizontal", size: "xs") %>
+                  <%= t("pages.dashboard.widget_size.width_label") %>
+                </p>
+                <%= render DS::SegmentedControl.new(full_width: true, aria_label: t("pages.dashboard.widget_size.width_label")) do |sc| %>
+                  <% { "single" => "half", "full" => "full" }.each do |value, i18n_key| %>
+                    <% sc.with_segment(
+                         t("pages.dashboard.widget_size.#{i18n_key}"),
+                         active: layout[:col_span] == value,
+                         data: { action: "dashboard-widget-size#selectWidth", col_span: value }
+                       ) %>
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
+            <% if layout[:grow] %>
+              <div class="space-y-1.5">
+                <p class="flex items-center gap-1.5 text-xs font-medium text-secondary">
+                  <%= icon("move-vertical", size: "xs") %>
+                  <%= t("pages.dashboard.widget_size.height_label") %>
+                </p>
+                <%= render DS::SegmentedControl.new(full_width: true, aria_label: t("pages.dashboard.widget_size.height_label")) do |sc| %>
+                  <% PagesController::DASHBOARD_HEIGHT_PRESETS.each do |preset, px| %>
+                    <% sc.with_segment(
+                         t("pages.dashboard.widget_size.#{preset}"),
+                         active: layout[:height_preset] == preset,
+                         data: { action: "dashboard-widget-size#selectHeight", preset: preset, height: px }
+                       ) %>
+                  <% end %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </details>
+      <% end %>
+      <button
+        type="button"
+        class="cursor-grab active:cursor-grabbing hidden lg:flex items-center justify-center w-6 h-6 text-secondary hover:text-primary transition-colors opacity-0 group-hover:opacity-100"
+        aria-label="<%= t("pages.dashboard.drag_to_reorder") %>">
+        <%= icon("grip-vertical", size: "sm") %>
+      </button>
+    </div>
+  </div>
+  <div class="py-4" data-dashboard-section-target="content">
+    <%= render partial: section[:partial], locals: section[:locals] %>
+  </div>
+</section>

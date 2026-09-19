@@ -12,6 +12,7 @@ en:
     feed:
       calendar_name: Sure Bills
     ai_prompts:
+      more: More asks
       due_before_paycheck: What's due before my next paycheck?
       subscriptions_up: Which subscriptions went up this year?
       monthly_subscriptions: What am I paying monthly for subscriptions?

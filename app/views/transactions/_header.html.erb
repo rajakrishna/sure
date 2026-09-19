@@ -36,16 +36,26 @@
     <%= ask_chip t("transactions.show.ask_in_chat"),
           hint: t("transactions.show.ask_hint"),
           context: [ { type: "transaction", id: entry.transaction.id } ] %>
-    <%= ask_chip t("transactions.index.ask_merchant"),
-          hint: t("transactions.show.ask_merchant_hint"),
-          context: [ { type: "transaction", id: entry.transaction.id } ] %>
     <% if entry.transaction.splittable? %>
       <%= ask_chip t("transactions.index.ask_split"),
             hint: t("transactions.show.ask_split_hint"),
             context: [ { type: "transaction", id: entry.transaction.id } ] %>
     <% end %>
-    <%= ask_chip t("transactions.index.ask_rule"),
-          hint: t("transactions.show.ask_rule_hint"),
-          context: [ { type: "transaction", id: entry.transaction.id } ] %>
+    <%= render DS::Menu.new do |menu| %>
+      <% menu.with_item(
+            variant: "link",
+            text: t("transactions.index.ask_merchant"),
+            href: ask_in_chat_href(t("transactions.show.ask_merchant_hint"), [ { type: "transaction", id: entry.transaction.id } ]),
+            icon: "sparkles",
+            frame: :sidebar_chat,
+            data: { action: "click->app-layout#openRightSidebar" }) %>
+      <% menu.with_item(
+            variant: "link",
+            text: t("transactions.index.ask_rule"),
+            href: ask_in_chat_href(t("transactions.show.ask_rule_hint"), [ { type: "transaction", id: entry.transaction.id } ]),
+            icon: "sparkles",
+            frame: :sidebar_chat,
+            data: { action: "click->app-layout#openRightSidebar" }) %>
+    <% end %>
   </div>
 </div>

@@ -13,6 +13,8 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get root_path
     assert_response :ok
     assert_match I18n.t("pages.dashboard.home.needs_review"), response.body
+    assert_select "[data-testid=home-hero]"
+    assert_select "#home-analytics"
     assert_select "#cashflow-preview", count: 0
     assert_select "[data-controller='sankey-chart']", count: 0
     assert_select "[data-section-key='cashflow_sankey']", count: 0

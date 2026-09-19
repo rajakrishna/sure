@@ -1,6 +1,6 @@
 <%# locals: (family:, user:, active_tab: nil, mobile: false) %>
 <nav class="h-full flex flex-col min-h-0" aria-label="<%= t("layouts.application.sidebar_aria") %>">
-  <div class="flex items-center gap-3 px-3 py-3 shrink-0">
+  <div class="flex items-center gap-3 px-3 py-2 shrink-0">
     <%= link_to root_path, class: "flex items-center gap-3 min-w-0 flex-1 focus-ring rounded-lg" do %>
       <%= image_tag "logomark-color.svg", class: "w-8 h-8 shrink-0", alt: "" %>
       <div class="min-w-0">
@@ -11,7 +11,7 @@
     <%= render "users/user_menu", user: user, placement: "bottom-start", offset: 8 %>
   </div>
 
-  <div class="flex-1 min-h-0 overflow-y-auto px-2 pb-3 space-y-6">
+  <div class="flex-1 min-h-0 overflow-y-auto px-2 pb-3 space-y-4">
     <div>
       <p class="px-2 mb-1 text-xs font-medium uppercase tracking-wide text-secondary"><%= t("layouts.application.nav.section_workspace") %></p>
       <ul class="space-y-0.5">

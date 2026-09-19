@@ -22,6 +22,9 @@
           <% if @uncategorized_count > 0 %>
             <% menu.with_item(variant: "link", text: t(".categorize_button", count: @uncategorized_count), href: transactions_categorize_path, icon: "tag", data: { turbo_frame: :_top }) %>
           <% end %>
+          <% menu.with_item(variant: "link", text: t(".ask_merchant"), href: ask_in_chat_href(t(".ask_merchant_hint")), icon: "sparkles", frame: :sidebar_chat, data: { action: "click->app-layout#openRightSidebar" }) %>
+          <% menu.with_item(variant: "link", text: t(".ask_split"), href: ask_in_chat_href(t(".ask_split_hint")), icon: "sparkles", frame: :sidebar_chat, data: { action: "click->app-layout#openRightSidebar" }) %>
+          <% menu.with_item(variant: "link", text: t(".ask_rule"), href: ask_in_chat_href(t(".ask_rule_hint")), icon: "sparkles", frame: :sidebar_chat, data: { action: "click->app-layout#openRightSidebar" }) %>
         <% end %>
 
         <div class="hidden md:flex">
@@ -54,12 +57,11 @@
     </div>
   </header>
 
-  <div class="flex flex-wrap items-center gap-2">
-    <%= ask_chip t(".ask_categorize"), hint: t(".ask_categorize_hint") %>
-    <%= ask_chip t(".ask_merchant"), hint: t(".ask_merchant_hint") %>
-    <%= ask_chip t(".ask_split"), hint: t(".ask_split_hint") %>
-    <%= ask_chip t(".ask_rule"), hint: t(".ask_rule_hint") %>
-  </div>
+  <% if @uncategorized_count.to_i.positive? %>
+    <div class="flex flex-wrap items-center gap-2">
+      <%= ask_chip t(".ask_categorize"), hint: t(".ask_categorize_hint") %>
+    </div>
+  <% end %>
 
   <%= render "summary", totals: @search.totals %>
   <% if Current.family.recurring_transactions_disabled? %>

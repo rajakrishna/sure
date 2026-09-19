@@ -9,6 +9,8 @@ class CashFlowTest < ApplicationSystemTestCase
     sign_in @user
     visit root_path
 
+    assert_selector "[data-testid=home-hero]"
+    assert_selector "#home-analytics"
     assert_no_selector "#cashflow-preview"
     assert_no_selector "[data-section-key='cashflow_sankey']"
     assert_no_selector "[data-controller='sankey-chart']"
