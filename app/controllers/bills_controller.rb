@@ -15,6 +15,7 @@ class BillsController < ApplicationController
   # Six covers a month of weekly paydays with room for a leading bridge.
   PAY_PERIOD_LIMIT = 6
   before_action :ensure_recurring_enabled
+  before_action :set_index_plan_breadcrumbs, only: :index
 
   # The pay-run workspace, built on occurrence rows rather than series
   # projections, so every row has a real due date and payment state.
@@ -204,10 +205,18 @@ class BillsController < ApplicationController
     # Only the bill's own page carries the deep material, so only it pays for
     # the aggregates behind it.
     load_deep_extras
+    @breadcrumbs = plan_breadcrumb_prefix + [
+      [ t("bills.index.title"), bills_path ],
+      [ @series.display_name, nil ]
+    ]
     render
   end
 
   private
+    def set_index_plan_breadcrumbs
+      @breadcrumbs = plan_breadcrumb_prefix + [ [ t("bills.index.title"), nil ] ]
+    end
+
     # The plan plus the income facts the page states alongside it. One planner
     # instance answers both, so the income list and the periods always agree.
     def load_paycheck_plan

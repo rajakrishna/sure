@@ -1,17 +1,47 @@
-<%# Plan hub: budgets + goals under one nav entry. Two summary cards
-    fronting the existing /budgets and /goals pages — the two features
-    share a home here, not a data model. %>
+<%# Plan hub: Budget is GA. Goals / Bills / Debt / Forecast stay behind
+    the per-user preview toggle, marked with a Preview pill on each panel. %>
 <div class="@container space-y-6 pb-6 lg:pb-12">
   <header>
-    <div class="flex items-center gap-2">
-      <h1 class="text-2xl font-semibold text-primary"><%= t(".title") %></h1>
-      <%= render DS::Pill.new(label: t("shared.preview"), size: :md) %>
-    </div>
+    <h1 class="text-2xl font-semibold text-primary"><%= t(".title") %></h1>
     <p class="text-sm text-secondary mt-1"><%= t(".subtitle") %></p>
   </header>
 
-  <div class="grid grid-cols-1 @3xl:grid-cols-2 gap-4 items-stretch">
+  <% if preview_features_enabled? %>
+    <%= render DS::Tabs.new(active_tab: @active_tab, url_param_key: "tab", testid: "plan-hub-tabs") do |tabs| %>
+      <% tabs.with_nav(classes: "max-w-full overflow-x-auto no-scrollbar") do |nav| %>
+        <% nav.with_btn(id: "budget", label: t(".tabs.budget"), classes: "px-3 whitespace-nowrap") %>
+        <% nav.with_btn(id: "goals", label: t(".tabs.goals"), classes: "px-3 whitespace-nowrap") %>
+        <% nav.with_btn(id: "bills", label: t(".tabs.bills"), classes: "px-3 whitespace-nowrap") %>
+        <% nav.with_btn(id: "debt", label: t(".tabs.debt"), classes: "px-3 whitespace-nowrap") %>
+        <% nav.with_btn(id: "forecast", label: t(".tabs.forecast"), classes: "px-3 whitespace-nowrap") %>
+      <% end %>
+
+      <% tabs.with_panel(tab_id: "budget") do %>
+        <%= render "plans/budget_card", budget: @budget, top_budget_categories: @top_budget_categories, editable: @editable, switch_options: @switch_options %>
+      <% end %>
+
+      <% tabs.with_panel(tab_id: "goals") do %>
+        <%= render "plans/goals_card", goals: @goals, summary: @goals_summary, linkable_account_count: @linkable_account_count, family_has_goals: @family_has_goals %>
+      <% end %>
+
+      <% tabs.with_panel(tab_id: "bills") do %>
+        <%= render "plans/bills_card", hub: @plan_hub %>
+      <% end %>
+
+      <% tabs.with_panel(tab_id: "debt") do %>
+        <%= render "plans/debt_card", hub: @plan_hub %>
+      <% end %>
+
+      <% tabs.with_panel(tab_id: "forecast") do %>
+        <%= render "plans/forecast_card", hub: @plan_hub, budget: @budget %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <%= render DS::Alert.new(variant: :info, title: t(".preview_nudge.title")) do %>
+      <p><%= t(".preview_nudge.body") %></p>
+      <%= render DS::Link.new(text: t(".preview_nudge.action"), href: settings_preferences_path) %>
+    <% end %>
+
     <%= render "plans/budget_card", budget: @budget, top_budget_categories: @top_budget_categories, editable: @editable, switch_options: @switch_options %>
-    <%= render "plans/goals_card", goals: @goals, summary: @goals_summary, linkable_account_count: @linkable_account_count, family_has_goals: @family_has_goals %>
-  </div>
+  <% end %>
 </div>

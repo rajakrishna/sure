@@ -36,6 +36,13 @@ class BillsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "breadcrumbs include the Plan hub" do
+    get bills_url
+
+    assert_response :success
+    assert_select "a[href=?]", plan_path, minimum: 1
+  end
+
   test "bills page shell is localized in German" do
     @user.update!(locale: "de")
     Provider::Registry.stubs(:preferred_llm_provider).returns(Object.new)

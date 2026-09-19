@@ -1,0 +1,63 @@
+<%# locals: (hub:) %>
+
+<%= render DS::Card.new do %>
+  <div class="flex flex-wrap items-center gap-2 mb-4">
+    <%= render "plans/card_heading", icon_name: "receipt", title: t(".title"), preview: true %>
+  </div>
+
+  <% if hub.recurring_disabled? %>
+    <%= render DS::EmptyState.new(
+          icon: "receipt",
+          title: t(".disabled_title"),
+          description: t(".disabled_body"),
+          class: "py-10"
+        ) %>
+  <% else %>
+    <div class="flex items-baseline gap-2">
+      <span class="text-3xl font-medium text-primary tabular-nums privacy-sensitive">
+        <%= format_money(hub.remaining_this_month) %>
+      </span>
+      <span class="text-sm text-subdued"><%= t(".left_to_pay") %></span>
+    </div>
+    <p class="text-xs text-subdued mt-1 mb-4">
+      <% if hub.overdue_count.positive? %>
+        <span class="text-destructive"><%= t(".overdue_count", count: hub.overdue_count) %></span>
+        <span> · <%= format_money(hub.overdue_total) %></span>
+      <% else %>
+        <%= t(".none_overdue") %>
+      <% end %>
+      <span> · <%= t(".next_seven", amount: format_money(hub.due_next_seven)) %></span>
+    </p>
+
+    <% if hub.next_up.any? %>
+      <p class="mt-6 mb-1 text-[11px] font-medium uppercase tracking-wide text-secondary"><%= t(".next_up") %></p>
+      <div class="flex-1">
+        <% shown = hub.next_up %>
+        <% shown.each_with_index do |occurrence, index| %>
+          <%= link_to bill_path(occurrence.recurring_transaction), class: "flex items-center gap-3 py-2.5 #{"border-b border-divider" unless index == shown.size - 1}" do %>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-primary truncate"><%= occurrence.recurring_transaction.display_name %></p>
+              <p class="text-xs text-subdued"><%= format_date(occurrence.effective_due_on) %></p>
+            </div>
+            <span class="shrink-0 text-xs tabular-nums text-primary privacy-sensitive">
+              <%= format_money(occurrence.remaining_amount_money) %>
+            </span>
+            <%= icon("chevron-right", size: "sm", class: "text-subdued shrink-0") %>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-sm text-secondary py-6"><%= t(".empty_body") %></p>
+    <% end %>
+
+    <%= render DS::Link.new(
+      text: t(".view_bills"),
+      variant: "secondary",
+      href: bills_path,
+      icon: "chevron-right",
+      icon_position: :right,
+      full_width: true,
+      class: "mt-5"
+    ) %>
+  <% end %>
+<% end %>

@@ -1,0 +1,82 @@
+<%# locals: (hub:, budget:) %>
+
+<%= render DS::Card.new do %>
+  <div class="flex flex-wrap items-center gap-2 mb-4">
+    <%= render "plans/card_heading", icon_name: "calendar-clock", title: t(".title"), preview: true %>
+  </div>
+
+  <% if hub.cash_accounts.empty? %>
+    <%= render DS::EmptyState.new(
+          icon: "landmark",
+          title: t(".empty_title"),
+          description: t(".empty_body"),
+          class: "py-10"
+        ) do |es| %>
+      <% es.with_action do %>
+        <%= render DS::Link.new(
+          text: t(".add_account"),
+          variant: "primary",
+          href: new_account_path(return_to: plan_path(tab: "forecast")),
+          icon: "plus"
+        ) %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <div class="flex items-baseline gap-2">
+      <span class="text-3xl font-medium tabular-nums privacy-sensitive <%= hub.forecast_remainder.negative? ? "text-destructive" : "text-primary" %>">
+        <%= format_money(hub.forecast_remainder) %>
+      </span>
+      <span class="text-sm text-subdued"><%= t(".after_bills") %></span>
+    </div>
+    <p class="text-xs text-subdued mt-1 mb-4">
+      <%= t(".horizon", days: PlanHub::FORECAST_HORIZON_DAYS) %>
+    </p>
+
+    <div class="space-y-2">
+      <div class="flex items-center justify-between gap-3 py-2.5 border-b border-divider">
+        <span class="text-sm text-secondary"><%= t(".cash_on_hand") %></span>
+        <span class="text-sm tabular-nums text-primary privacy-sensitive"><%= format_money(hub.cash_on_hand) %></span>
+      </div>
+      <div class="flex items-center justify-between gap-3 py-2.5 border-b border-divider">
+        <span class="text-sm text-secondary"><%= t(".scheduled_bills") %></span>
+        <span class="text-sm tabular-nums text-primary privacy-sensitive"><%= format_money(hub.forecast_bills_total) %></span>
+      </div>
+      <% if budget.initialized? %>
+        <div class="flex items-center justify-between gap-3 py-2.5">
+          <span class="text-sm text-secondary"><%= t(".budget_remaining") %></span>
+          <span class="text-sm tabular-nums text-primary privacy-sensitive"><%= format_money(budget.available_to_spend_money) %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <% if hub.forecast_obligations.any? %>
+      <p class="mt-6 mb-1 text-[11px] font-medium uppercase tracking-wide text-secondary"><%= t(".upcoming") %></p>
+      <div class="flex-1">
+        <% shown = hub.forecast_obligations.sort_by(&:effective_due_on).first(PlanHub::NEXT_UP_LIMIT) %>
+        <% shown.each_with_index do |occurrence, index| %>
+          <div class="flex items-center gap-3 py-2.5 <%= "border-b border-divider" unless index == shown.size - 1 %>">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-primary truncate"><%= occurrence.recurring_transaction.display_name %></p>
+              <p class="text-xs text-subdued"><%= format_date(occurrence.effective_due_on) %></p>
+            </div>
+            <span class="shrink-0 text-xs tabular-nums text-primary privacy-sensitive">
+              <%= format_money(occurrence.remaining_amount_money) %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% unless hub.recurring_disabled? %>
+      <%= render DS::Link.new(
+        text: t(".view_calendar"),
+        variant: "secondary",
+        href: bills_path(view: "calendar"),
+        icon: "chevron-right",
+        icon_position: :right,
+        full_width: true,
+        class: "mt-5"
+      ) %>
+    <% end %>
+  <% end %>
+<% end %>

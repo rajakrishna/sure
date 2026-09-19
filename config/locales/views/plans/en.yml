@@ -3,7 +3,17 @@ en:
   plans:
     show:
       title: Plan
-      subtitle: Decide where your money goes — what you spend, and what you save.
+      subtitle: Decide where your money goes — what you spend, what you save, and what comes due.
+      tabs:
+        budget: Budget
+        goals: Goals
+        bills: Bills
+        debt: Debt
+        forecast: Forecast
+      preview_nudge:
+        title: More planning tools
+        body: Goals, bills, debt, and a 30-day forecast are in preview. Turn them on when you want to try them.
+        action: Enable preview features
     budget_card:
       title: This month
       edit_budget: Edit budget
@@ -34,3 +44,38 @@ en:
       pending_marker: pending
       runway: "%{months} mo runway · %{pace}/mo"
       all_goals: All goals
+    bills_card:
+      title: Bills & Recurrings
+      left_to_pay: left to pay this month
+      overdue_count:
+        one: 1 overdue
+        other: "%{count} overdue"
+      none_overdue: Nothing overdue
+      next_seven: "%{amount} due in 7 days"
+      next_up: Next up
+      empty_body: No bills due soon. Add a recurring payment or wait for Sure to find them.
+      view_bills: View bills
+      disabled_title: Recurring bills are off
+      disabled_body: This household turned off recurring detection, so there is nothing to list here.
+    debt_card:
+      title: Debt
+      total_owed: total owed
+      account_count:
+        one: 1 account
+        other: "%{count} accounts"
+      accounts: Accounts
+      empty_title: No debt accounts
+      empty_body: Add a credit card or loan to track balances here. Payoff plans come later.
+      add_account: Add account
+    forecast_card:
+      title: Forecast
+      after_bills: after scheduled bills
+      horizon: Next %{days} days
+      cash_on_hand: Cash on hand
+      scheduled_bills: Scheduled bills
+      budget_remaining: Budget remaining this month
+      upcoming: Upcoming
+      view_calendar: Bills calendar
+      empty_title: No cash accounts
+      empty_body: Add a checking or savings account to project cash after upcoming bills.
+      add_account: Add account

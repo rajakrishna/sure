@@ -61,6 +61,7 @@ en:
     payments: Payments
     pending_duplicate_merges: Duplicate review
     plaid_items: Plaid
+    bills: Bills
     plan: Plan
     preferences: Preferences
     profile: Profile Info
