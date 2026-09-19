@@ -31,6 +31,13 @@
         <% if @chat.error.present? && @chat.needs_assistant_response? %>
           <%= render "chats/error", chat: @chat %>
         <% end %>
+
+        <% pending_proposals = @chat.ai_proposals.pending.recent %>
+        <% if pending_proposals.any? %>
+          <div class="mt-4">
+            <%= render "ai_proposals/list", proposals: pending_proposals %>
+          </div>
+        <% end %>
       </div>
 
       <%# DESKTOP - Chat form %>

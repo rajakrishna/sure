@@ -2,10 +2,11 @@ class Assistant::FunctionToolCaller
   Error = Class.new(StandardError)
   FunctionExecutionError = Class.new(Error)
 
-  attr_reader :functions
+  attr_reader :functions, :recorder
 
-  def initialize(functions = [])
+  def initialize(functions = [], recorder: nil)
     @functions = functions
+    @recorder = recorder
   end
 
   def fulfill_requests(function_requests)
@@ -35,7 +36,11 @@ class Assistant::FunctionToolCaller
       end
 
       fn_args = JSON.parse(function_request.function_args.presence || "{}")
-      fn.call(fn_args)
+      if recorder && fn.mutating?
+        recorder.record(fn, fn_args)
+      else
+        fn.call(fn_args)
+      end
     rescue JSON::ParserError => e
       Rails.logger.warn("Assistant tool #{function_request.function_name} got invalid JSON arguments: #{e.class}: #{e.message}")
 

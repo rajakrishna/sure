@@ -8,6 +8,12 @@ class Assistant::FunctionToolCallerTest < ActiveSupport::TestCase
     def call(params = {}) = params
   end
 
+  class WriteFunction < Assistant::Function
+    def self.name = "create_tag"
+    def self.description = "Writes a tag"
+    def call(params = {}) = { written: true, name: params["name"] }
+  end
+
   FunctionRequest = Provider::LlmConcept::ChatFunctionRequest
 
   setup do
@@ -23,6 +29,22 @@ class Assistant::FunctionToolCallerTest < ActiveSupport::TestCase
     result = @caller.fulfill_requests([ request ]).first
 
     assert_equal({ "foo" => "bar" }, result.function_result)
+  end
+
+  test "records mutating tools instead of executing them" do
+    chat = chats(:one)
+    recorder = Assistant::ProposalRecorder.new(chat)
+    caller = Assistant::FunctionToolCaller.new([ WriteFunction.new(chat.user) ], recorder: recorder)
+    request = FunctionRequest.new(
+      id: "call_write", call_id: "call_write", function_name: "create_tag",
+      function_args: { "name" => "Hold please" }.to_json
+    )
+
+    assert_difference "AiProposal.count", 1 do
+      result = caller.fulfill_requests([ request ]).first
+      assert result.function_result[:pending_approval]
+      assert_equal "Hold please", chat.user.family.ai_proposals.pending.last.payload.dig("arguments", "name")
+    end
   end
 
   test "treats empty-string arguments as an empty argument set" do
@@ -110,7 +132,7 @@ class Assistant::FunctionToolCallerTest < ActiveSupport::TestCase
     )
 
     result = assert_nothing_raised do
-      caller.fulfill_requests([ request ]).first
+      @caller.fulfill_requests([ request ]).first
     end
 
     assert_equal "exploding failed unexpectedly", result.function_result["error"]

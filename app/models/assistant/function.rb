@@ -11,6 +11,32 @@ class Assistant::Function
 
   MAX_PAGE_SIZE = 100
 
+  MUTATING_NAMES = %w[
+    apply_category_updates
+    create_bill
+    create_category
+    create_goal
+    create_rule
+    create_tag
+    create_transaction
+    delete_transaction
+    record_bill_payment
+    record_valuation
+    update_bill
+    update_budget
+    update_category
+    update_tag
+    update_transaction
+  ].freeze
+
+  def self.mutating?
+    MUTATING_NAMES.include?(name)
+  end
+
+  def mutating?
+    self.class.mutating?
+  end
+
   def initialize(user)
     @user = user
   end

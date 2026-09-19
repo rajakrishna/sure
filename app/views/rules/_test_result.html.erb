@@ -1,0 +1,24 @@
+<%# locals: (matched:, preview:) %>
+<div class="ml-6 space-y-3">
+  <% if matched %>
+    <%= render DS::Alert.new(title: t("rules.test.matched"), variant: :success) %>
+  <% else %>
+    <%= render DS::Alert.new(title: t("rules.test.not_matched"), variant: :warning) %>
+  <% end %>
+
+  <% if preview && preview[:match_count].to_i.positive? %>
+    <div class="bg-container-inset rounded-lg p-3 space-y-2">
+      <p class="text-xs text-secondary"><%= t("rules.test.existing_matches", count: preview[:match_count]) %></p>
+      <ul class="space-y-1">
+        <% preview[:samples].each do |sample| %>
+          <li class="text-sm text-primary flex items-center justify-between gap-2">
+            <span class="truncate"><%= sample.name %></span>
+            <span class="text-secondary tabular-nums shrink-0"><%= format_money(sample.amount) %></span>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% elsif preview %>
+    <p class="text-xs text-secondary"><%= t("rules.test.no_existing_matches") %></p>
+  <% end %>
+</div>

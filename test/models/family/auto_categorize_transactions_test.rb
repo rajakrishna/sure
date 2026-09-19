@@ -26,11 +26,13 @@ class Family::AutoCategorizeTransactionsTest < ActiveSupport::TestCase
 
     txn = create_transaction(account: @account, name: "Starbucks Coffee").transaction
 
-    assert_difference [ "DataEnrichment.count", "DebugLogEntry.count" ], 1 do
+    assert_difference [ "AiProposal.count", "DebugLogEntry.count" ], 1 do
       assert_equal 1, @family.auto_categorize_transactions([ txn.id ])
     end
-    assert_equal @coffee, txn.reload.category
-    assert_equal "bayes", txn.data_enrichments.find_by(attribute_name: "category_id").source
+    assert_nil txn.reload.category
+    proposal = @family.ai_proposals.pending.find_by(target_id: txn.id)
+    assert_equal "bayes", proposal.source
+    assert_equal @coffee.id, proposal.payload["category_id"]
 
     log_entry = DebugLogEntry.order(:created_at).last
     assert_equal "auto_categorization", log_entry.category
@@ -64,10 +66,11 @@ class Family::AutoCategorizeTransactionsTest < ActiveSupport::TestCase
       AutoCategorization.new(transaction_id: txn.id, category_name: test_category.name)
     ])).once
 
-    assert_difference [ "DataEnrichment.count", "DebugLogEntry.count" ], 1 do
+    assert_difference [ "AiProposal.count", "DebugLogEntry.count" ], 1 do
       assert_equal 1, @family.auto_categorize_transactions([ txn.id ])
     end
-    assert_equal test_category, txn.reload.category
+    assert_nil txn.reload.category
+    assert_equal test_category.id, @family.ai_proposals.pending.find_by(target_id: txn.id).payload["category_id"]
 
     assert_ai_categorization_log(transaction_ids: [ txn.id ])
   end
@@ -84,13 +87,15 @@ class Family::AutoCategorizeTransactionsTest < ActiveSupport::TestCase
       AutoCategorization.new(transaction_id: llm_txn.id, category_name: test_category.name)
     ])).once
 
-    assert_difference "DataEnrichment.count", 2 do
+    assert_difference "AiProposal.count", 2 do
       assert_difference "DebugLogEntry.count", 1 do
         assert_equal 2, @family.auto_categorize_transactions([ bayes_txn.id, llm_txn.id ])
       end
     end
-    assert_equal @coffee, bayes_txn.reload.category
-    assert_equal test_category, llm_txn.reload.category
+    assert_nil bayes_txn.reload.category
+    assert_nil llm_txn.reload.category
+    assert_equal @coffee.id, @family.ai_proposals.pending.find_by(target_id: bayes_txn.id).payload["category_id"]
+    assert_equal test_category.id, @family.ai_proposals.pending.find_by(target_id: llm_txn.id).payload["category_id"]
 
     assert_ai_categorization_log(transaction_ids: [ llm_txn.id ])
   end

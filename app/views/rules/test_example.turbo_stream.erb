@@ -1,0 +1,4 @@
+<% target = @rule.persisted? ? dom_id(@rule, :test_result) : "rule_test_result" %>
+<%= turbo_stream.update target do %>
+  <%= render "rules/test_result", matched: @matched, preview: @preview %>
+<% end %>

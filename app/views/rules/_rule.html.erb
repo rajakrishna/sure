@@ -1,7 +1,18 @@
 <%# locals: (rule:) %>
-<div id="<%= dom_id(rule) %>" class="flex justify-between items-center p-4 <%= rule.active? ? "text-primary" : "text-secondary" %>">
-
-  <div class="text-sm space-y-1.5">
+<div id="<%= dom_id(rule) %>"
+     class="flex justify-between items-center p-4 <%= rule.active? ? "text-primary" : "text-secondary" %>"
+     data-rules-sortable-target="rule"
+     data-rule-id="<%= rule.id %>"
+     draggable="true"
+     data-action="dragstart->rules-sortable#dragStart dragend->rules-sortable#dragEnd">
+  <div class="flex items-start gap-3 min-w-0">
+    <div class="flex flex-col items-center gap-1 shrink-0">
+      <span class="text-xs font-medium text-secondary tabular-nums" title="<%= t("rules.rule.priority") %>"><%= rule.position %></span>
+      <button type="button" class="text-subdued cursor-grab" data-rules-sortable-target="handle" aria-label="<%= t("rules.rule.reorder") %>">
+        <%= icon("grip-vertical", size: "sm") %>
+      </button>
+    </div>
+    <div class="text-sm space-y-1.5 min-w-0">
     <% if rule.name.present? %>
       <h3 class="font-medium text-md"><%= rule.name %></h3>
     <% end %>
@@ -10,7 +21,7 @@
       <% additional_condition_count = rule.additional_displayable_conditions_count %>
       <div class="flex items-center gap-2 mt-1">
         <div class="flex items-center gap-1 text-secondary w-16 shrink-0">
-          <span class="font-mono text-xs">IF</span>
+          <span class="font-mono text-xs"><%= t("rules.rule.if") %></span>
         </div>
         <p class="flex items-center flex-wrap gap-1.5 m-0">
           <span class="px-2 py-1 border border-secondary rounded-full">
@@ -49,7 +60,7 @@
     </div>
     <div class="flex items-center gap-2 mt-1">
       <div class="flex items-center gap-1 text-secondary w-16 shrink-0">
-        <span class="font-mono text-xs">FOR</span>
+        <span class="font-mono text-xs"><%= t("rules.rule.for") %></span>
       </div>
       <p class="flex items-center flex-wrap gap-1.5 m-0">
         <span class="px-2 py-1 border border-secondary rounded-full">
@@ -61,8 +72,27 @@
         </span>
       </p>
     </div>
+    </div>
   </div>
-  <div class="flex items-center gap-4">
+  <div class="flex items-center gap-2">
+    <div class="flex flex-col">
+      <%= render DS::Button.new(
+        href: move_rule_path(rule, direction: "up"),
+        method: :post,
+        variant: "icon",
+        icon: "chevron-up",
+        size: :sm,
+        aria_label: t("rules.rule.move_up")
+      ) %>
+      <%= render DS::Button.new(
+        href: move_rule_path(rule, direction: "down"),
+        method: :post,
+        variant: "icon",
+        icon: "chevron-down",
+        size: :sm,
+        aria_label: t("rules.rule.move_down")
+      ) %>
+    </div>
     <%= styled_form_with model: rule, namespace: "rule_#{rule.id}", data: { controller: "auto-submit-form" } do |f| %>
       <%= f.toggle :active, { data: { auto_submit_form_target: "auto" } } %>
     <% end %>

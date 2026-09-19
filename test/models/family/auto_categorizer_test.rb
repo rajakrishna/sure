@@ -25,17 +25,17 @@ class Family::AutoCategorizerTest < ActiveSupport::TestCase
 
     @llm_provider.expects(:auto_categorize).returns(provider_response).once
 
-    assert_difference "DataEnrichment.count", 2 do
+    assert_difference "AiProposal.count", 2 do
       Family::AutoCategorizer.new(@family, transaction_ids: [ txn1.id, txn2.id, txn3.id ]).auto_categorize
     end
 
-    assert_equal test_category, txn1.reload.category
-    assert_equal test_category, txn2.reload.category
+    assert_nil txn1.reload.category
+    assert_nil txn2.reload.category
     assert_nil txn3.reload.category
 
-    # After auto-categorization, only successfully categorized transactions are locked
-    # txn3 remains enrichable since it didn't get a category (allows retry)
-    assert_equal 1, @account.transactions.reload.enrichable(:category_id).count
+    proposal = @family.ai_proposals.pending.find_by(target_id: txn1.id)
+    assert_equal test_category.id, proposal.payload["category_id"]
+    assert_equal 3, @account.transactions.reload.enrichable(:category_id).count
   end
 
   test "raises when provider returns an unsuccessful response" do

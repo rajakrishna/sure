@@ -63,8 +63,13 @@ class Family::BayesCategorizer
       next if category_id.nil?
 
       categorized_ids << transaction.id
-      was_modified = transaction.enrich_attribute(:category_id, category_id, source: "bayes")
-      modified_count += 1 if was_modified
+      was_proposed = AiProposal.propose_categorize!(
+        family: family,
+        transaction: transaction,
+        category_id: category_id,
+        source: "bayes"
+      )
+      modified_count += 1 if was_proposed
     end
 
     Result.new(categorized_ids: categorized_ids, modified_count: modified_count)

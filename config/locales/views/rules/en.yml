@@ -8,6 +8,12 @@ en:
       re_apply_rule: Re-apply rule
       delete: Delete
       then: THEN
+      if: IF
+      for: FOR
+      priority: Priority
+      reorder: Reorder rule
+      move_up: Move rule up
+      move_down: Move rule down
       and_more_conditions:
         one: and 1 more condition
         other: and %{count} more conditions
@@ -26,6 +32,12 @@ en:
       all_past_and_future: All past and future %{resource}
       starting_from: Starting from
       then: THEN
+      back: Back to rules
+      new_title: "New %{resource} rule"
+      edit_title: "Edit %{resource} rule"
+      edit_title_with_name: "Edit %{resource} rule \"%{name}\""
+      if: IF
+      for: FOR
     index:
       page_title: Rules
       delete_all_rules: Delete all rules
@@ -33,8 +45,10 @@ en:
       ai_cost_warning: AI-enabled rule actions will cost money.  Be sure to filter as narrowly as possible to avoid unnecessary costs.
       rules_heading: Rules
       sort_by: "Sort by:"
+      sort_priority: Priority
       sort_name: Name
       sort_updated_at: Updated At
+      priority_hint: Rules run from top to bottom. Drag or use the arrows to set priority — later rules can overwrite earlier ones.
       toggle_sort_direction: Toggle sort direction
       no_rules_title: No rules yet
       no_rules_description: Set up rules to perform actions to your transactions and other data on every account sync.
@@ -50,6 +64,7 @@ en:
       cost_warning: You may incur costs, please check with the model provider for the most up-to-date prices.
       view_usage_history: View usage history
       confirm_changes: Confirm changes
+      sample_matches: Transactions that currently match
     actions:
       to_label: to
       value_placeholder: Enter a value
@@ -99,6 +114,21 @@ en:
       confirm_body: Are you sure you want to reset the AI cache? This will allow AI rules to re-process all transactions. This may incur additional API costs.
       confirm_button: Reset Cache
       success: AI cache is being cleared. This may take a few moments.
+    test:
+      title: Test this rule
+      description: Try a sample transaction name and amount to see whether this rule would match, plus existing transactions that already do.
+      name_label: Example name
+      name_placeholder: Starbucks
+      amount_label: Example amount
+      type_label: Type
+      any_type: Any type
+      run: Test example
+      matched: This example matches the rule
+      not_matched: This example does not match the rule
+      existing_matches:
+        one: "1 existing transaction matches"
+        other: "%{count} existing transactions match"
+      no_existing_matches: No existing transactions currently match this rule.
     condition_filters:
       transaction_type:
         income: Income

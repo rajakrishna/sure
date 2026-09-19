@@ -13,6 +13,19 @@
       <%= t(".apply_notice_html", count: @rule.affected_resource_count, resource: @rule.resource_type.pluralize) %>
     </p>
 
+    <% samples = Rule::ExampleMatcher.new(@rule).preview[:samples] %>
+    <% if samples.any? %>
+      <div class="bg-container-inset rounded-lg p-3 mb-4 space-y-1">
+        <p class="text-xs text-secondary mb-2"><%= t("rules.confirm.sample_matches") %></p>
+        <% samples.each do |sample| %>
+          <div class="text-sm text-primary flex items-center justify-between gap-2">
+            <span class="truncate"><%= sample.name %></span>
+            <span class="text-secondary tabular-nums shrink-0"><%= format_money(sample.amount) %></span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
     <% if @rule.actions.any? { |a| a.action_type == "auto_categorize" } %>
       <% affected_count = @rule.affected_resource_count %>
       <div class="mb-4">

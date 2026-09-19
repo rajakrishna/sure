@@ -1,0 +1,57 @@
+<%# locals: (proposal:) %>
+<div id="<%= dom_id(proposal) %>">
+  <%= render DS::Card.new(class: "gap-4") do %>
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0 space-y-1">
+        <div class="flex items-center gap-2">
+          <%= render DS::Pill.new(label: t("ai_proposals.kinds.#{proposal.kind}"), tone: :warning, marker: false) %>
+          <p class="text-xs text-secondary"><%= t("ai_proposals.sources.#{proposal.source}") %></p>
+        </div>
+        <h3 class="text-sm font-medium text-primary"><%= proposal.summary %></h3>
+        <% if proposal.kind == "categorize" && proposal.payload["amount"].present? %>
+          <p class="text-xs text-secondary">
+            <%= t("ai_proposals.card.amount_on_date",
+                  amount: format_money(proposal.payload["amount"]),
+                  date: proposal.payload["date"]) %>
+          </p>
+        <% elsif proposal.payload["arguments"].present? %>
+          <p class="text-xs text-secondary font-mono truncate"><%= proposal.payload["arguments"].except("external_id").values.first(3).join(" · ") %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <% if proposal.pending? %>
+      <%= render DS::Disclosure.new(title: t("ai_proposals.card.edit"), variant: :inline) do %>
+        <%= render "ai_proposals/edit_form", proposal: proposal %>
+      <% end %>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <%= render DS::Button.new(
+          text: t("ai_proposals.card.approve"),
+          href: approve_ai_proposal_path(proposal),
+          method: :post,
+          variant: "primary",
+          icon: "check"
+        ) %>
+        <% if proposal.kind == "categorize" && proposal.suggested_rule? %>
+          <%= render DS::Button.new(
+            text: t("ai_proposals.card.approve_and_create_rule"),
+            href: approve_ai_proposal_path(proposal, create_rule: 1),
+            method: :post,
+            variant: "secondary",
+            icon: "git-branch"
+          ) %>
+        <% end %>
+        <%= render DS::Button.new(
+          text: t("ai_proposals.card.dismiss"),
+          href: dismiss_ai_proposal_path(proposal),
+          method: :post,
+          variant: "ghost",
+          icon: "x"
+        ) %>
+      </div>
+    <% else %>
+      <%= render DS::Pill.new(label: t("ai_proposals.statuses.#{proposal.status}"), tone: proposal.status == "approved" ? :success : :neutral, marker: false) %>
+    <% end %>
+  <% end %>
+</div>

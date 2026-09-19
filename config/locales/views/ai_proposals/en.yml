@@ -1,0 +1,38 @@
+---
+en:
+  ai_proposals:
+    list:
+      title: Waiting for your approval
+      description: AI suggested these changes. Approve, edit, or dismiss them — nothing is saved until you do.
+    kinds:
+      categorize: Category
+      create_rule: Rule
+      mutation: Change
+    sources:
+      chat: From chat
+      auto_categorize: AI categorize
+      bayes: Suggested
+    statuses:
+      pending: Pending
+      approved: Approved
+      dismissed: Dismissed
+    summaries:
+      categorize: "Categorize %{name} as %{category}"
+      create_rule: "Create rule “%{name}”"
+      unnamed_transaction: this transaction
+      unnamed_rule: new rule
+      mutation: "Apply “%{function}”"
+    card:
+      amount_on_date: "%{amount} on %{date}"
+      edit: Edit
+      approve: Approve
+      approve_and_create_rule: Approve and create rule
+      dismiss: Dismiss
+    edit:
+      rule_name: Rule name
+      match_value: Name contains
+      save: Save changes
+    approve:
+      success: Change approved
+    dismiss:
+      dismissed: Suggestion dismissed

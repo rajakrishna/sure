@@ -135,18 +135,19 @@ class Family::BayesCategorizerTest < ActiveSupport::TestCase
     # Already categorized → outside scope, must not be counted.
     txn3 = create_transaction(account: @account, name: "Safeway Groceries", category: @groceries)
 
-    assert_difference "DataEnrichment.count", 2 do
+    assert_difference "AiProposal.count", 2 do
       result = categorizer.classify_and_apply([ txn1.transaction.id, txn2.transaction.id, txn3.transaction.id ])
       assert_equal [ txn1.transaction.id, txn2.transaction.id ].sort, result.categorized_ids.sort
       assert_equal 2, result.modified_count
     end
 
-    assert_equal @coffee, txn1.transaction.reload.category
-    assert_equal @coffee, txn2.transaction.reload.category
+    assert_nil txn1.transaction.reload.category
+    assert_nil txn2.transaction.reload.category
     assert_equal @groceries, txn3.transaction.reload.category
 
-    enrichment = txn1.transaction.data_enrichments.find_by(attribute_name: "category_id")
-    assert_equal "bayes", enrichment.source
+    proposal = @family.ai_proposals.pending.find_by(target_id: txn1.transaction.id)
+    assert_equal "bayes", proposal.source
+    assert_equal @coffee.id, proposal.payload["category_id"]
   end
 
   test "classify_and_apply returns categorized_ids and modified_count separately" do

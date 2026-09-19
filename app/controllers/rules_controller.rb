@@ -1,17 +1,18 @@
 class RulesController < ApplicationController
   include StreamExtensions
 
-  before_action :set_rule, only: [  :edit, :update, :destroy, :apply, :confirm ]
+  before_action :set_rule, only: [ :edit, :update, :destroy, :apply, :confirm, :move ]
 
   def index
-    @sort_by = params[:sort_by] || "name"
+    @sort_by = params[:sort_by] || "position"
     @direction = params[:direction] || "asc"
 
-    allowed_columns = [ "name", "updated_at" ]
-    @sort_by = "name" unless allowed_columns.include?(@sort_by)
+    allowed_columns = [ "name", "updated_at", "position" ]
+    @sort_by = "position" unless allowed_columns.include?(@sort_by)
     @direction = "asc" unless [ "asc", "desc" ].include?(@direction)
 
-    @rules = Current.family.rules.includes(conditions: :sub_conditions).order(@sort_by => @direction)
+    @rules = Current.family.rules.includes(conditions: :sub_conditions, actions: []).order(@sort_by => @direction)
+    @ai_proposals = Current.family.ai_proposals.pending.recent.includes(:chat, :user)
 
     # Fetch recent rule runs with pagination
     recent_runs_scope = RuleRun
@@ -131,6 +132,34 @@ class RulesController < ApplicationController
   def clear_ai_cache
     enqueue_ai_cache_reset
     redirect_to rules_path, notice: t("rules.clear_ai_cache.success")
+  end
+
+  def reorder
+    Rule.reorder!(Current.family, params[:rule_ids])
+    head :ok
+  end
+
+  def move
+    @rule.move!(params[:direction])
+    redirect_to rules_path
+  end
+
+  def test_example
+    @rule = if params[:id].present?
+      Current.family.rules.find(params[:id])
+    else
+      Current.family.rules.build(rule_params)
+    end
+
+    @example = Rule::ExampleMatcher::Example.from_params(params)
+    matcher = Rule::ExampleMatcher.new(@rule)
+    @matched = matcher.match?(@example)
+    @preview = matcher.preview
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { render :test_example, layout: false }
+    end
   end
 
   private
