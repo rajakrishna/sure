@@ -98,9 +98,12 @@ class DeliverInsightNotificationJobTest < ActiveJob::TestCase
     end
   end
 
-  test "preview opt out after enqueueing prevents delivery" do
+  test "unused preview opt-out after enqueueing does not block delivery" do
     @subscription.user.update!(preferences: { "preview_features_enabled" => false })
-    Apns::Client.expects(:new).never
+    response = stub(ok?: true)
+    client = mock
+    Apns::Client.expects(:new).with(environment: "sandbox").returns(client)
+    client.expects(:deliver).returns(response)
     DeliverInsightNotificationJob.perform_now(insight_id: @insight.id, push_subscription_id: @subscription.id)
   end
 

@@ -26,13 +26,12 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
   # Unread state is carried by the well's header count, not by a pill on every
   # row. The widget shows three rows, so the pill was usually on all of them,
   # repeating what the header already says and crowding each title.
-  test "home surfaces insight titles as ask chips instead of a feed widget" do
+  test "home still renders the insights feed widget" do
     get root_url
 
     assert_response :success
-    assert_select "#insights-feed", count: 0
+    assert_select "#insights-feed"
     assert_match CGI.escapeHTML(@insight.title), response.body
-    assert_select "a[data-turbo-frame='sidebar_chat']", minimum: 1
   end
 
   # Acknowledging is a quiet action — no undo toast. Acknowledgement only covers
@@ -203,13 +202,13 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
     assert @insight.reload.acknowledged?
   end
 
-  test "home keeps the insights bell and omits the old feed widget" do
+  test "home keeps the insights feed when the unused preview preference is off" do
     disable_preview_features
 
     get root_url
 
     assert_response :success
-    assert_select "#insights-feed", count: 0
+    assert_select "#insights-feed"
     assert_select "a[href=?]", insights_path
   end
 

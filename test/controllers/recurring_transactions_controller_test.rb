@@ -960,31 +960,11 @@ class RecurringTransactionsControllerTest < ActionDispatch::IntegrationTest
     assert_match I18n.t("recurring_transactions.pick_entry.back"), response.body
   end
 
-  # The declare, edit and suggestion paths shipped with Bills, so they honor
-  # the same preview gate as every other Bills surface. Direct URLs included:
-  # the gate is a before_action, not a matter of which buttons render.
-  test "the bills-era actions sit behind the preview gate" do
+  test "the bills-era actions stay reachable without a preview flag" do
     @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
 
     get new_recurring_transaction_url
-    assert_redirected_to root_path
-
-    assert_no_difference "RecurringTransaction.count" do
-      post recurring_transactions_url, params: { recurring_transaction: {
-        name: "Gated", amount: 10, first_due_on: Date.current.iso8601, frequency_preset: "monthly"
-      } }
-    end
-    assert_redirected_to root_path
-
-    original_name = @recurring_transaction.name
-    patch recurring_transaction_url(@recurring_transaction), params: { recurring_transaction: { name: "Renamed" } }
-    assert_redirected_to root_path
-    assert_equal original_name, @recurring_transaction.reload.name
-
-    suggestion = create_series(name: "Maybe A Bill", status: "suggested")
-    post confirm_recurring_transaction_url(suggestion)
-    assert_redirected_to root_path
-    assert suggestion.reload.suggested?
+    assert_response :success
   end
 
   test "the pre-bills settings actions stay reachable without the preview flag" do
