@@ -10,7 +10,8 @@ module SidebarNavHelper
       { name: t("layouts.application.nav.goals"), path: plan_path(tab: "goals"), active: plan_tab_active?("goals") || page_active?(goals_path) },
       { name: t("layouts.application.nav.bills"), path: plan_path(tab: "bills"), active: plan_tab_active?("bills") || page_active?(bills_path) },
       { name: t("layouts.application.nav.debt"), path: plan_path(tab: "debt"), active: plan_tab_active?("debt") },
-      { name: t("layouts.application.nav.forecast"), path: plan_path(tab: "forecast"), active: plan_tab_active?("forecast") }
+      { name: t("layouts.application.nav.forecast"), path: plan_path(tab: "forecast"), active: plan_tab_active?("forecast") },
+      { name: t("layouts.application.nav.cash_flow"), path: plan_path(tab: "cash_flow"), active: plan_tab_active?("cash_flow") }
     ]
   end
 

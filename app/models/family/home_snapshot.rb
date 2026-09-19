@@ -20,7 +20,7 @@ class Family::HomeSnapshot
   end
 
   def needs_review_count
-    @needs_review_count ||= accessible_entries.uncategorized_transactions.count
+    @needs_review_count ||= Transaction::Inbox.uncategorized_for(family, account_ids: user.accessible_accounts.select(:id)).count
   end
 
   def pending_proposal_count

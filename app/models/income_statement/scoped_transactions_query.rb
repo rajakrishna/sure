@@ -57,6 +57,10 @@ module IncomeStatement::ScopedTransactionsQuery
       @budget_excluded_kinds_sql ||= Transaction::BUDGET_EXCLUDED_KINDS.map { |k| "'#{k}'" }.join(", ")
     end
 
+    def exclude_budget_excluded_categories_sql(t)
+      "AND (#{t}.category_id IS NULL OR NOT EXISTS (SELECT 1 FROM categories excluded_cats WHERE excluded_cats.id = #{t}.category_id AND excluded_cats.exclude_from_budget IS TRUE))"
+    end
+
     def pending_providers_sql(t = "t")
       Transaction.pending_providers_sql(t)
     end

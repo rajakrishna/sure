@@ -1,0 +1,32 @@
+<div class="space-y-6 pb-6">
+  <header>
+    <h1 class="text-2xl font-medium text-primary"><%= t(".title") %></h1>
+    <p class="text-sm text-secondary mt-1"><%= t(".subtitle") %></p>
+  </header>
+
+  <%= styled_form_with model: @custom_alert, url: custom_alerts_path, class: "space-y-3" do |f| %>
+    <%= f.text_field :name, label: t(".name"), required: true %>
+    <%= f.select :kind, CustomAlert::KINDS.map { |kind| [t("custom_alerts.kinds.#{kind}"), kind] }, { label: t(".kind") } %>
+    <label class="flex items-center gap-2 text-sm text-primary">
+      <%= f.check_box :enabled %>
+      <%= t(".enabled") %>
+    </label>
+    <%= f.submit t(".create") %>
+  <% end %>
+
+  <% if @custom_alerts.any? %>
+    <ul class="space-y-2">
+      <% @custom_alerts.each do |alert| %>
+        <li class="flex items-center justify-between gap-3 bg-container rounded-xl px-4 py-3 shadow-border-xs">
+          <div>
+            <p class="text-sm font-medium text-primary"><%= alert.name %></p>
+            <p class="text-xs text-secondary"><%= t("custom_alerts.kinds.#{alert.kind}") %></p>
+          </div>
+          <%= render DS::Button.new(text: t(".remove"), href: custom_alert_path(alert), method: :delete, variant: "ghost", size: "sm") %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <%= render DS::EmptyState.new(icon: "bell", title: t(".empty")) %>
+  <% end %>
+</div>

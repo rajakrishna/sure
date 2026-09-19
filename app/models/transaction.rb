@@ -5,6 +5,7 @@ class Transaction < ApplicationRecord
   belongs_to :merchant, optional: true
   belongs_to :transfer, optional: true
   belongs_to :assignee, class_name: "User", optional: true
+  belongs_to :reviewed_by, class_name: "User", optional: true
 
   has_many :taggings, as: :taggable, dependent: :destroy
   has_many :tags, through: :taggings
@@ -150,6 +151,18 @@ class Transaction < ApplicationRecord
   # Overarching grouping method for all transfer-type transactions
   def transfer?
     TRANSFER_KINDS.include?(kind)
+  end
+
+  def reviewed?
+    reviewed_at.present?
+  end
+
+  def mark_reviewed!(actor)
+    update!(reviewed_at: Time.current, reviewed_by: actor)
+  end
+
+  def intelligence_source
+    data_enrichments.find { |enrichment| enrichment.attribute_name == "category_id" }&.source
   end
 
   def set_category!(category)

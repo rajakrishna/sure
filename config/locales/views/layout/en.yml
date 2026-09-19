@@ -17,6 +17,7 @@ en:
         budgets: Budget
         debt: Debt
         forecast: Forecast
+        cash_flow: Cash flow
         home: Home
         plan: Plan
         reports: Reports

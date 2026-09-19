@@ -49,14 +49,32 @@
       <span></span>
     <% end %>
 
-    <%= render DS::Button.new(
-      text: t("insights.card.acknowledge"),
-      icon: "check",
-      variant: "ghost",
-      size: "sm",
-      href: acknowledge_insight_path(insight),
-      method: :patch,
-      title: t("insights.card.acknowledge_title")
-    ) %>
+    <div class="flex items-center gap-1">
+      <%= render DS::Button.new(
+        text: t("insights.card.helpful"),
+        icon: "thumbs-up",
+        variant: insight.feedback == "helpful" ? "secondary" : "ghost",
+        size: "sm",
+        href: feedback_insight_path(insight, value: "helpful"),
+        method: :patch
+      ) %>
+      <%= render DS::Button.new(
+        text: t("insights.card.unhelpful"),
+        icon: "thumbs-down",
+        variant: insight.feedback == "unhelpful" ? "secondary" : "ghost",
+        size: "sm",
+        href: feedback_insight_path(insight, value: "unhelpful"),
+        method: :patch
+      ) %>
+      <%= render DS::Button.new(
+        text: t("insights.card.acknowledge"),
+        icon: "check",
+        variant: "ghost",
+        size: "sm",
+        href: acknowledge_insight_path(insight),
+        method: :patch,
+        title: t("insights.card.acknowledge_title")
+      ) %>
+    </div>
   </div>
 </div>

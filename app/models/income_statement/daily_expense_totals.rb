@@ -50,6 +50,7 @@ class IncomeStatement::DailyExpenseTotals
           #{exchange_rates_join_sql}
           WHERE at.kind NOT IN (#{budget_excluded_kinds_sql})
             #{investment_activity_label_sql("at")}
+            #{exclude_budget_excluded_categories_sql("at")}
             AND ae.excluded = false
             AND a.family_id = :family_id
             AND a.status IN ('draft', 'active')

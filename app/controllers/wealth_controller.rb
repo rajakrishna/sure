@@ -7,6 +7,7 @@ class WealthController < ApplicationController
     load_snapshot
     @ai_proposals = Current.family.ai_proposals.pending.where(kind: %w[budget_adjust]).recent
     @sparkline_series = @snapshot.sparkline_series
+    @net_worth_estimate = Family::NetWorthEstimate.new(Current.family, user: Current.user).intra_period
     @breadcrumbs = [
       [ t("breadcrumbs.home"), root_path ],
       [ t("breadcrumbs.wealth"), nil ]

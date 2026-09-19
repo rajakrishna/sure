@@ -362,6 +362,7 @@ en:
       preferences_label: Preferences
       profile_label: Profile Info
       recurring_transactions_label: Recurring
+      alerts_label: Alerts
       rules_label: Rules
       mcp_label: MCP
       security_label: Security

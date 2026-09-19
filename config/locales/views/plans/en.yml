@@ -11,6 +11,7 @@ en:
         bills: Bills
         debt: Debt
         forecast: Forecast
+        cash_flow: Cash flow
       preview_nudge:
         title: More planning tools
         body: Goals, bills, debt, and a 30-day forecast are in preview. Turn them on when you want to try them.

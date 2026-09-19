@@ -21,14 +21,14 @@ class AiProposalsControllerTest < ActionDispatch::IntegrationTest
 
   test "approve writes the category" do
     post approve_ai_proposal_url(@proposal)
-    assert_redirected_to rules_url
+    assert_redirected_to ai_proposals_url
     assert_equal @category, @transaction.reload.category
     assert_equal "approved", @proposal.reload.status
   end
 
   test "dismiss does not write the category" do
     post dismiss_ai_proposal_url(@proposal)
-    assert_redirected_to rules_url
+    assert_redirected_to ai_proposals_url
     assert_nil @transaction.reload.category
     assert_equal "dismissed", @proposal.reload.status
   end
@@ -36,7 +36,7 @@ class AiProposalsControllerTest < ActionDispatch::IntegrationTest
   test "update edits the proposed category" do
     other = @family.categories.create!(name: "Tea")
     patch ai_proposal_url(@proposal), params: { ai_proposal: { category_id: other.id } }
-    assert_redirected_to rules_url
+    assert_redirected_to ai_proposals_url
     assert_equal other.id, @proposal.reload.payload["category_id"]
     assert_nil @transaction.reload.category
   end
@@ -52,5 +52,32 @@ class AiProposalsControllerTest < ActionDispatch::IntegrationTest
 
     post approve_ai_proposal_url(other_proposal)
     assert_response :not_found
+  end
+
+  test "index lists pending proposals" do
+    get ai_proposals_url
+    assert_response :success
+    assert_match @proposal.summary, response.body
+  end
+
+  test "bulk approve writes selected proposals" do
+    post bulk_approve_ai_proposals_url, params: { proposal_ids: [ @proposal.id ] }
+    assert_redirected_to ai_proposals_url
+    assert_equal @category, @transaction.reload.category
+    assert_equal "approved", @proposal.reload.status
+  end
+
+  test "index shows confidence and why" do
+    @proposal.update!(payload: @proposal.payload.merge(
+      "confidence" => 0.91,
+      "reason" => "Learned from coffee",
+      "alternatives" => [ { "category_id" => SecureRandom.uuid, "category_name" => "Dining" } ]
+    ))
+
+    get ai_proposals_url
+    assert_response :success
+    assert_match "91%", response.body
+    assert_match "Learned from coffee", response.body
+    assert_match "Dining", response.body
   end
 end

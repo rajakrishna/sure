@@ -38,6 +38,13 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
   # the numbers the user saw (see Insight's class comment), so a dismissed
   # insight resurfaces on its own when those numbers move; a toast interrupting
   # every dismissal bought little.
+  test "feedback records a helpful thumb" do
+    patch feedback_insight_url(@insight, value: "helpful")
+
+    assert_redirected_to insights_url
+    assert_equal "helpful", @insight.reload.feedback
+  end
+
   test "acknowledge clears the insight without an undo toast" do
     patch acknowledge_insight_url(@insight), as: :turbo_stream
 

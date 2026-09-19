@@ -59,6 +59,15 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
     assert_match I18n.t("plans.show.tabs.bills"), response.body
     assert_match I18n.t("plans.show.tabs.debt"), response.body
     assert_match I18n.t("plans.show.tabs.forecast"), response.body
+    assert_match I18n.t("plans.show.tabs.cash_flow"), response.body
+  end
+
+  test "cash flow tab shows MTD comparison" do
+    get plan_url(tab: "cash_flow")
+
+    assert_response :success
+    assert_match I18n.t("plans.cash_flow.title"), response.body
+    assert_match I18n.t("plans.cash_flow.income"), response.body
   end
 
   test "nests plan children in the left rail and keeps assistant out of it" do

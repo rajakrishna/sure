@@ -33,16 +33,22 @@ class Family::BayesCategorizer
   # the model isn't trained yet or no category clears the confidence
   # threshold (below threshold = no confident answer).
   def classify(transaction)
-    return nil unless enough_training_data?
+    top = classify_candidates(transaction).first
+    return nil unless top
+    return nil if top[:confidence] < confidence_threshold
+
+    [ top[:category_id], top[:confidence] ]
+  end
+
+  def classify_candidates(transaction, limit: 2)
+    return [] unless enough_training_data?
 
     log_scores = log_scores_for(tokens_for(transaction))
-    return nil if log_scores.empty?
+    return [] if log_scores.empty?
 
-    category_id, _score = log_scores.max_by { |_, score| score }
-    confidence = softmax(log_scores.values).max
-    return nil if confidence < CONFIDENCE_THRESHOLD
-
-    [ category_id, confidence ]
+    probabilities = softmax(log_scores.values)
+    ranked = log_scores.keys.zip(probabilities).sort_by { |_, confidence| -confidence }
+    ranked.first(limit).map { |category_id, confidence| { category_id: category_id, confidence: confidence } }
   end
 
   # Labels every uncategorized, enrichable transaction in transaction_ids
@@ -59,16 +65,30 @@ class Family::BayesCategorizer
           .enrichable(:category_id)
           .includes(:category, :merchant, :entry)
           .find_each do |transaction|
-      category_id, _confidence = classify(transaction)
-      next if category_id.nil?
+      candidates = classify_candidates(transaction)
+      top = candidates.first
+      next unless top
 
-      categorized_ids << transaction.id
+      category_id = top[:category_id]
+      confidence = top[:confidence]
+      alternatives = candidates.drop(1).filter_map do |candidate|
+        alt = family.categories.find_by(id: candidate[:category_id])
+        next unless alt
+
+        { "category_id" => alt.id, "category_name" => alt.name, "confidence" => candidate[:confidence] }
+      end
+
+      categorized_ids << transaction.id if confidence >= confidence_threshold
       was_proposed = AiProposal.propose_categorize!(
         family: family,
         transaction: transaction,
         category_id: category_id,
-        source: "bayes"
+        source: "bayes",
+        confidence: confidence,
+        reason: I18n.t("ai_proposals.reasons.bayes"),
+        alternatives: alternatives
       )
+      maybe_auto_apply!(transaction, category_id, confidence) if was_proposed
       modified_count += 1 if was_proposed
     end
 
@@ -135,6 +155,20 @@ class Family::BayesCategorizer
     end
 
     # Numerically stable softmax over the log-scores.
+    def confidence_threshold
+      family.respond_to?(:bayes_confidence_threshold) ? family.bayes_confidence_threshold : CONFIDENCE_THRESHOLD
+    end
+
+    def maybe_auto_apply!(transaction, category_id, confidence)
+      return unless family.high_confidence_auto_apply?
+      return unless family.intelligence_unlocked?
+      return unless confidence.to_f >= 0.9
+
+      actor = family.users.where(role: %w[admin super_admin]).first || family.users.first
+      proposal = family.ai_proposals.pending.find_by(kind: "categorize", target_id: transaction.id)
+      proposal&.approve!(actor) if actor
+    end
+
     def softmax(scores)
       max = scores.max
       exps = scores.map { |score| Math.exp(score - max) }

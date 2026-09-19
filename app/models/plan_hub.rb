@@ -2,8 +2,8 @@
 # Budget and goals keep their existing controller-loaded objects; this PORO
 # only gathers the extra planning snapshots so the hub controller stays thin.
 class PlanHub
-  TABS = %w[budget goals bills debt forecast].freeze
-  PREVIEW_TABS = %w[goals bills debt forecast].freeze
+  TABS = %w[budget goals bills debt forecast cash_flow].freeze
+  PREVIEW_TABS = %w[goals bills debt forecast cash_flow].freeze
   BUDGET_MODES = %w[categories spending_plan].freeze
   DEBT_ACCOUNT_TYPES = %w[CreditCard Loan].freeze
   FORECAST_HORIZON_DAYS = 30

@@ -62,6 +62,12 @@ class Insight < ApplicationRecord
     update!(status: :acknowledged, dismissed_at: Time.current)
   end
 
+  def record_feedback!(value)
+    raise ArgumentError, "Invalid feedback" unless %w[helpful unhelpful].include?(value.to_s)
+
+    update!(feedback: value.to_s)
+  end
+
   # Undoes an acknowledgement without re-badging the insight as new — the user
   # has obviously seen it, so it returns as read. Guarded to only reverse an
   # actual acknowledgement: a stale/replayed undo (e.g. an old toast link

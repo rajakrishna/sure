@@ -22,6 +22,7 @@
       <% nav.with_btn(id: "bills", label: t(".tabs.bills"), classes: "px-3 whitespace-nowrap") %>
       <% nav.with_btn(id: "debt", label: t(".tabs.debt"), classes: "px-3 whitespace-nowrap") %>
       <% nav.with_btn(id: "forecast", label: t(".tabs.forecast"), classes: "px-3 whitespace-nowrap") %>
+      <% nav.with_btn(id: "cash_flow", label: t(".tabs.cash_flow"), classes: "px-3 whitespace-nowrap") %>
     <% end %>
 
     <% tabs.with_panel(tab_id: "budget") do %>
@@ -47,6 +48,10 @@
 
     <% tabs.with_panel(tab_id: "forecast") do %>
       <%= render "plans/forecast_card", hub: @plan_hub, budget: @budget, calendar: @cash_flow_calendar, forecast_explain: @forecast_explain %>
+    <% end %>
+
+    <% tabs.with_panel(tab_id: "cash_flow") do %>
+      <%= render "plans/cash_flow_card", cash_flow: @cash_flow %>
     <% end %>
   <% end %>
 </div>

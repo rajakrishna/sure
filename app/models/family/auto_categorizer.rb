@@ -64,7 +64,8 @@ class Family::AutoCategorizer
           family: family,
           transaction: transaction,
           category_id: category_id,
-          source: "auto_categorize"
+          source: "auto_categorize",
+          reason: I18n.t("ai_proposals.reasons.llm")
         )
         modified_count += 1 if was_proposed
       end

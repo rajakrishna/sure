@@ -18,7 +18,7 @@ class Transaction::Inbox
 
   def self.uncategorized_for(family, account_ids: nil)
     scope = family.transactions
-      .where(category_id: nil)
+      .where(category_id: nil, reviewed_at: nil)
       .where.not(kind: Transaction::UNCATEGORIZED_EXCLUDED_KINDS)
       .where(entries: { excluded: false })
       .where(accounts: { status: %w[draft active] })

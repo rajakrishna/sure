@@ -32,6 +32,26 @@ class RecurringTransactionsController < ApplicationController
     @family = Current.family
   end
 
+  def board
+    @board = Family::RecurringBoard.new(
+      Current.family,
+      user: Current.user,
+      month: calendar_month
+    )
+    @breadcrumbs = [
+      [ t("breadcrumbs.home"), root_path ],
+      [ t("breadcrumbs.bills"), bills_path ],
+      [ t("recurring_transactions.board.title"), nil ]
+    ]
+  end
+
+  def calendar_month
+    Date.strptime(params[:month].to_s, "%Y-%m")
+  rescue ArgumentError, TypeError
+    Date.current.beginning_of_month
+  end
+  private :calendar_month
+
   # Detection proposes, the user disposes: confirming makes the suggestion a
   # real, active bill; dismissing tombstones it as `ended`, which the
   # Identifier treats as "never suggest this again".

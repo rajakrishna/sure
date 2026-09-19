@@ -148,6 +148,19 @@ class Family::BayesCategorizerTest < ActiveSupport::TestCase
     proposal = @family.ai_proposals.pending.find_by(target_id: txn1.transaction.id)
     assert_equal "bayes", proposal.source
     assert_equal @coffee.id, proposal.payload["category_id"]
+    assert proposal.payload["confidence"].to_f > 0.7
+    assert_equal "Groceries", proposal.alternatives.first&.fetch("category_name")
+  end
+
+  test "classify_candidates returns a top-2 ranking" do
+    train_two_categories
+    categorizer = Family::BayesCategorizer.new(@family)
+    txn = create_transaction(account: @account, name: "Starbucks Coffee")
+
+    candidates = categorizer.classify_candidates(txn.transaction)
+    assert_equal 2, candidates.size
+    assert_equal @coffee.id, candidates.first[:category_id]
+    assert_equal @groceries.id, candidates.second[:category_id]
   end
 
   test "classify_and_apply returns categorized_ids and modified_count separately" do

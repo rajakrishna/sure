@@ -86,7 +86,8 @@ module Assistant
         Function::CreateRule,
         Function::CreateRuleDraft,
         Function::SplitTransactionDraft,
-        Function::ProposeBudgetAdjust
+        Function::ProposeBudgetAdjust,
+        Function::ExplainTransaction
       ]
 
       classes += PREVIEW_FUNCTION_CLASSES

@@ -23,6 +23,9 @@
         <div class="min-w-0 space-y-1">
           <p class="text-xs font-medium uppercase tracking-wide text-secondary"><%= t(".net_worth") %></p>
           <p class="text-3xl font-medium text-primary tabular-nums privacy-sensitive"><%= @snapshot.net_worth_money.format %></p>
+          <% if @net_worth_estimate&.last&.estimated %>
+            <p class="text-xs text-secondary"><%= t(".estimated") %></p>
+          <% end %>
           <div class="flex flex-wrap gap-4 text-sm">
             <p class="text-secondary">
               <%= t(".assets") %>

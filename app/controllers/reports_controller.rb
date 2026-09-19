@@ -518,7 +518,9 @@ class ReportsController < ApplicationController
         period_withdrawals: period_totals.withdrawals,
         top_holdings: investment_statement.top_holdings(limit: 5),
         accounts: investment_accounts.to_a,
-        gains_by_tax_treatment: build_gains_by_tax_treatment(investment_statement)
+        gains_by_tax_treatment: build_gains_by_tax_treatment(investment_statement),
+        benchmark_symbol: Current.family.investment_benchmark_symbol.presence || "SPY",
+        benchmark_return: Family::InvestmentBenchmark.new(Current.family, period: @period).return_percent
       }
     end
 

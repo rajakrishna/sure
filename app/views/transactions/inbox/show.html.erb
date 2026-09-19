@@ -38,6 +38,13 @@
             </div>
             <div class="flex items-center gap-3 shrink-0">
               <span class="text-sm tabular-nums privacy-sensitive text-primary"><%= format_money(entry.amount_money) %></span>
+              <%= render DS::Button.new(
+                text: t(".mark_reviewed"),
+                href: transactions_review_path(transaction_id: transaction.id),
+                method: :post,
+                variant: "ghost",
+                size: "sm"
+              ) %>
               <%= form_with model: entry, url: transaction_path(transaction), method: :patch, class: "min-w-40" do |form| %>
                 <%= form.hidden_field :entryable_type, value: "Transaction" %>
                 <%= form.fields_for :entryable, transaction do |tf| %>

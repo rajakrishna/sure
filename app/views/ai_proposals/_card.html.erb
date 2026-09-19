@@ -8,6 +8,15 @@
           <p class="text-xs text-secondary"><%= t("ai_proposals.sources.#{proposal.source}") %></p>
         </div>
         <h3 class="text-sm font-medium text-primary"><%= proposal.summary %></h3>
+        <% if proposal.kind == "categorize" && proposal.confidence.present? %>
+          <p class="text-xs text-secondary"><%= t("ai_proposals.card.confidence", percent: (proposal.confidence * 100).round) %></p>
+        <% end %>
+        <% if proposal.reason.present? %>
+          <p class="text-xs text-secondary"><%= t("ai_proposals.card.why", reason: proposal.reason) %></p>
+        <% end %>
+        <% proposal.alternatives.first(2).each do |alternative| %>
+          <p class="text-xs text-secondary"><%= t("ai_proposals.card.alternative", name: alternative["category_name"]) %></p>
+        <% end %>
         <% if proposal.kind.in?(%w[categorize refund_match set_merchant split]) && proposal.payload["amount"].present? %>
           <p class="text-xs text-secondary">
             <%= t("ai_proposals.card.amount_on_date",

@@ -1,0 +1,3 @@
+<%= turbo_stream.replace dom_id(@insight) do %>
+  <%= render "insights/insight_card", insight: @insight, unread: false %>
+<% end %>

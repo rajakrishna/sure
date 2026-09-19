@@ -14,11 +14,25 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_match I18n.t("pages.dashboard.home.needs_review"), response.body
     assert_select "[data-testid=home-hero]"
+    assert_select "[data-testid=command-palette-trigger]"
     assert_select "#home-analytics"
     assert_select "#cashflow-preview", count: 0
     assert_select "[data-controller='sankey-chart']", count: 0
     assert_select "[data-section-key='cashflow_sankey']", count: 0
     assert_select "#netWorthChart"
+  end
+
+  test "dashboard weekly recap lists briefing items" do
+    @family.weekly_briefings.create!(
+      week_of: Date.current.beginning_of_week,
+      generated_at: Time.current,
+      payload: { "headline" => "A calm week", "items" => [ { "title" => "Dining cooled off" } ], "suggested_prompts" => [] }
+    )
+
+    get root_path
+    assert_response :ok
+    assert_select "#weekly-recap"
+    assert_match "Dining cooled off", response.body
   end
 
   test "dashboard renders the net worth chart as drag-selectable, opting it out of card drag-and-drop" do
@@ -391,6 +405,8 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     # The chart needs the selected month's own length to label only its days
     # on narrow (mobile) widths.
     assert_equal selected_month.end_of_month.day, chart.fetch("current_days")
+    assert chart.fetch("ideal").any?
+    assert_equal selected_month.end_of_month.day, chart.fetch("ideal").size
   end
 
   test "dashboard spending trend widget caps an in-progress month at today" do

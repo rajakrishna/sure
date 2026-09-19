@@ -1,6 +1,6 @@
 class InsightsController < ApplicationController
   before_action :require_preview_features!
-  before_action :set_insight, only: %i[acknowledge unacknowledge]
+  before_action :set_insight, only: %i[acknowledge unacknowledge feedback]
 
   def index
     load_feed
@@ -35,6 +35,14 @@ class InsightsController < ApplicationController
     load_feed
     load_widget_feed
 
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_back_or_to insights_path }
+    end
+  end
+
+  def feedback
+    @insight.record_feedback!(params[:value])
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_back_or_to insights_path }

@@ -10,6 +10,7 @@ class TransactionsController < ApplicationController
   def show
     super
     assign_mark_recurring_state
+    @related_proposals = Current.family.ai_proposals.pending.where(target_type: "Transaction", target_id: @entry.entryable_id)
   end
 
   def new

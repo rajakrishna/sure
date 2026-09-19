@@ -33,6 +33,12 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: /preferences/i
   end
 
+  test "should get recurrings review" do
+    get recurrings_onboarding_url
+    assert_response :success
+    assert_match I18n.t("onboardings.recurrings.title"), response.body
+  end
+
   test "preferences page renders Series chart data without errors" do
     get preferences_onboarding_url
     assert_response :success

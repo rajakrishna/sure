@@ -33,6 +33,18 @@
     </div>
   </div>
   <div class="flex flex-wrap items-center justify-end gap-1">
+    <% if entry.transaction.intelligence_source.present? %>
+      <%= render DS::Pill.new(
+        label: t("transactions.transaction.intelligence"),
+        tone: :info,
+        marker: false,
+        icon: "sparkles",
+        title: t("transactions.show.intelligence")
+      ) %>
+    <% end %>
+    <%= ask_chip t("transactions.show.explain"),
+          hint: t("transactions.show.explain_hint"),
+          context: [ { type: "transaction", id: entry.transaction.id } ] %>
     <%= ask_chip t("transactions.show.ask_in_chat"),
           hint: t("transactions.show.ask_hint"),
           context: [ { type: "transaction", id: entry.transaction.id } ] %>

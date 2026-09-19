@@ -22,11 +22,12 @@ class Family::HomeSnapshotTest < ActiveSupport::TestCase
     briefing = @family.weekly_briefings.create!(
       week_of: Date.current.beginning_of_week,
       generated_at: Time.current,
-      payload: { "headline" => "Quiet week", "items" => [], "suggested_prompts" => [] }
+      payload: { "headline" => "Quiet week", "items" => [ { "title" => "Coffee was high" } ], "suggested_prompts" => [] }
     )
 
     snapshot = Family::HomeSnapshot.new(@family.reload, user: @user.reload)
     assert snapshot.show_briefing?
     assert_equal briefing, snapshot.weekly_briefing
+    assert_equal "Coffee was high", snapshot.weekly_briefing.items.first["title"]
   end
 end

@@ -30,6 +30,20 @@
     </div>
   <% end %>
 
+  <% if snapshot.show_briefing? %>
+    <%= render DS::Card.new(class: "gap-3", id: "weekly-recap") do %>
+      <p class="text-xs font-medium uppercase tracking-wide text-secondary"><%= t("pages.dashboard.home.recap") %></p>
+      <p class="text-sm font-medium text-primary"><%= snapshot.weekly_briefing.headline %></p>
+      <% if snapshot.weekly_briefing.items.any? %>
+        <ul class="space-y-1">
+          <% snapshot.weekly_briefing.items.first(4).each do |item| %>
+            <li class="text-sm text-secondary"><%= item["title"] || item["text"] %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    <% end %>
+  <% end %>
+
   <div class="bg-container rounded-xl shadow-border-xs divide-y divide-subdued">
     <div class="flex items-center gap-3 px-4 py-3">
       <div class="min-w-0 flex-1">
@@ -47,7 +61,7 @@
         <% if snapshot.pending_proposal_count.positive? %>
           <%= render DS::Link.new(
             text: t("pages.dashboard.home.pending_proposals", count: snapshot.pending_proposal_count),
-            href: rules_path,
+            href: ai_proposals_path,
             size: "sm"
           ) %>
         <% end %>

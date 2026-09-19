@@ -45,6 +45,10 @@ class PlansController < ApplicationController
         extra_payment: params[:extra_payment]
       ).result
       @forecast_explain = Current.family.forecast_explains.order(generated_at: :desc).first
+      @cash_flow = IncomeStatement::CashFlow.new(
+        IncomeStatement.new(Current.family, user: Current.user),
+        month: Date.current.beginning_of_month
+      ).as_json
     end
 
     def calendar_month

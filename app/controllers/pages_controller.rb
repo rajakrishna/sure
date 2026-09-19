@@ -493,7 +493,13 @@ class PagesController < ApplicationController
       previous_total = comparison_days.positive? ? previous_header_series[comparison_days - 1][:value] : 0
       previous_comparison_day = comparison_days if comparison_days.positive? && comparison_days < previous_header_series.size
       currency = income_statement.family.currency
-
+      ideal_total = current_budget_spend_target(income_statement.family)
+      ideal_series = (1..axis_days).map do |day|
+        {
+          day: day,
+          value: ideal_total.positive? ? (ideal_total * day / axis_days.to_f) : 0
+        }
+      end
 
       {
         month: month_start,
@@ -504,6 +510,7 @@ class PagesController < ApplicationController
         axis_labels: spending_trend_axis_labels(month_start, axis_days),
         current: current_series,
         previous: previous_series,
+        ideal: ideal_series,
         current_total: Money.new(current_total, currency),
         previous_total: Money.new(previous_total, currency),
         delta: Money.new(current_total - previous_total, currency),
@@ -614,6 +621,13 @@ class PagesController < ApplicationController
         balance: selected_totals.income_money - selected_totals.expense_money,
         account_ids: account_ids
       }
+    end
+
+    def current_budget_spend_target(family)
+      start_date, end_date = Budget.period_for(Date.current, family: family)
+      owner = family.personal_budgets? ? Current.user : nil
+      budget = family.budgets.find_by(start_date: start_date, end_date: end_date, user: owner)
+      (budget&.budgeted_spending || 0).to_d
     end
 
     def ensure_intro_guest!
