@@ -15,6 +15,25 @@ class TransactionsControllerTest < ActionDispatch::IntegrationTest
     assert_match I18n.t("transactions.show.ask_in_chat"), response.body
   end
 
+  test "index surfaces pending category suggestions as accept cards" do
+    ensure_tailwind_build
+    transaction = @entry.transaction
+    category = @user.family.categories.expenses.first
+    AiProposal.propose_categorize!(
+      family: @user.family,
+      transaction: transaction,
+      category_id: category.id,
+      source: "auto_categorize"
+    )
+
+    get transactions_url
+
+    assert_response :success
+    assert_select "#ai-proposals", 1
+    assert_match CGI.escapeHTML(I18n.t("ai_proposals.card.approve")), response.body
+    assert_match CGI.escapeHTML(I18n.t("ai_proposals.card.dismiss")), response.body
+  end
+
   # Bills has always linked out to transactions. Until now nothing linked back,
   # so a transaction that settled a bill was a dead end. The link-back is part
   # of the preview-gated bills surface, so the viewer needs the flag.

@@ -12,6 +12,8 @@
     </div>
   </header>
 
+  <%= render "ai_proposals/list", proposals: @ai_proposals %>
+
   <%= form_with url: transactions_inbox_path, method: :get, class: "flex flex-wrap items-end gap-3" do %>
     <%= hidden_field_tag :view, shared_view.key %>
     <div>

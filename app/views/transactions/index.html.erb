@@ -63,6 +63,8 @@
     </div>
   <% end %>
 
+  <%= render "ai_proposals/list", proposals: @ai_proposals %>
+
   <%= render "summary", totals: @search.totals %>
   <% if Current.family.recurring_transactions_disabled? %>
     <%= render "transactions/list", transactions: @transactions, projected_recurring: @projected_recurring, q: params[:q], pagy: @pagy %>

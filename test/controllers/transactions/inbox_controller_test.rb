@@ -23,4 +23,21 @@ class Transactions::InboxControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match CGI.escapeHTML(I18n.t("transactions.inbox.show.ask_bulk")), response.body
   end
+
+  test "show surfaces pending category suggestions as accept cards" do
+    transaction = entries(:transaction).transaction
+    category = @user.family.categories.expenses.first
+    AiProposal.propose_categorize!(
+      family: @user.family,
+      transaction: transaction,
+      category_id: category.id,
+      source: "auto_categorize"
+    )
+
+    get transactions_inbox_url
+
+    assert_response :success
+    assert_select "#ai-proposals", 1
+    assert_match CGI.escapeHTML(I18n.t("ai_proposals.card.approve")), response.body
+  end
 end

@@ -80,6 +80,7 @@ class TransactionsController < ApplicationController
     end
 
     @projected_recurring = load_projected_recurring
+    @ai_proposals = Current.family.ai_proposals.pending.where(kind: %w[categorize set_merchant split refund_match]).recent.limit(8)
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.transactions"), nil ] ]
   end

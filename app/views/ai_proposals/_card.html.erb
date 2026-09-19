@@ -11,7 +11,7 @@
         <% if proposal.kind.in?(%w[categorize refund_match set_merchant split]) && proposal.payload["amount"].present? %>
           <p class="text-xs text-secondary">
             <%= t("ai_proposals.card.amount_on_date",
-                  amount: format_money(proposal.payload["amount"]),
+                  amount: format_money(proposal.payload["amount"].to_d),
                   date: proposal.payload["date"] || proposal.payload["expense_date"]) %>
           </p>
         <% elsif proposal.payload["arguments"].present? %>
