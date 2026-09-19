@@ -3,7 +3,7 @@
     <h1 class="text-xl"><%= t(".title") %></h1>
     <div class="flex items-center gap-5">
       <div class="flex items-center gap-2">
-        <% if preview_features_enabled? && @uncategorized_count.to_i.positive? %>
+        <% if @uncategorized_count.to_i.positive? %>
           <%= render DS::Link.new(
             text: t(".inbox"),
             icon: "inbox",
@@ -53,6 +53,12 @@
       </div>
     </div>
   </header>
+
+  <div class="flex flex-wrap items-center gap-2">
+    <%= ask_chip t(".ask_categorize"), hint: t(".ask_categorize_hint") %>
+    <%= ask_chip t(".ask_merchant"), hint: t(".ask_merchant_hint") %>
+    <%= ask_chip t(".ask_rule"), hint: t(".ask_rule_hint") %>
+  </div>
 
   <%= render "summary", totals: @search.totals %>
   <% if Current.family.recurring_transactions_disabled? %>

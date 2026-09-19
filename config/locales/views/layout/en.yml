@@ -10,13 +10,18 @@ en:
       release_highlight:
         title: What's new
         done: Got it
+      sidebar_aria: Main navigation
       nav:
         assistant: Assistant
         bills: Bills
-        budgets: Budgets
+        budgets: Budget
+        debt: Debt
+        forecast: Forecast
         home: Home
         plan: Plan
         reports: Reports
+        section_accounts: Accounts
+        section_workspace: Workspace
         wealth: Wealth
         goals: Goals
         transactions: Transactions

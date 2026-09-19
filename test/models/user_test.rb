@@ -892,20 +892,12 @@ class UserTest < ActiveSupport::TestCase
   end
 
   # Preview features preference tests
-  test "preview_features_enabled? defaults to false" do
+  test "preview_features_enabled? is always true" do
     @user.update!(preferences: {})
-    assert_not @user.preview_features_enabled?
-  end
-
-  test "preview_features_enabled? true only when explicitly true" do
-    @user.update!(preferences: { "preview_features_enabled" => true })
     assert @user.preview_features_enabled?
 
     @user.update!(preferences: { "preview_features_enabled" => false })
-    assert_not @user.preview_features_enabled?
-
-    @user.update!(preferences: { "preview_features_enabled" => "yes" })
-    assert_not @user.preview_features_enabled?, "truthy non-boolean should not enable"
+    assert @user.preview_features_enabled?
   end
 
   # ActiveStorage attachment cleanup tests

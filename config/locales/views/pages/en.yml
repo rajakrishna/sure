@@ -60,6 +60,10 @@ en:
         bill_item: "%{name} · %{amount} · %{date}"
         view_bills: View bills
         briefing: Weekly briefing
+        ask_unusual: What's unusual?
+        ask_unusual_hint: What looks unusual in my spending this week? Point me at the transactions or bills I should review.
+        ask_start: How should I start?
+        ask_start_hint: I have no accounts yet. What should I add first so the home briefing is useful?
       sections_aria_label: "Dashboard sections"
       drag_to_reorder: "Drag to reorder section"
       toggle_section: "Toggle section visibility"
@@ -127,6 +131,7 @@ en:
         title: "No accounts yet"
         description: "Add accounts to display net worth data"
         add_account: "Add account"
+        ask_start: How should I start?
       outflows_donut:
         title: "Outflows"
         total_outflows: "Total Outflows"

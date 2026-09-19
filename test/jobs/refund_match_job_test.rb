@@ -21,11 +21,11 @@ class RefundMatchJobTest < ActiveJob::TestCase
     assert_equal "refund_match", @family.ai_proposals.pending.sole.kind
   end
 
-  test "skips families without preview" do
+  test "creates proposals even when the preview preference is off" do
     create_transaction(account: @account, name: "Store", amount: 18)
     create_transaction(account: @account, name: "Store", amount: -18)
 
-    assert_no_difference "AiProposal.count" do
+    assert_difference "AiProposal.count", 1 do
       RefundMatchJob.perform_now(family_id: @family.id)
     end
   end

@@ -34,12 +34,14 @@
   </div>
   <%= render DS::Link.new(
     text: t("transactions.show.ask_in_chat"),
-    href: new_chat_path(
-      message_hint: t("transactions.show.ask_hint"),
-      composer_context: [ { type: "transaction", id: entry.transaction.id } ].to_json
+    href: ask_in_chat_href(
+      t("transactions.show.ask_hint"),
+      [ { type: "transaction", id: entry.transaction.id } ]
     ),
     icon: "sparkles",
-    variant: "outline",
-    size: "sm"
+    variant: "ghost",
+    size: "sm",
+    frame: chat_frame,
+    data: { action: "click->app-layout#openRightSidebar" }
   ) %>
 </div>

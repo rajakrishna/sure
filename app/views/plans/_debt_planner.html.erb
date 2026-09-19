@@ -4,7 +4,6 @@
 <div data-testid="debt-payoff-planner" class="mt-6">
   <div class="flex flex-wrap items-center gap-2 mb-3">
     <p class="text-[11px] font-medium uppercase tracking-wide text-secondary"><%= t("plans.debt_planner.title") %></p>
-    <%= render DS::Pill.new(label: t("shared.preview")) %>
   </div>
 
   <%= render DS::SegmentedControl.new(aria_label: t("plans.debt_planner.strategy_aria")) do |control| %>

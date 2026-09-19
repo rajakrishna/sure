@@ -2,7 +2,7 @@
 
 <%= render DS::Card.new do %>
   <div class="flex flex-wrap items-center gap-2 mb-4">
-    <%= render "plans/card_heading", icon_name: "receipt", title: t(".title"), preview: true %>
+    <%= render "plans/card_heading", icon_name: "receipt", title: t(".title") %>
   </div>
 
   <% if hub.recurring_disabled? %>

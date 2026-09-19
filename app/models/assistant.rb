@@ -89,8 +89,8 @@ module Assistant
         Function::ProposeBudgetAdjust
       ]
 
-      classes += PREVIEW_FUNCTION_CLASSES if user&.preview_features_enabled?
-      classes += [ Function::ParseReceiptDraft, Function::GetWealthSnapshot, Function::GetFinancialHealth ] if user&.preview_features_enabled?
+      classes += PREVIEW_FUNCTION_CLASSES
+      classes += [ Function::ParseReceiptDraft, Function::GetWealthSnapshot, Function::GetFinancialHealth ]
       classes
     end
 

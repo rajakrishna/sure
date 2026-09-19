@@ -4,6 +4,7 @@ en:
     show:
       title: Plan
       subtitle: Decide where your money goes — what you spend, what you save, and what comes due.
+      ask_hint: How is my plan tracking this month?
       tabs:
         budget: Budget
         goals: Goals
@@ -105,6 +106,8 @@ en:
       empty_title: No debt accounts
       empty_body: Add a credit card or loan to track balances and a payoff plan.
       add_account: Add account
+      ask_what_if: Explain this payoff plan
+      ask_what_if_hint: Explain this debt what-if and what changes if I pay extra. Do not change balances.
     forecast_card:
       title: Forecast
       after_bills: after scheduled bills
@@ -118,3 +121,5 @@ en:
       empty_title: No cash accounts
       empty_body: Add a checking or savings account to project cash after upcoming bills.
       add_account: Add account
+      ask_narration: Walk through this forecast
+      ask_narration_hint: Narrate the next 30 days of cash after bills. Call out any tight days.

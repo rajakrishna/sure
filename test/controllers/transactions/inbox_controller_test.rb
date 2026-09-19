@@ -15,11 +15,12 @@ class Transactions::InboxControllerTest < ActionDispatch::IntegrationTest
     assert_match CGI.escapeHTML(I18n.t("transactions.inbox.show.title")), response.body
   end
 
-  test "redirects users without preview access" do
+  test "stays available when the preview preference is off" do
     @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
 
     get transactions_inbox_url
 
-    assert_redirected_to root_path
+    assert_response :success
+    assert_match CGI.escapeHTML(I18n.t("transactions.inbox.show.ask_bulk")), response.body
   end
 end

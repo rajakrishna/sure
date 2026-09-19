@@ -2,7 +2,10 @@
 
 <%= render DS::Card.new do %>
   <div class="flex flex-wrap items-center gap-2 mb-4">
-    <%= render "plans/card_heading", icon_name: "hand-coins", title: t(".title"), preview: true %>
+    <%= render "plans/card_heading", icon_name: "hand-coins", title: t(".title") %>
+    <div class="ml-auto">
+      <%= ask_chip t(".ask_what_if"), hint: t(".ask_what_if_hint") %>
+    </div>
   </div>
 
   <% if hub.debt_accounts.empty? %>

@@ -2,7 +2,10 @@
 
 <%= render DS::Card.new do %>
   <div class="flex flex-wrap items-center gap-2 mb-4">
-    <%= render "plans/card_heading", icon_name: "calendar-clock", title: t(".title"), preview: true %>
+    <%= render "plans/card_heading", icon_name: "calendar-clock", title: t(".title") %>
+    <div class="ml-auto">
+      <%= ask_chip t(".ask_narration"), hint: t(".ask_narration_hint") %>
+    </div>
   </div>
 
   <% if hub.cash_accounts.empty? %>

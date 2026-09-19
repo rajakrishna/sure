@@ -37,17 +37,16 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
                  "the depleted reserve's bar stayed neutral"
   end
 
-  test "renders the budget tab without preview access" do
+  test "renders every plan tab without a preview preference" do
     @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
 
     get plan_url
 
     assert_response :success
     assert_match I18n.t("plans.budget_card.title"), response.body
-    assert_match I18n.t("plans.show.preview_nudge.title"), response.body
-    assert_select "[data-testid=?]", "plan-hub-tabs", count: 0
-    assert_select "nav p", text: I18n.t("layouts.application.nav.plan")
-    assert_no_match I18n.t("plans.goals_card.title"), response.body
+    assert_select "[data-testid=?]", "plan-hub-tabs"
+    assert_match I18n.t("plans.show.tabs.goals"), response.body
+    assert_no_match I18n.t("plans.show.preview_nudge.title"), response.body
   end
 
   test "renders all plan tabs for preview users" do
@@ -62,27 +61,26 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
     assert_match I18n.t("plans.show.tabs.forecast"), response.body
   end
 
-  test "keeps bills off the main nav" do
+  test "nests plan children in the left rail and keeps assistant out of it" do
     get plan_url
 
     assert_response :success
-    assert_select "nav p", text: I18n.t("layouts.application.nav.plan")
-    assert_select "nav p", text: I18n.t("layouts.application.nav.bills"), count: 0
-    assert_select "nav p", text: I18n.t("layouts.application.nav.budgets"), count: 0
-    assert_select "nav.shrink-0 a[href=?]", chats_path do |links|
-      assert links.any? { |link| link.text.include?(I18n.t("layouts.application.nav.assistant")) },
-        "expected desktop left nav to keep Assistant after the Plan hub nav change"
+    assert_select "nav[aria-label=?]", I18n.t("layouts.application.sidebar_aria") do
+      assert_select "a[href=?]", plan_path(tab: "bills")
+      assert_select "a[href=?]", plan_path(tab: "budget")
+      assert_select "a[href=?]", chats_path, count: 0
     end
+    assert_select "#chat-container turbo-frame#sidebar_chat"
   end
 
-  test "falls back to the budget tab when a preview tab is requested without preview" do
+  test "opens a requested plan tab even without a preview preference" do
     @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
 
     get plan_url(tab: "goals")
 
     assert_response :success
-    assert_select "[data-testid=?]", "plan-hub-tabs", count: 0
-    assert_match I18n.t("plans.budget_card.title"), response.body
+    assert_select "[data-testid=?]", "plan-hub-tabs"
+    assert_match I18n.t("plans.goals_card.title"), response.body
   end
 
   test "renders budget and goals summary cards with drill-in links" do

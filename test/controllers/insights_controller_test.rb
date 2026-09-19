@@ -26,27 +26,13 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
   # Unread state is carried by the well's header count, not by a pill on every
   # row. The widget shows three rows, so the pill was usually on all of them,
   # repeating what the header already says and crowding each title.
-  test "dashboard insights feed counts unread in its header, without per-row badges" do
+  test "home surfaces insight titles as ask chips instead of a feed widget" do
     get root_url
 
     assert_response :success
-    assert_select "#insights-feed", count: 1
-    assert_select "#insights-feed p", text: /#{Regexp.escape(I18n.t("insights.feed.header_new"))}/
-    assert_select "#insights-feed span", text: I18n.t("insights.card.new"), count: 0
-  end
-
-  test "insights feed leads the dashboard for users with a saved order that predates it" do
-    @user.update!(preferences: (@user.preferences || {}).merge(
-      "section_order" => %w[cashflow_sankey outflows_donut net_worth_chart balance_sheet]
-    ))
-
-    get root_url
-
-    assert_response :success
-    feed_position = response.body.index('data-section-key="insights_feed"')
-    sankey_position = response.body.index('data-section-key="cashflow_sankey"')
-    assert feed_position.present? && feed_position < sankey_position,
-      "insights_feed should be prepended, not appended, for saved orders that predate it"
+    assert_select "#insights-feed", count: 0
+    assert_match CGI.escapeHTML(@insight.title), response.body
+    assert_select "a[data-turbo-frame='sidebar_chat']", minimum: 1
   end
 
   # Acknowledging is a quiet action — no undo toast. Acknowledgement only covers
@@ -122,21 +108,17 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
 
   # Acknowledging used to be reachable only from /insights, so the dashboard —
   # the surface people actually look at — could show an insight but not clear it.
-  test "dashboard feed rows carry an acknowledge control" do
-    get root_url
+  test "insights index rows carry an acknowledge control" do
+    get insights_url
 
     assert_response :success
-    assert_select "#insights-feed form[action=?]", acknowledge_insight_path(@insight)
+    assert_select "form[action=?]", acknowledge_insight_path(@insight)
   end
 
-  # The widget shows the top N, so clearing one has to promote the next into the
-  # freed slot rather than leave a gap — hence a re-render, not a row removal.
-  test "acknowledge re-renders the dashboard feed so the next insight backfills" do
+  test "acknowledge re-renders the insights list so the next insight backfills" do
     family = @user.family
     family.insights.destroy_all
 
-    # One more than the well holds, same priority so `ordered` falls through to
-    # generated_at and the sequence is predictable.
     rows = (Insight::FEED_LIMIT + 1).times.map do |i|
       family.insights.create!(
         insight_type: "idle_cash",
@@ -152,7 +134,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
     patch acknowledge_insight_url(rows.first), as: :turbo_stream
 
     assert_response :success
-    assert_match "insights-feed", response.body
+    assert_match "insights-list", response.body
     assert_no_match(/Test insight 0/, response.body)
     assert_match(/Test insight #{Insight::FEED_LIMIT}/, response.body)
   end
@@ -194,42 +176,41 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
   # without the flag reaches none of it — not the page, not the dashboard
   # section, not the top-bar entry, and not the job the refresh action would
   # otherwise enqueue.
-  test "redirects users without preview access" do
+  test "insights stay available when the preview preference is off" do
     disable_preview_features
 
     get insights_url
 
-    assert_redirected_to root_path
-    assert_match(/preview/i, flash[:alert])
+    assert_response :success
   end
 
-  test "refresh does not enqueue generation for users without preview access" do
+  test "refresh still enqueues generation when the preview preference is off" do
     disable_preview_features
 
-    assert_no_enqueued_jobs only: GenerateInsightsJob do
+    assert_enqueued_with(job: GenerateInsightsJob, args: [ { family_id: @user.family_id } ]) do
       post refresh_insights_url
     end
 
-    assert_redirected_to root_path
+    assert_redirected_to insights_path
   end
 
-  test "acknowledge is blocked for users without preview access" do
+  test "acknowledge still works when the preview preference is off" do
     disable_preview_features
 
     patch acknowledge_insight_url(@insight), as: :turbo_stream
 
-    assert_redirected_to root_path
-    assert @insight.reload.active?
+    assert_response :success
+    assert @insight.reload.acknowledged?
   end
 
-  test "dashboard omits the insights feed and top-bar entry without preview access" do
+  test "home keeps the insights bell and omits the old feed widget" do
     disable_preview_features
 
     get root_url
 
     assert_response :success
     assert_select "#insights-feed", count: 0
-    assert_select "a[href=?]", insights_path, count: 0
+    assert_select "a[href=?]", insights_path
   end
 
   private

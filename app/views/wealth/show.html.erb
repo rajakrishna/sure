@@ -1,13 +1,15 @@
 <div class="space-y-6 pb-6">
   <header class="flex flex-wrap items-start justify-between gap-4">
     <div>
-      <div class="flex items-center gap-2">
-        <h1 class="text-2xl font-semibold text-primary"><%= t(".title") %></h1>
-        <%= render DS::Pill.new(label: t("shared.preview"), size: :md) %>
-      </div>
+      <h1 class="text-2xl font-semibold text-primary"><%= t(".title") %></h1>
       <p class="text-sm text-secondary mt-1"><%= t(".subtitle") %></p>
     </div>
-    <%= render "shared/shared_view_switcher", path: wealth_path %>
+    <div class="flex flex-wrap items-center gap-2">
+      <%= ask_chip t(".ask_idle_cash"), hint: t(".ask_idle_cash_hint") %>
+      <%= ask_chip t(".ask_allocation"), hint: t(".ask_allocation_hint") %>
+      <%= ask_chip t(".ask_health"), hint: t(".ask_health_hint") %>
+      <%= render "shared/shared_view_switcher", path: wealth_path %>
+    </div>
   </header>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -76,8 +78,6 @@
   <% end %>
 
   <% if @forecast&.narration.present? %>
-    <%= render DS::Alert.new(title: t(".forecast_title"), variant: :info) do %>
-      <p><%= @forecast.narration %></p>
-    <% end %>
+    <p class="text-sm text-secondary"><%= @forecast.narration %></p>
   <% end %>
 </div>

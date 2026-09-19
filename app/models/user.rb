@@ -67,9 +67,9 @@ class User < ApplicationRecord
   # The `@>` containment operator uses index_users_on_preferences (GIN) and
   # matches only a JSON boolean true, so it agrees with that predicate's
   # strict `== true` — a stray "yes" enables neither.
-  scope :with_preview_features, -> {
-    where("preferences @> ?", { preview_features_enabled: true }.to_json)
-  }
+  # Preview features are generally available. The scope name is kept so
+  # existing job fan-out (`Family.with_preview_features.find_each`) still works.
+  scope :with_preview_features, -> { all }
 
   attribute :ui_layout, :string
   enum :ui_layout, { dashboard: "dashboard", intro: "intro" }, validate: true, prefix: true
@@ -680,7 +680,7 @@ class User < ApplicationRecord
   end
 
   def preview_features_enabled?
-    preferences&.dig("preview_features_enabled") == true
+    true
   end
 
   private

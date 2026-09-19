@@ -11,6 +11,8 @@ en:
       empty:
         title: No insights yet
         description: Insights appear here once there's enough activity in your accounts. They refresh automatically every night.
+        ask: What should I look at first?
+        ask_hint: I have no insights yet. What should I review first based on my recent transactions and bills?
     refresh:
       queued: We're generating fresh insights. Check back in a minute.
       checking: Checking…

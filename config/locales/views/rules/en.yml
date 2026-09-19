@@ -52,6 +52,8 @@ en:
       toggle_sort_direction: Toggle sort direction
       no_rules_title: No rules yet
       no_rules_description: Set up rules to perform actions to your transactions and other data on every account sync.
+      ask_from_corrections: Suggest rules from corrections
+      ask_from_corrections_hint: Draft rules from my recent category corrections. Do not apply them — leave each as a proposal I can approve, edit, or dismiss.
     confirm:
       title: Confirm changes
       title_with_name: "Confirm changes to \"%{name}\""

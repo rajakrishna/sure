@@ -22,11 +22,11 @@ class Api::V1::WealthControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
-  test "forbids users without preview features" do
+  test "returns a snapshot when the preview preference is off" do
     @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
 
     get api_v1_wealth_url, headers: api_headers(@api_key)
 
-    assert_response :forbidden
+    assert_response :success
   end
 end

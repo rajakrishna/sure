@@ -5,7 +5,12 @@ module ChatsHelper
 
   def chat_view_path(chat)
     return new_chat_path if params[:chat_view] == "new"
-    return chats_path if chat.nil? || params[:chat_view] == "all"
+    return chats_path if params[:chat_view] == "all"
+
+    if chat.nil?
+      recent = Current.user&.chats&.order(updated_at: :desc)&.first
+      return recent ? chat_path(recent) : new_chat_path
+    end
 
     chat.persisted? ? chat_path(chat) : new_chat_path
   end
@@ -22,11 +27,13 @@ module ChatsHelper
     commands << { id: "categorize", label: t("messages.chat_form.commands.categorize"), prompt: t("messages.chat_form.prompts.categorize") }
     commands << { id: "recurring", label: t("messages.chat_form.commands.recurring"), prompt: t("messages.chat_form.prompts.recurring") }
 
-    if preview_features_enabled?
-      commands << { id: "goals", label: t("messages.chat_form.commands.goals"), prompt: t("messages.chat_form.prompts.goals") }
-      commands << { id: "bills", label: t("messages.chat_form.commands.bills"), prompt: t("messages.chat_form.prompts.bills") }
-      commands << { id: "insights", label: t("messages.chat_form.commands.insights"), prompt: t("messages.chat_form.prompts.insights") }
-    end
+    commands << { id: "goals", label: t("messages.chat_form.commands.goals"), prompt: t("messages.chat_form.prompts.goals") }
+    commands << { id: "bills", label: t("messages.chat_form.commands.bills"), prompt: t("messages.chat_form.prompts.bills") }
+    commands << { id: "insights", label: t("messages.chat_form.commands.insights"), prompt: t("messages.chat_form.prompts.insights") }
+    commands << { id: "rule", label: t("messages.chat_form.commands.rule"), prompt: t("messages.chat_form.prompts.rule") }
+    commands << { id: "split", label: t("messages.chat_form.commands.split"), prompt: t("messages.chat_form.prompts.split") }
+    commands << { id: "report", label: t("messages.chat_form.commands.report"), prompt: t("messages.chat_form.prompts.report") }
+    commands << { id: "debt", label: t("messages.chat_form.commands.debt"), prompt: t("messages.chat_form.prompts.debt") }
 
     commands
   end
@@ -38,7 +45,7 @@ module ChatsHelper
   def chat_greeting_questions
     questions = []
 
-    briefing = preview_features_enabled? ? Current.family&.weekly_briefings&.recent&.first : nil
+    briefing = Current.family&.weekly_briefings&.recent&.first
     Array(briefing&.suggested_prompts).each do |prompt|
       text = prompt["text"] || prompt[:text]
       next if text.blank?
@@ -54,13 +61,11 @@ module ChatsHelper
       { icon: "alert-triangle", text: t("chats.ai_greeting.unusual_patterns") }
     ]
 
-    if preview_features_enabled?
-      defaults += [
-        { icon: "sparkles", text: t("chats.ai_greeting.insights") },
-        { icon: "repeat", text: t("chats.ai_greeting.bills") },
-        { icon: "store", text: t("chats.ai_greeting.merchants") }
-      ]
-    end
+    defaults += [
+      { icon: "sparkles", text: t("chats.ai_greeting.insights") },
+      { icon: "repeat", text: t("chats.ai_greeting.bills") },
+      { icon: "store", text: t("chats.ai_greeting.merchants") }
+    ]
 
     defaults.each do |question|
       next if questions.any? { |existing| existing[:text] == question[:text] }

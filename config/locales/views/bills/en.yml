@@ -16,6 +16,8 @@ en:
       subscriptions_up: Which subscriptions went up this year?
       monthly_subscriptions: What am I paying monthly for subscriptions?
       safe_to_spend: How much is safe to spend this period?
+      cancel_playbook: How would I cancel this?
+      why_spiked: Why did this spike?
     smart_configurations:
       show:
         trigger: Let AI configure

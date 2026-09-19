@@ -5,7 +5,7 @@
             next_budget: @next_budget,
             latest_budget: @latest_budget %>
 
-  <% if preview_features_enabled? && @budget_nudges.present? %>
+  <% if @budget_nudges.present? %>
     <div class="mb-4">
       <%= render "shared/budget_nudges", nudges: @budget_nudges %>
     </div>
@@ -55,17 +55,12 @@
     <%# Goals live behind the preview flag, so a panel that subtracts what they
         claim — and links to them — must too, or it points at a page the reader
         cannot reach and explains a subtraction they have no way to inspect. %>
-    <% if preview_features_enabled? %>
-      <%= render "budgets/available_cash", budget: @budget %>
-      <%= render "budgets/flex_summary", budget: @budget %>
-      <% if @spending_plan && @budget.initialized? && @budget_mode == "spending_plan" %>
-        <%= render DS::Card.new do %>
-          <div class="flex items-center gap-2 mb-4">
-            <h2 class="text-sm font-medium text-primary"><%= t("plans.spending_plan.title") %></h2>
-            <%= render DS::Pill.new(label: t("shared.preview")) %>
-          </div>
-          <%= render "plans/spending_plan", plan: @spending_plan, budget_mode: @budget_mode %>
-        <% end %>
+    <%= render "budgets/available_cash", budget: @budget %>
+    <%= render "budgets/flex_summary", budget: @budget %>
+    <% if @spending_plan && @budget.initialized? && @budget_mode == "spending_plan" %>
+      <%= render DS::Card.new do %>
+        <h2 class="text-sm font-medium text-primary mb-4"><%= t("plans.spending_plan.title") %></h2>
+        <%= render "plans/spending_plan", plan: @spending_plan, budget_mode: @budget_mode %>
       <% end %>
     <% end %>
 

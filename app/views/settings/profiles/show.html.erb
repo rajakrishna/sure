@@ -124,10 +124,9 @@
   <% end %>
 <% end %>
 
-<% if preview_features_enabled? && Current.user.admin? %>
+<% if Current.user.admin? %>
   <%= settings_section title: t(".advisor_title"), subtitle: t(".advisor_subtitle") do %>
     <div class="space-y-4">
-      <%= render DS::Pill.new(label: t("shared.preview")) %>
       <p class="text-sm text-secondary"><%= t(".advisor_help") %></p>
       <%= form_with url: advisor_invites_path, class: "flex flex-wrap items-end gap-3" do %>
         <%= text_field_tag "advisor_invite[name]", nil, placeholder: t(".advisor_name"), class: "rounded-lg border border-primary bg-container-inset text-primary text-sm px-3 py-2" %>

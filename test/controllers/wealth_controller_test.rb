@@ -16,11 +16,12 @@ class WealthControllerTest < ActionDispatch::IntegrationTest
     assert_match CGI.escapeHTML(I18n.t("wealth.show.health_score")), response.body
   end
 
-  test "redirects users without preview access" do
+  test "stays available when the preview preference is off" do
     @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
 
     get wealth_url
 
-    assert_redirected_to root_path
+    assert_response :success
+    assert_match CGI.escapeHTML(I18n.t("wealth.show.ask_idle_cash")), response.body
   end
 end

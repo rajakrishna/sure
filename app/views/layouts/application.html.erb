@@ -7,16 +7,14 @@
   ]
 else
   [
-    { name: t(".nav.home"), path: root_path, icon: "pie-chart", icon_custom: false, active: page_active?(root_path) },
+    { name: t(".nav.home"), path: root_path, icon: "home", icon_custom: false, active: page_active?(root_path) },
     { name: t(".nav.transactions"), path: transactions_path, icon: "credit-card", icon_custom: false, active: page_active?(transactions_path) },
     plan_nav_item,
     { name: t(".nav.reports"), path: reports_path, icon: "chart-bar", icon_custom: false, active: page_active?(reports_path) },
-    preview_gated_nav_item({ name: t(".nav.wealth"), path: wealth_path, icon: "wallet", icon_custom: false, active: page_active?(wealth_path) }),
-    { name: t(".nav.assistant"), path: chats_path, icon: "icon-assistant", icon_custom: true, active: page_active?(chats_path) }
-  ].compact
+    { name: t(".nav.assistant"), path: chats_path, icon: "icon-assistant", icon_custom: true, active: page_active?(chats_path), mobile_only: true }
+  ]
 end %>
 
-<% desktop_nav_items = mobile_nav_items.reject { |item| item[:mobile_only] } %>
 <% expanded_sidebar_class = "w-full" %>
 <% collapsed_sidebar_class = "w-0 overflow-hidden" %>
 
@@ -40,8 +38,9 @@ end %>
       <% end %>
 
       <%= render(
-        "accounts/account_sidebar_tabs",
+        "layouts/shared/app_sidebar",
         family: Current.family,
+        user: Current.user,
         active_tab: @account_group_tab,
         mobile: true
       ) %>
@@ -73,73 +72,22 @@ end %>
       </div>
     </nav>
 
-    <%# DESKTOP - Left navbar %>
-    <div class="hidden lg:block border-r border-divider">
-      <nav class="h-full flex flex-col shrink-0 w-[84px] py-4">
-        <div class="pl-2 mb-3">
-          <%= link_to home_path, class: "block" do %>
-            <%= image_tag "logomark-color.svg", class: "w-9 h-9 mx-auto" %>
-          <% end %>
-        </div>
-
-        <ul class="space-y-0.5">
-          <% desktop_nav_items.reject { |item| item[:mobile_only] }.each do |nav_item| %>
-            <li>
-              <%= render "layouts/shared/nav_item", **nav_item %>
-            </li>
-          <% end %>
-        </ul>
-
-        <div class="pl-2 mt-auto mx-auto flex flex-col gap-2">
-          <%= render DS::Link.new(
-            variant: "icon",
-            icon: "message-circle-question",
-            href: "https://discord.gg/36ZGBsxYEK",
-            target: "_blank"
-          ) %>
-
-          <%= render "users/user_menu", user: Current.user, intro_mode: intro_mode %>
-        </div>
-      </nav>
-    </div>
-
-    <%# DESKTOP - Left sidebar %>
     <%= tag.div class: class_names(
-        "hidden lg:block relative py-4 shrink-0 transition-all duration-300 border-divider",
+        "hidden lg:block relative shrink-0 transition-all duration-300 border-divider bg-container",
         Current.user.show_sidebar? ? [expanded_sidebar_class, "border-r"] : [collapsed_sidebar_class, "border-r-0"],
        ),
-       style: "max-width: var(--left-sidebar-width, 320px)",
+       style: "max-width: var(--left-sidebar-width, 280px)",
        inert: !Current.user.show_sidebar?,
        data: { app_layout_target: "leftSidebar", sidebar_resize_target: "leftSidebar" } do %>
       <%= render "layouts/shared/sidebar_resize_handle", side: "left" %>
-      <div id="sidebar-scroll" data-controller="preserve-scroll" class="px-4 h-full flex flex-col overflow-y-auto">
+      <div id="sidebar-scroll" data-controller="preserve-scroll" class="h-full flex flex-col overflow-y-auto">
         <% if content_for?(:sidebar) %>
-          <%= yield :sidebar %>
+          <div class="px-4 py-4"><%= yield :sidebar %></div>
         <% else %>
-          <div class="grow">
-            <%= render "accounts/account_sidebar_tabs", family: Current.family, active_tab: @account_group_tab %>
-          </div>
-
-          <% if Current.family.trialing? && !self_hosted? %>
-            <div class="px-4 py-3 space-y-4 bg-container shadow-border-xs rounded-xl">
-              <div class="flex items-start justify-between">
-                <div>
-                  <p class="text-sm font-medium text-primary"><%= t("layouts.trial.open_demo") %></p>
-                  <p class="text-sm text-secondary"><%= t("layouts.trial.data_deleted_in_days", days: Current.family.days_left_in_trial) %></p>
-                </div>
-
-                <%= render DS::Link.new(
-                  text: t("layouts.trial.contribute"),
-                  href: upgrade_subscription_path,
-                ) %>
-              </div>
-
-              <div class="flex items-center gap-0.5 h-1.5">
-                <div class="h-full bg-warning rounded-full" style="width: <%= Current.family.percentage_of_trial_completed %>%"></div>
-                <div class="h-full bg-surface-inset rounded-full" style="width: <%= Current.family.percentage_of_trial_remaining %>%"></div>
-              </div>
-            </div>
-          <% end %>
+          <%= render "layouts/shared/app_sidebar",
+                family: Current.family,
+                user: Current.user,
+                active_tab: @account_group_tab %>
         <% end %>
       </div>
     <% end %>
@@ -159,11 +107,7 @@ end %>
           </div>
 
           <div class="flex items-center gap-2">
-            <%# Preview-gated. Gating the whole block (rather than just the
-                link) also keeps the unread COUNT off every page render for
-                users who haven't opted in. No preview dot on the icon: the
-                unread badge already occupies that corner. %>
-            <% if Current.family && preview_features_enabled? %>
+            <% if Current.family %>
               <% unread_insights_count = Current.family.insights.active.count %>
               <%# Prefetch disabled: /insights marks insights read on real visits
                   and deliberately skips prefetch requests, so a prefetched

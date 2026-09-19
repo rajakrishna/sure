@@ -12,8 +12,8 @@ class Family::HomeSnapshotTest < ActiveSupport::TestCase
     assert_equal expected, @snapshot.needs_review_count
   end
 
-  test "hides bills and briefing without preview" do
-    assert_not @snapshot.show_bills?
+  test "shows bills when recurring is on and hides briefing until one exists" do
+    assert @snapshot.show_bills?
     assert_not @snapshot.show_briefing?
   end
 

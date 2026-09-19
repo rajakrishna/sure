@@ -42,34 +42,9 @@ class PagesController < ApplicationController
     @investment_statement = Current.family.investment_statement
     @accounts = Current.user.accessible_accounts.visible.with_attached_logo
 
-    family_currency = Current.family.currency
-
-    # Use IncomeStatement for all cashflow data (now includes categorized trades)
-    income_statement = Current.family.income_statement
-    income_totals = income_statement.income_totals(period: @period)
-    expense_totals = income_statement.expense_totals(period: @period)
-    net_totals = income_statement.net_category_totals(period: @period)
-
-    @cashflow_sankey_data = build_cashflow_sankey_data(net_totals, income_totals, expense_totals, family_currency)
-    @outflows_data = build_outflows_donut_data(net_totals)
-    # Preview-gated: skip the query outright rather than loading rows the
-    # section won't be built from.
-    @feed_insights = preview_features_enabled? ? Current.family.insights.visible.ordered.limit(Insight::FEED_LIMIT) : Insight.none
-
-    @money_flow_accounts = income_statement.eligible_accounts
-    # TransactionsController's default (account_ids absent) scopes to this
-    # broader set, not @money_flow_accounts, so the view needs it to know
-    # when the drill-down links can safely omit account_ids.
-    @money_flow_accessible_account_ids = Current.user.accessible_accounts.pluck(:id).map(&:to_s)
-    @money_flow_month = money_flow_month_param
-    @money_flow_account_ids = money_flow_account_ids_param
-    @money_flow_data = build_money_flow_data(income_statement, @money_flow_month, @money_flow_account_ids)
-
-    @spending_trend_month = spending_trend_month_param
-    @spending_trend_data = build_spending_trend_data(income_statement, @spending_trend_month)
-
+    @feed_insights = Current.family.insights.visible.ordered.limit(Insight::FEED_LIMIT)
     @home_snapshot = Family::HomeSnapshot.new(Current.family, user: Current.user)
-    @dashboard_sections = build_dashboard_sections
+    @dashboard_sections = []
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.dashboard"), nil ] ]
   end
@@ -136,7 +111,7 @@ class PagesController < ApplicationController
     # downstream behaviors fall out for free: the saved-order lookup finds
     # nothing to map, and the insights_feed unshift special-case never fires.
     def insights_feed_section
-      return nil unless preview_features_enabled?
+      return nil
 
       {
         key: "insights_feed",

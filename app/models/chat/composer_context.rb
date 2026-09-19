@@ -66,7 +66,6 @@ class Chat::ComposerContext
     end
 
     def format_bill(id)
-      return unless user.preview_features_enabled?
       return if user.family.recurring_transactions_disabled?
 
       series = user.family.recurring_transactions.accessible_by(user).find_by(id: id)
@@ -76,8 +75,6 @@ class Chat::ComposerContext
     end
 
     def format_goal(id)
-      return unless user.preview_features_enabled?
-
       goal = user.family.goals.find_by(id: id)
       return unless goal
 

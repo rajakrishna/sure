@@ -84,11 +84,11 @@ class Family::HomeSnapshot
   end
 
   def show_bills?
-    user.preview_features_enabled? && !family.recurring_transactions_disabled?
+    !family.recurring_transactions_disabled?
   end
 
   def show_briefing?
-    user.preview_features_enabled? && weekly_briefing.present?
+    weekly_briefing.present?
   end
 
   def current_budget

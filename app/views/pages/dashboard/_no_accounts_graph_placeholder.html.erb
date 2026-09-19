@@ -7,11 +7,14 @@
 
     <p class="text-sm font-medium text-primary"><%= t("pages.dashboard.no_accounts.title") %></p>
     <p class="text-secondary text-sm"><%= t("pages.dashboard.no_accounts.description") %></p>
-    <%= render DS::Link.new(
-      text: t("pages.dashboard.no_accounts.add_account"),
-      icon: "plus",
-      href: new_account_path,
-      frame: :modal
-    ) %>
+    <div class="flex flex-wrap items-center justify-center gap-2">
+      <%= render DS::Link.new(
+        text: t("pages.dashboard.no_accounts.add_account"),
+        icon: "plus",
+        href: new_account_path,
+        frame: :modal
+      ) %>
+      <%= ask_chip t("pages.dashboard.no_accounts.ask_start"), hint: t("pages.dashboard.home.ask_start_hint") %>
+    </div>
   </div>
 </div>

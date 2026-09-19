@@ -1,0 +1,40 @@
+<%# locals: (family:, user:, active_tab: nil, mobile: false) %>
+<nav class="h-full flex flex-col min-h-0" aria-label="<%= t("layouts.application.sidebar_aria") %>">
+  <div class="flex items-center gap-3 px-3 py-3 shrink-0">
+    <%= link_to root_path, class: "flex items-center gap-3 min-w-0 flex-1 focus-ring rounded-lg" do %>
+      <%= image_tag "logomark-color.svg", class: "w-8 h-8 shrink-0", alt: "" %>
+      <div class="min-w-0">
+        <p class="text-sm font-medium text-primary truncate"><%= family.name %></p>
+        <p class="text-xs text-secondary truncate"><%= user.display_name %></p>
+      </div>
+    <% end %>
+    <%= render "users/user_menu", user: user, placement: "bottom-start", offset: 8 %>
+  </div>
+
+  <div class="flex-1 min-h-0 overflow-y-auto px-2 pb-3 space-y-6">
+    <div>
+      <p class="px-2 mb-1 text-xs font-medium uppercase tracking-wide text-secondary"><%= t("layouts.application.nav.section_workspace") %></p>
+      <ul class="space-y-0.5">
+        <% app_sidebar_primary_items.each do |item| %>
+          <li>
+            <%= render "layouts/shared/app_sidebar_item", item: item %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <div>
+      <p class="px-2 mb-1 text-xs font-medium uppercase tracking-wide text-secondary"><%= t("layouts.application.nav.section_accounts") %></p>
+      <%= render "accounts/account_sidebar_tabs", family: family, active_tab: active_tab, mobile: mobile %>
+    </div>
+  </div>
+
+  <div class="shrink-0 px-2 py-3 border-t border-primary">
+    <%= render "layouts/shared/app_sidebar_item", item: {
+      name: t("users.user_menu.settings"),
+      path: accounts_path,
+      icon: "settings",
+      active: request.path.start_with?("/settings") || page_active?(accounts_path)
+    } %>
+  </div>
+</nav>

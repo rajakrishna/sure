@@ -17,7 +17,8 @@
         </div>
       <% end %>
 
-      <%# Print Report Button %>
+      <div class="flex items-center gap-2">
+        <%= ask_chip t("reports.index.ask_report"), hint: t("saved_reports.ask_draft_hint") %>
         <%= render DS::Link.new(
           href: print_reports_path(period_type: @period_type, start_date: @start_date, end_date: @end_date),
           icon: "printer",
@@ -28,6 +29,7 @@
           aria: { label: t("reports.index.print_report") },
           class: "hidden sm:inline-flex"
         ) %>
+      </div>
     </header>
 
     <%= render "reports/saved_reports",

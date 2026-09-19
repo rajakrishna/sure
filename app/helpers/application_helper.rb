@@ -83,25 +83,34 @@ module ApplicationHelper
   # the hash for users with the flag (so the partial paints the violet
   # dot on the icon). Use inside an `Array#compact` nav-items list.
   def preview_gated_nav_item(item)
-    return nil unless preview_features_enabled?
-    item.merge(preview: true)
+    item
   end
 
-  # Plan is the GA planning spine. It stays lit on Budget/Goals/Bills drill-in
-  # pages because those paths don't share the /plan prefix. Extra Plan tabs
-  # remain preview-gated in the hub itself; the rail entry is not a preview
-  # surface.
   def plan_nav_item
-    active = page_active?(plan_path) || page_active?(budgets_path)
-    active ||= page_active?(goals_path) || page_active?(bills_path) if preview_features_enabled?
-
     {
       name: t("layouts.application.nav.plan"),
       path: plan_path,
       icon: "compass",
       icon_custom: false,
-      active: active
+      active: page_active?(plan_path) || page_active?(budgets_path) ||
+        page_active?(goals_path) || page_active?(bills_path)
     }
+  end
+
+  def ask_in_chat_href(hint, context = [])
+    new_chat_path(message_hint: hint, composer_context: Array(context).to_json)
+  end
+
+  def ask_chip(text, hint: nil, context: [], variant: "ghost", size: "sm")
+    render DS::Link.new(
+      text: text,
+      href: ask_in_chat_href(hint.presence || text, context),
+      icon: "sparkles",
+      variant: variant,
+      size: size,
+      frame: :sidebar_chat,
+      data: { action: "click->app-layout#openRightSidebar" }
+    )
   end
 
   # Wrapper around I18n.l to support custom date formats

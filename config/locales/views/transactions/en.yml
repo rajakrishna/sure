@@ -198,6 +198,14 @@ en:
       categorize_button:
         one: "Categorize (1)"
         other: "Categorize (%{count})"
+      ask_categorize: Suggest categories
+      ask_categorize_hint: Suggest categories for uncategorized transactions. Leave each as a proposal I can approve, edit, or dismiss.
+      ask_merchant: Explain this merchant
+      ask_merchant_hint: What do you know about the merchants on this page, and which ones look like subscriptions or spikes?
+      ask_split: Draft a split
+      ask_split_hint: Draft a split for a transaction that looks mixed. Do not write it — leave it as a proposal.
+      ask_rule: Draft a rule
+      ask_rule_hint: Draft a rule from a repeated merchant or name. Do not apply it — leave it as a proposal.
     categorizes:
       show:
         exit: "Exit"

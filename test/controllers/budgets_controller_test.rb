@@ -119,13 +119,13 @@ class BudgetsControllerTest < ActionDispatch::IntegrationTest
   end
   # --- Lot A3: cash on hand ---
 
-  test "the cash panel is hidden without preview access" do
+  test "the cash panel stays visible when the preview preference is off" do
     @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
 
     get budget_url(Budget.date_to_param(Date.current.beginning_of_month))
 
     assert_response :success
-    assert_no_match I18n.t("budgets.available_cash.heading"), response.body
+    assert_match I18n.t("budgets.available_cash.heading"), response.body
   end
 
   test "the cash panel shows what goals have already claimed" do

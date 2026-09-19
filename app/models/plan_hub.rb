@@ -9,12 +9,9 @@ class PlanHub
   FORECAST_HORIZON_DAYS = 30
   NEXT_UP_LIMIT = 4
 
-  def self.tab_for(tab, preview:)
+  def self.tab_for(tab, preview: true)
     candidate = tab.to_s
-    return "budget" unless TABS.include?(candidate)
-    return "budget" if PREVIEW_TABS.include?(candidate) && !preview
-
-    candidate
+    TABS.include?(candidate) ? candidate : "budget"
   end
 
   def self.budget_mode_for(mode)

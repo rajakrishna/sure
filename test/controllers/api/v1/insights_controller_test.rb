@@ -39,12 +39,11 @@ class Api::V1::InsightsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unauthorized
   end
 
-  test "does not expose insights when the API key owner opted out of preview features" do
+  test "exposes insights when the API key owner turned the preview preference off" do
     @user.update!(preferences: @user.preferences.merge("preview_features_enabled" => false))
 
     get api_v1_insights_url, headers: api_headers(@api_key)
 
-    assert_response :forbidden
-    assert_equal "feature_disabled", response.parsed_body.fetch("error")
+    assert_response :success
   end
 end

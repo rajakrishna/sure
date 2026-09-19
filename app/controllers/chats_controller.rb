@@ -4,8 +4,12 @@ class ChatsController < ApplicationController
   before_action :set_chat, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @chat = nil # override application_controller default behavior of setting @chat to last viewed chat
-    @chats = Current.user.chats.order(created_at: :desc)
+    recent = Current.user.last_viewed_chat || Current.user.chats.order(updated_at: :desc).first
+    if recent
+      redirect_to chat_path(recent)
+    else
+      redirect_to new_chat_path
+    end
   end
 
   def show

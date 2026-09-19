@@ -6,6 +6,7 @@ en:
       subtitle: Comprehensive insights into your financial health
       export: Export CSV
       print_report: Print Report
+      ask_report: Describe a custom report
       drag_to_reorder: "Drag to reorder section"
       toggle_section: "Toggle section visibility"
       periods:
@@ -85,6 +86,7 @@ en:
       description: Start tracking your finances by adding transactions or connecting your accounts to see comprehensive reports
       add_transaction: Add Transaction
       add_account: Add Account
+      ask_report: What report should I start with?
     transactions_breakdown:
       title: Activity Breakdown
       no_transactions: No activity found for the selected period and filters
