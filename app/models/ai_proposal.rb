@@ -1,6 +1,6 @@
 class AiProposal < ApplicationRecord
-  SOURCES = %w[chat auto_categorize bayes].freeze
-  KINDS = %w[categorize create_rule mutation].freeze
+  SOURCES = %w[chat auto_categorize bayes rule_suggest refund_match merchant_detect].freeze
+  KINDS = %w[categorize create_rule mutation refund_match set_merchant].freeze
   STATUSES = %w[pending approved dismissed].freeze
 
   belongs_to :family
@@ -18,6 +18,30 @@ class AiProposal < ApplicationRecord
 
   def pending?
     status == "pending"
+  end
+
+  def self.propose_merchant!(family:, transaction:, merchant_id:, merchant_name:, source: "merchant_detect", website_url: nil, logo_url: nil)
+    proposal = family.ai_proposals.pending.find_or_initialize_by(
+      kind: "set_merchant",
+      target_type: "Transaction",
+      target_id: transaction.id
+    )
+    entry = transaction.entry
+    proposal.assign_attributes(
+      source: source,
+      payload: {
+        "transaction_id" => transaction.id,
+        "merchant_id" => merchant_id,
+        "merchant_name" => merchant_name,
+        "website_url" => website_url,
+        "logo_url" => logo_url,
+        "entry_name" => entry&.name,
+        "amount" => entry&.amount,
+        "date" => entry&.date&.iso8601
+      }
+    )
+    proposal.save!
+    true
   end
 
   def self.propose_categorize!(family:, transaction:, category_id:, source:, user: nil)
@@ -74,6 +98,10 @@ class AiProposal < ApplicationRecord
       apply_suggested_rule!(actor) if create_rule
     when "create_rule"
       apply_create_rule!(actor)
+    when "refund_match"
+      apply_refund_match!
+    when "set_merchant"
+      apply_merchant!
     else
       apply_function!(actor)
     end
@@ -103,6 +131,14 @@ class AiProposal < ApplicationRecord
     when "create_rule"
       I18n.t("ai_proposals.summaries.create_rule",
         name: payload.dig("arguments", "name").presence || payload["entry_name"].presence || I18n.t("ai_proposals.summaries.unnamed_rule"))
+    when "refund_match"
+      I18n.t("ai_proposals.summaries.refund_match",
+        expense: payload["expense_name"],
+        refund: payload["refund_name"])
+    when "set_merchant"
+      I18n.t("ai_proposals.summaries.set_merchant",
+        name: payload["entry_name"].presence || I18n.t("ai_proposals.summaries.unnamed_transaction"),
+        merchant: payload["merchant_name"])
     else
       I18n.t("ai_proposals.summaries.mutation", function: human_function_name)
     end
@@ -154,6 +190,55 @@ class AiProposal < ApplicationRecord
       else
         payload.merge!(attrs)
       end
+    end
+
+    def apply_refund_match!
+      expense = family.transactions.find_by(id: payload["expense_transaction_id"])
+      refund = family.transactions.find_by(id: payload["refund_transaction_id"])
+      raise ActiveRecord::RecordNotFound, "Refund pair not found" unless expense && refund
+
+      tag = family.tags.find_or_create_by!(name: I18n.t("ai_proposals.refund_tag")) do |record|
+        record.color = Tag::COLORS.first
+      end
+      [ expense, refund ].each do |transaction|
+        transaction.tags << tag unless transaction.tags.include?(tag)
+        entry = transaction.entry
+        note = I18n.t("ai_proposals.refund_note", counterpart: counterpart_name(transaction, expense, refund))
+        next if entry.notes.to_s.include?(note)
+
+        entry.update!(notes: [ entry.notes.presence, note ].compact.join("\n"))
+      end
+    end
+
+    def counterpart_name(transaction, expense, refund)
+      transaction.id == expense.id ? refund.entry.name : expense.entry.name
+    end
+
+    def apply_merchant!
+      transaction = target_transaction
+      raise ActiveRecord::RecordNotFound, "Transaction not found" unless transaction
+
+      merchant_id = payload["merchant_id"].presence
+      merchant_id ||= find_or_create_merchant_from_payload&.id
+      raise ArgumentError, "Merchant missing" if merchant_id.blank?
+
+      transaction.enrich_attribute(:merchant_id, merchant_id, source: "ai")
+      transaction.lock_attr!(:merchant_id)
+    end
+
+    def find_or_create_merchant_from_payload
+      name = payload["merchant_name"].to_s.strip
+      return if name.blank?
+
+      existing = ProviderMerchant.find_by(source: "ai", name: name)
+      return existing if existing
+
+      ProviderMerchant.create!(
+        source: "ai",
+        name: name,
+        website_url: payload["website_url"],
+        logo_url: payload["logo_url"]
+      )
     end
 
     def apply_categorize!

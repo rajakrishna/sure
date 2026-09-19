@@ -1,6 +1,7 @@
 class Assistant::Function::GetBudget < Assistant::Function
   include ActiveSupport::NumberHelper
   include Assistant::Function::MonthResolvable
+  include Assistant::Function::Presentable
 
   MAX_PRIOR_MONTHS = 11
 
@@ -79,7 +80,12 @@ class Assistant::Function::GetBudget < Assistant::Function
     }
     unavailable = requested - months.length
     result[:months_unavailable] = unavailable if unavailable > 0
-    result
+    current = months.last
+    with_presentation(
+      result,
+      chart: budget_chart(current),
+      deep_links: [ deep_link(I18n.t("assistant.deep_links.budget"), current ? budget_path(current[:month]) : budgets_path) ]
+    )
   end
 
   private
@@ -177,5 +183,15 @@ class Assistant::Function::GetBudget < Assistant::Function
 
     def format_percent(value)
       number_to_percentage(value || 0, precision: 1)
+    end
+
+    def budget_chart(current)
+      return nil unless current
+
+      categories = Array(current[:categories]).first(6)
+      breakdown_chart(
+        categories.map { |category| { label: category[:name], formatted: category[:percent_spent] } },
+        aria_label: I18n.t("assistant.charts.budget")
+      )
     end
 end

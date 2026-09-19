@@ -17,11 +17,19 @@ This is Raja’s fork of [we-promise/sure](https://github.com/we-promise/sure) (
 - OpenAI-compatible Ollama hosts (`:11434` or hostname containing `ollama`): `tool_choice: required` when tools are present (still `none` on the final responder round). Qwen models also send `think: false`.
 
 ### Chat composer (was “Coming soon”)
-- **+** add account / transaction / goal context, or attach a file
-- **/** slash commands (`/biggest`, `/smallest`, `/income`, `/budget`, `/networth`, `/goals` when preview is on)
+- **+** add account / transaction / bill / goal context, or attach a file
+- **/** slash commands (`/biggest`, `/smallest`, `/income`, `/budget`, `/networth`, `/categorize`, `/recurring`; `/goals`, `/bills`, `/insights` when preview is on)
 - **@** mention picker (same catalog)
-- Click-pointer adds the current page’s account, transaction, or goal when the URL matches
+- Click-pointer adds the current page’s account, transaction, bill, or goal when the URL matches
 - Selected context is prepended to the user message so local models see names and amounts
+- Tool results can render an inline sparkline/breakdown plus deep links; mutating tools still wait on Approve / Edit / Dismiss
+
+### Home + nightly automations (preview families)
+- Home hero: safe-to-spend (paycheck leftover, else budget remaining), Needs Review, budget chips, next-7 bills strip, weekly briefing card
+- `CategorizeJob` (6:30 UTC): rules first, then Bayes/LLM **proposals** only — never silent category writes
+- `RuleSuggestFromCorrection`: 3× same payee→category creates a pending `create_rule` proposal
+- `RefundMatchJob`: same-account opposite amounts become pending `refund_match` proposals
+- `WeeklyBriefingJob` (Mondays 08:00 UTC): payload + suggested prompts + session memory for chat
 
 ### Preview / Goals
 - `get_goals` + `create_goal` are preview-gated (Settings → Preferences) and available on MCP for opted-in users

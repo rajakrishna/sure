@@ -7,6 +7,15 @@
   <% end %>
   <% menu.with_item(variant: "link", text: t(".sharing"), href: account_sharing_path(account), icon: "users", data: { turbo_frame: :modal }) %>
   <% menu.with_item(variant: "link", text: t(".statements"), href: account_path(account, tab: "statements"), icon: "archive") %>
+  <% menu.with_item(
+       variant: "link",
+       text: t(".ask_in_chat"),
+       icon: "sparkles",
+       href: new_chat_path(
+         message_hint: t(".ask_hint", name: account.name),
+         composer_context: [ { type: "account", id: account.id } ].to_json
+       )
+     ) %>
 
   <% if permission.in?([ :owner, :full_control ]) %>
     <% menu.with_item(variant: "divider") %>

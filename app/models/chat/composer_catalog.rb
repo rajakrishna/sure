@@ -15,6 +15,7 @@ class Chat::ComposerCatalog
     {
       accounts: accounts,
       transactions: transactions,
+      bills: bills,
       goals: goals
     }
   end
@@ -48,6 +49,26 @@ class Chat::ComposerCatalog
             id: transaction.id,
             name: name,
             subtitle: "#{entry.amount_money.abs.format} · #{entry.date} · #{entry.account.name}"
+          }
+        end
+    end
+
+    def bills
+      return [] unless user.preview_features_enabled?
+      return [] if user.family.recurring_transactions_disabled?
+
+      user.family.recurring_transactions
+        .accessible_by(user)
+        .where(status: :active)
+        .includes(:merchant)
+        .order(:name)
+        .limit(TRANSACTION_LIMIT)
+        .map do |series|
+          {
+            type: "bill",
+            id: series.id,
+            name: series.display_name,
+            subtitle: series.amount_money.abs.format
           }
         end
     end

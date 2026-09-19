@@ -1,4 +1,5 @@
 class Assistant::Function::GetInsights < Assistant::Function
+  include Assistant::Function::Presentable
   DEFAULT_LIMIT = 10
   MAX_LIMIT = 50
 
@@ -59,21 +60,24 @@ class Assistant::Function::GetInsights < Assistant::Function
 
     limit = params["limit"].present? ? params["limit"].to_i.clamp(1, MAX_LIMIT) : DEFAULT_LIMIT
 
-    {
-      insights: scope.ordered.limit(limit).map { |insight|
-        {
-          id: insight.id,
-          type: insight.insight_type,
-          title: insight.title,
-          body: insight.body,
-          priority: insight.priority,
-          status: insight.status,
-          period_start: insight.period_start,
-          period_end: insight.period_end,
-          generated_at: insight.generated_at.iso8601,
-          metadata: insight.metadata
-        }.compact
-      }
-    }
+    with_presentation(
+      {
+        insights: scope.ordered.limit(limit).map { |insight|
+          {
+            id: insight.id,
+            type: insight.insight_type,
+            title: insight.title,
+            body: insight.body,
+            priority: insight.priority,
+            status: insight.status,
+            period_start: insight.period_start,
+            period_end: insight.period_end,
+            generated_at: insight.generated_at.iso8601,
+            metadata: insight.metadata
+          }.compact
+        }
+      },
+      deep_links: [ deep_link(I18n.t("assistant.deep_links.insights"), insights_path) ]
+    )
   end
 end

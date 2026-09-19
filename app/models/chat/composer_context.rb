@@ -44,6 +44,8 @@ class Chat::ComposerContext
         format_transaction(item["id"])
       when "goal"
         format_goal(item["id"])
+      when "bill"
+        format_bill(item["id"])
       end
     end
 
@@ -61,6 +63,16 @@ class Chat::ComposerContext
       entry = transaction.entry
       merchant = transaction.merchant&.name.presence || entry.name
       "- Transaction: #{merchant} — #{entry.amount_money.abs.format} on #{entry.date} (#{entry.account.name})"
+    end
+
+    def format_bill(id)
+      return unless user.preview_features_enabled?
+      return if user.family.recurring_transactions_disabled?
+
+      series = user.family.recurring_transactions.accessible_by(user).find_by(id: id)
+      return unless series
+
+      "- Bill: #{series.display_name} — #{series.amount_money.abs.format} (#{series.bill_type})"
     end
 
     def format_goal(id)

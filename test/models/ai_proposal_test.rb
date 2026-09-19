@@ -98,4 +98,44 @@ class AiProposalTest < ActiveSupport::TestCase
     end
     assert_equal "Proposal Tag", @family.tags.find_by(name: "Proposal Tag").name
   end
+
+  test "refund match approval tags both transactions without creating a transfer" do
+    expense = create_transaction(account: @account, name: "Amazon", amount: 40).transaction
+    refund = create_transaction(account: @account, name: "Amazon", amount: -40).transaction
+    proposal = @family.ai_proposals.create!(
+      source: "refund_match",
+      kind: "refund_match",
+      target_type: "Transaction",
+      target_id: expense.id,
+      payload: {
+        "expense_transaction_id" => expense.id,
+        "refund_transaction_id" => refund.id,
+        "expense_name" => "Amazon",
+        "refund_name" => "Amazon"
+      }
+    )
+
+    assert_no_difference "Transfer.count" do
+      proposal.approve!(@user)
+    end
+
+    assert_equal "approved", proposal.reload.status
+    assert expense.reload.tags.any? { |tag| tag.name == "Refund" }
+    assert refund.reload.tags.any? { |tag| tag.name == "Refund" }
+  end
+
+  test "merchant proposal does not assign until approved" do
+    merchant = ProviderMerchant.create!(name: "Coffee Co", source: "ai")
+    AiProposal.propose_merchant!(
+      family: @family,
+      transaction: @transaction,
+      merchant_id: merchant.id,
+      merchant_name: merchant.name
+    )
+
+    assert_nil @transaction.reload.merchant
+    proposal = @family.ai_proposals.pending.sole
+    proposal.approve!(@user)
+    assert_equal merchant, @transaction.reload.merchant
+  end
 end

@@ -40,9 +40,16 @@ class Family::AutoMerchantDetector
         merchant_id ||= find_or_create_ai_merchant(auto_detection)&.id
 
         if merchant_id.present?
-          was_modified = transaction.enrich_attribute(:merchant_id, merchant_id, source: "ai")
-          transaction.lock_attr!(:merchant_id)
-          modified_count += 1 if was_modified
+          merchant = Merchant.find_by(id: merchant_id)
+          was_proposed = AiProposal.propose_merchant!(
+            family: family,
+            transaction: transaction,
+            merchant_id: merchant_id,
+            merchant_name: merchant&.name || auto_detection.business_name,
+            website_url: auto_detection.business_url,
+            logo_url: merchant&.logo_url
+          )
+          modified_count += 1 if was_proposed
         end
 
       elsif existing_merchant.is_a?(ProviderMerchant) && existing_merchant.source != "ai"

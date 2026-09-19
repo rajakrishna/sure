@@ -1,5 +1,6 @@
 class Assistant::Function::EnqueueAutoCategorize < Assistant::Function
   include Assistant::Function::CategorizeSupport
+  include Assistant::Function::Presentable
 
   DEFAULT_LIMIT = 100
   MAX_LIMIT = 1000
@@ -14,6 +15,7 @@ class Assistant::Function::EnqueueAutoCategorize < Assistant::Function
     def description
       <<~INSTRUCTIONS
         Enqueues built-in auto-categorize jobs for uncategorized transactions.
+        Suggestions wait for Approve / Edit / Dismiss — this does not apply categories itself.
         Prefer apply_category_updates when an agent can classify the rows itself,
         especially on a slow local GPU.
 
@@ -71,14 +73,17 @@ class Assistant::Function::EnqueueAutoCategorize < Assistant::Function
       batches += 1
     end
 
-    {
-      success: true,
-      enqueued_count: transaction_ids.size,
-      batches: batches,
-      limit: limit,
-      batch_size: batch_size,
-      message: "Enqueued #{transaction_ids.size} transactions in #{batches} auto-categorize jobs."
-    }
+    with_presentation(
+      {
+        success: true,
+        enqueued_count: transaction_ids.size,
+        batches: batches,
+        limit: limit,
+        batch_size: batch_size,
+        message: "Enqueued #{transaction_ids.size} transactions for categorization. Suggestions will wait for approval."
+      },
+      deep_links: [ deep_link(I18n.t("assistant.deep_links.categorize"), transactions_categorize_path) ]
+    )
   end
 
   private

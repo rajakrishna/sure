@@ -1,4 +1,6 @@
 class Assistant::Function::GetRecurringTransactions < Assistant::Function
+  include Assistant::Function::Presentable
+
   MAX_RESULTS = 200
 
   class << self
@@ -63,13 +65,18 @@ class Assistant::Function::GetRecurringTransactions < Assistant::Function
     total_count = scope.count
     rows = scope.order(status: :asc, next_expected_date: :asc).limit(MAX_RESULTS).to_a
 
-    {
-      as_of_date: Date.current,
-      total_results: total_count,
-      truncated: total_count > MAX_RESULTS,
-      recurring_transactions: rows.map { |rt| serialize(rt) },
-      totals_by_currency: totals_by_currency(scope)
-    }
+    with_presentation(
+      {
+        as_of_date: Date.current,
+        total_results: total_count,
+        truncated: total_count > MAX_RESULTS,
+        recurring_transactions: rows.map { |rt| serialize(rt) },
+        totals_by_currency: totals_by_currency(scope)
+      },
+      deep_links: [
+        deep_link(I18n.t("assistant.deep_links.recurring"), bills_path)
+      ]
+    )
   end
 
   private

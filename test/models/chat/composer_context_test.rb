@@ -5,6 +5,20 @@ class Chat::ComposerContextTest < ActiveSupport::TestCase
     @user = users(:family_admin)
   end
 
+  test "prepends bill context when preview is on" do
+    @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => true))
+    series = recurring_transactions(:netflix_subscription)
+
+    merged = Chat::ComposerContext.merge(
+      "How is this bill?",
+      [ { "type" => "bill", "id" => series.id } ],
+      user: @user
+    )
+
+    assert_includes merged, "Bill:"
+    assert_includes merged, series.display_name
+  end
+
   test "prepends account and transaction context" do
     account = accounts(:depository)
     transaction = transactions(:one)

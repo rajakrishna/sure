@@ -148,6 +148,7 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
   test "should get show" do
     get account_url(@account)
     assert_response :success
+    assert_match I18n.t("accounts.show.menu.ask_in_chat"), response.body
   end
 
   test "show renders the balance chart as drag-selectable for a custom date range" do

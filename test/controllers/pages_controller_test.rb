@@ -12,6 +12,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
   test "dashboard" do
     get root_path
     assert_response :ok
+    assert_match I18n.t("pages.dashboard.home.needs_review"), response.body
   end
 
   test "dashboard renders the net worth chart as drag-selectable, opting it out of card drag-and-drop" do

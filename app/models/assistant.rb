@@ -77,6 +77,7 @@ module Assistant
         Function::ListUncategorizedTransactions,
         Function::ApplyCategoryUpdates,
         Function::EnqueueAutoCategorize,
+        Function::EnqueueDetectMerchants,
         Function::GetMerchants,
         Function::UpdateTransaction,
         Function::CreateTransaction,

@@ -8,7 +8,7 @@ en:
       disclaimer: "AI responses are informational only. Not financial advice!"
       add_context: Add context
       attach_file: Attach file
-      mention: Mention an account or transaction
+      mention: Mention an account, transaction, or bill
       commands_label: Commands
       page_context: Add this page to chat
       search_context: Search accounts and transactions
@@ -20,6 +20,10 @@ en:
         budget: Budget this month
         networth: Net worth
         goals: Goals progress
+        bills: Upcoming bills
+        insights: Insights
+        categorize: Uncategorized
+        recurring: Recurring
       prompts:
         biggest: What was my biggest expense this month?
         smallest: What was my smallest expense this month?
@@ -27,3 +31,7 @@ en:
         budget: How am I tracking against my budget this month?
         networth: What is my current net worth?
         goals: How are my savings goals going?
+        bills: What bills are due in the next 7 days?
+        insights: What should I know about my finances?
+        categorize: Help me categorize recent transactions
+        recurring: What recurring payments do I have?

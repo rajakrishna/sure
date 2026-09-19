@@ -1,0 +1,30 @@
+---
+en:
+  weekly_briefings:
+    headline:
+      items:
+        one: "1 thing to review this week"
+        other: "%{count} things to review this week"
+      quiet: A quiet week so far
+    items:
+      spend_up:
+        title: Spending is up
+        body: "%{current} this month vs %{previous} last month"
+      budget:
+        title: Budget pressure
+        body: "%{names} — %{percent}% of the month used"
+      merchants:
+        title:
+          one: New merchant this week
+          other: "%{count} new merchants this week"
+      bills:
+        title:
+          one: "1 bill due in the next 7 days"
+          other: "%{count} bills due in the next 7 days"
+        body: "%{amount} remaining"
+    prompts:
+      spending: Where did my money go this week?
+      budget: How am I tracking against my budget?
+      bills: What bills are due soon?
+      anomaly: Why does this week look unusual?
+      merchants: What are these new merchants?
