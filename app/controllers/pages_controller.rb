@@ -38,10 +38,6 @@ class PagesController < ApplicationController
       redirect_to chats_path and return
     end
 
-    @balance_sheet = Current.family.balance_sheet
-    @investment_statement = Current.family.investment_statement
-    @accounts = Current.user.accessible_accounts.visible.with_attached_logo
-
     @feed_insights = Current.family.insights.visible.ordered.limit(Insight::FEED_LIMIT)
     @home_snapshot = Family::HomeSnapshot.new(Current.family, user: Current.user)
     @dashboard_sections = []

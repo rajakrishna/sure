@@ -66,8 +66,10 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_equal previous_height, @user.reload.dashboard_section_height("net_worth_chart")
   end
 
-  test "dashboard does not build income statement chart totals" do
-    IncomeStatement.any_instance.expects(:build_period_total).never
+  test "dashboard does not build leftover home chart payloads" do
+    PagesController.any_instance.expects(:build_cashflow_sankey_data).never
+    PagesController.any_instance.expects(:build_spending_trend_data).never
+    PagesController.any_instance.expects(:build_money_flow_data).never
 
     get root_path
 
