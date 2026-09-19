@@ -46,6 +46,25 @@ class ChatsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Hello", chat.messages.find_by!(type: "UserMessage").content
   end
 
+  test "creates chat with attached context" do
+    account = accounts(:depository)
+
+    assert_difference("Chat.count") do
+      post chats_url, params: {
+        chat: {
+          content: "Tell me about this",
+          ai_model: "gpt-4.1",
+          composer_context: [ { type: "account", id: account.id } ].to_json
+        }
+      }
+    end
+
+    chat = Chat.order(created_at: :desc).first
+    message = chat.messages.find_by!(type: "UserMessage")
+    assert_includes message.content, account.name
+    assert_includes message.content, "Tell me about this"
+  end
+
   test "shows chat" do
     chat = chats(:one)
     @user.update!(last_viewed_chat: nil)
@@ -54,6 +73,11 @@ class ChatsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal chat, @user.reload.last_viewed_chat
+    assert_select "[data-testid=chat-add-context]"
+    assert_select "[data-testid=chat-commands]"
+    assert_select "[data-testid=chat-mention]"
+    assert_select "[data-testid=chat-page-context]"
+    assert_no_match(/Coming soon/i, response.body)
   end
 
   test "destroys chat" do

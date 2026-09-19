@@ -1,27 +1,56 @@
-<%# locals: (chat: nil, message_hint: nil) %>
+<%# locals: (chat: nil, message_hint: nil, composer_seed: nil) %>
 
-<div id="chat-form" class="space-y-2">
+<% catalog = chat_composer_catalog %>
+<% seed_items = Array(composer_seed) %>
+
+<div id="chat-form" class="space-y-2" data-controller="chat-composer" data-chat-composer-catalog-value="<%= catalog.to_json %>" data-chat-composer-seed-value="<%= seed_items.to_json %>" data-action="keydown.esc->chat-composer#closePanels">
   <% model = chat && chat.persisted? ? [chat, Message.new] : Chat.new %>
 
   <%= form_with model: model,
                 class: "flex lg:flex-col gap-2 bg-container px-2 py-1.5 rounded-full lg:rounded-lg shadow-border-xs",
-                data: { chat_target: "form" } do |f| %>
+                data: { chat_target: "form" },
+                multipart: true do |f| %>
 
-    <%# In the future, this will be a dropdown with different AI models %>
     <%= f.hidden_field :ai_model, value: default_ai_model %>
+    <%= f.hidden_field :composer_context, value: seed_items.to_json, data: { chat_composer_target: "contextField" } %>
+
+    <div class="hidden flex-wrap gap-1 px-1" data-chat-composer-target="chips"></div>
+    <p class="hidden px-1 text-xs text-secondary" data-chat-composer-target="fileName"></p>
 
     <%= f.text_area :content, placeholder: t(".placeholder"), value: message_hint,
                   class: "w-full border-0 focus:ring-0 text-sm resize-none px-1 bg-transparent",
-                  data: { chat_target: "input", action: "input->chat#autoResize keydown->chat#handleInputKeyDown" },
+                  data: { chat_target: "input", chat_composer_target: "input", action: "input->chat#autoResize keydown->chat#handleInputKeyDown input->chat-composer#handleInput" },
                   rows: 1 %>
 
     <div class="flex items-center justify-between gap-1">
-      <div class="items-center gap-1 hidden lg:flex">
-        <%# These are disabled for now, but in the future, will all open specific menus with their own context and search %>
-        <% ["plus", "command", "at-sign", "mouse-pointer-click"].each do |icon| %>
-          <%= icon(icon, as_button: true, disabled: true, class: "cursor-not-allowed", title: t(".coming_soon")) %>
-        <% end %>
+      <div class="relative flex items-center gap-1">
+        <%= render DS::Button.new(variant: "icon", icon: "plus", type: "button", title: t(".add_context"), aria_label: t(".add_context"), data: { action: "chat-composer#togglePicker", testid: "chat-add-context" }) %>
+        <%= render DS::Button.new(variant: "icon", icon: "command", type: "button", title: t(".commands"), aria_label: t(".commands"), data: { action: "chat-composer#toggleCommands", testid: "chat-commands" }) %>
+        <%= render DS::Button.new(variant: "icon", icon: "at-sign", type: "button", title: t(".mention"), aria_label: t(".mention"), data: { action: "chat-composer#togglePicker", testid: "chat-mention" }) %>
+        <%= render DS::Button.new(variant: "icon", icon: "mouse-pointer-click", type: "button", title: t(".page_context"), aria_label: t(".page_context"), data: { action: "chat-composer#addPageContext", testid: "chat-page-context" }) %>
+
+        <div class="absolute bottom-full left-0 mb-2 hidden z-50 w-72 max-w-[calc(100vw-2rem)] shadow-border-lg bg-container rounded-lg p-2" data-chat-composer-target="picker" role="dialog" aria-label="<%= t(".add_context") %>">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <p class="text-xs text-secondary"><%= t(".add_context") %></p>
+            <button type="button" class="text-xs text-primary hover:underline" data-action="chat-composer#openFilePicker">
+              <%= t(".attach_file") %>
+            </button>
+          </div>
+          <%= render DS::SearchInput.new(variant: :embedded, placeholder: t(".search_context"), aria_label: t(".search_context"), data: { chat_composer_target: "pickerSearch", action: "input->chat-composer#filterPicker" }) %>
+          <div class="mt-1 max-h-56 overflow-y-auto" data-chat-composer-target="pickerList"></div>
+        </div>
+
+        <div class="absolute bottom-full left-0 mb-2 hidden z-50 w-72 max-w-[calc(100vw-2rem)] shadow-border-lg bg-container rounded-lg py-1" data-chat-composer-target="commands" role="listbox" aria-label="<%= t(".commands") %>">
+          <% chat_slash_commands.each do |command| %>
+            <button type="button" class="flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm text-primary hover:bg-container-hover rounded-md" data-action="chat-composer#insertCommand" data-prompt="<%= command[:prompt] %>">
+              <span class="font-mono text-xs text-secondary">/<%= command[:id] %></span>
+              <span><%= command[:label] %></span>
+            </button>
+          <% end %>
+        </div>
       </div>
+
+      <%= f.file_field :attachments, multiple: true, accept: "image/jpeg,image/png,image/gif,image/webp,application/pdf,text/plain,text/csv,application/json", class: "hidden", data: { chat_composer_target: "fileInput", action: "change->chat-composer#handleFileChange" } %>
 
       <%= icon("arrow-up", as_button: true, type: "submit",
               data: { chat_target: "submit" }) %>

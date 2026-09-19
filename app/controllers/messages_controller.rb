@@ -4,11 +4,21 @@ class MessagesController < ApplicationController
   before_action :set_chat
 
   def create
+    attachments = Array(message_params[:attachments]).compact_blank
+    content = Chat::ComposerContext.merge(
+      message_params[:content],
+      message_params[:composer_context],
+      user: Current.user,
+      attachments: attachments
+    )
+    content = t("messages.chat_form.attached_only") if content.blank? && attachments.any?
+
     @message = UserMessage.new(
       chat: @chat,
-      content: message_params[:content],
+      content: content,
       ai_model: message_params[:ai_model].presence || Chat.default_model
     )
+    attachments.each { |file| @message.attachments.attach(file) }
 
     if @message.save
       redirect_to chat_path(@chat, thinking: true)
@@ -44,6 +54,6 @@ class MessagesController < ApplicationController
     end
 
     def message_params
-      params.require(:message).permit(:content, :ai_model)
+      params.require(:message).permit(:content, :ai_model, :composer_context, attachments: [])
     end
 end

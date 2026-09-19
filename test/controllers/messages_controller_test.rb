@@ -12,6 +12,42 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to chat_path(@chat, thinking: true)
   end
 
+  test "prepends selected account context to the message" do
+    account = accounts(:depository)
+
+    post chat_messages_url(@chat), params: {
+      message: {
+        content: "How is this account doing?",
+        ai_model: "gpt-4.1",
+        composer_context: [ { type: "account", id: account.id } ].to_json
+      }
+    }
+
+    assert_redirected_to chat_path(@chat, thinking: true)
+    message = @chat.messages.where(type: "UserMessage").order(:created_at).last
+    assert_includes message.content, "Attached context"
+    assert_includes message.content, account.name
+    assert_includes message.content, "How is this account doing?"
+  end
+
+  test "attaches a file and prepends its excerpt" do
+    file = fixture_file_upload("test.txt", "text/plain")
+
+    post chat_messages_url(@chat), params: {
+      message: {
+        content: "Read this",
+        ai_model: "gpt-4.1",
+        attachments: [ file ]
+      }
+    }
+
+    assert_redirected_to chat_path(@chat, thinking: true)
+    message = @chat.messages.where(type: "UserMessage").order(:created_at).last
+    assert message.attachments.attached?
+    assert_includes message.content, "Attached files"
+    assert_includes message.content, "Read this"
+  end
+
   test "redirects to chats when message save races with chat deletion" do
     UserMessage.any_instance.stubs(:save).raises(ActiveRecord::InvalidForeignKey)
 

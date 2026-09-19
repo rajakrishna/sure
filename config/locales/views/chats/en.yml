@@ -13,6 +13,7 @@ en:
       evaluate_portfolio: "Evaluate investment portfolio"
       spending_insights: "Show spending insights"
       unusual_patterns: "Find unusual patterns"
+      biggest_expense: "What was my biggest expense this month?"
     chat:
       edit_chat_title: "Edit chat title"
       delete_chat: "Delete chat"

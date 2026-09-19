@@ -7,3 +7,24 @@ en:
       placeholder: "Ask anything ..."
       disclaimer: "AI responses are informational only. Not financial advice!"
       coming_soon: Coming soon
+      add_context: Add context
+      attach_file: Attach file
+      mention: Mention an account or transaction
+      commands: Commands
+      page_context: Add this page to chat
+      search_context: Search accounts and transactions
+      attached_only: Please review the attached file.
+      commands:
+        biggest: Biggest expense this month
+        smallest: Smallest expense this month
+        income: Largest income this month
+        budget: Budget this month
+        networth: Net worth
+        goals: Goals progress
+      prompts:
+        biggest: What was my biggest expense this month?
+        smallest: What was my smallest expense this month?
+        income: What was my largest income this month?
+        budget: How am I tracking against my budget this month?
+        networth: What is my current net worth?
+        goals: How are my savings goals going?

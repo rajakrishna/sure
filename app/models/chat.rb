@@ -37,13 +37,15 @@ class Chat < ApplicationRecord
   scope :ordered, -> { order(created_at: :desc) }
 
   class << self
-    def start!(prompt, model:)
+    def start!(prompt, model:, attachments: [])
       # Ensure we have a valid model by using the default if none provided
       effective_model = model.presence || default_model
+      message = UserMessage.new(content: prompt, ai_model: effective_model)
+      Array(attachments).each { |file| message.attachments.attach(file) if file.present? }
 
       create!(
         title: generate_title(prompt),
-        messages: [ UserMessage.new(content: prompt, ai_model: effective_model) ]
+        messages: [ message ]
       )
     end
 

@@ -63,7 +63,15 @@ export default class extends Controller {
   }
 
   #hasContent() {
-    return this.inputTarget.value.trim().length > 0;
+    if (this.inputTarget.value.trim().length > 0) return true;
+
+    const files = this.element.querySelector('[data-chat-composer-target="fileInput"]');
+    if (files?.files?.length) return true;
+
+    const context = this.element.querySelector('[data-chat-composer-target="contextField"]');
+    if (context?.value && context.value !== "[]") return true;
+
+    return false;
   }
 
   #updateSubmitState() {
