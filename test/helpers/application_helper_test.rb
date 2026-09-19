@@ -107,4 +107,12 @@ class ApplicationHelperTest < ActionView::TestCase
 
     assert_equal [ "SGD", "USD", "EUR" ], currency_picker_options_for_family(family, extra: "EUR")
   end
+
+  test "#ask_in_chat_href seeds the right-rail composer without persisting a chat" do
+    href = ask_in_chat_href("What's unusual?", [ { type: "transaction", id: "tx-1" } ])
+
+    assert_includes href, "message_hint="
+    assert_includes href, "composer_context="
+    assert_match(%r{/chats/new}, href)
+  end
 end

@@ -1,24 +1,58 @@
 <%# locals: (snapshot:) %>
-<div class="space-y-4 mb-6">
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <%= render DS::Card.new(class: "gap-3") do %>
-      <p class="text-xs font-medium uppercase text-secondary"><%= snapshot.safe_to_spend_from_paycheck? ? t("pages.dashboard.home.safe_to_spend") : t("pages.dashboard.home.left_to_allocate") %></p>
-      <p class="text-2xl font-medium text-primary privacy-sensitive">
-        <%= snapshot.safe_to_spend_money ? format_money(snapshot.safe_to_spend_money) : t("pages.dashboard.home.not_enough_data") %>
-      </p>
-      <% if snapshot.budget_pace_percent %>
-        <p class="text-sm text-secondary">
-          <%= t("pages.dashboard.home.budget_pace",
-                percent: snapshot.budget_pace_percent.round,
-                days: snapshot.budget_days_remaining) %>
+<div class="space-y-4 mb-6" data-testid="home-hero">
+  <%= render DS::Card.new(class: "gap-4") do %>
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div class="min-w-0 space-y-1">
+        <p class="text-xs font-medium uppercase tracking-wide text-secondary">
+          <%= snapshot.safe_to_spend_from_paycheck? ? t("pages.dashboard.home.safe_to_spend") : t("pages.dashboard.home.left_to_allocate") %>
         </p>
+        <p class="text-3xl font-medium text-primary privacy-sensitive">
+          <%= snapshot.safe_to_spend_money ? format_money(snapshot.safe_to_spend_money) : t("pages.dashboard.home.not_enough_data") %>
+        </p>
+        <% if snapshot.budget_pace_percent %>
+          <p class="text-sm text-secondary">
+            <%= t("pages.dashboard.home.budget_pace",
+                  percent: snapshot.budget_pace_percent.round,
+                  days: snapshot.budget_days_remaining) %>
+          </p>
+        <% end %>
+        <% if snapshot.show_briefing? %>
+          <p class="text-sm text-primary"><%= snapshot.weekly_briefing.headline %></p>
+        <% end %>
+      </div>
+      <% if snapshot.show_briefing? && snapshot.weekly_briefing.suggested_prompts.any? %>
+        <div class="flex flex-wrap gap-2">
+          <% snapshot.weekly_briefing.suggested_prompts.first(2).each do |prompt| %>
+            <%= ask_chip prompt["text"], hint: prompt["text"] %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if snapshot.show_briefing? %>
+    <%= render DS::Card.new(class: "gap-3", id: "weekly-recap") do %>
+      <p class="text-xs font-medium uppercase tracking-wide text-secondary"><%= t("pages.dashboard.home.recap") %></p>
+      <p class="text-sm font-medium text-primary"><%= snapshot.weekly_briefing.headline %></p>
+      <% if snapshot.weekly_briefing.items.any? %>
+        <ul class="space-y-1">
+          <% snapshot.weekly_briefing.items.first(4).each do |item| %>
+            <li class="text-sm text-secondary"><%= item["title"] || item["text"] %></li>
+          <% end %>
+        </ul>
       <% end %>
     <% end %>
+  <% end %>
 
-    <%= render DS::Card.new(class: "gap-3") do %>
-      <p class="text-xs font-medium uppercase text-secondary"><%= t("pages.dashboard.home.needs_review") %></p>
-      <p class="text-2xl font-medium text-primary privacy-sensitive"><%= snapshot.needs_review_count %></p>
-      <div class="flex flex-wrap gap-2">
+  <div class="bg-container rounded-xl shadow-border-xs divide-y divide-subdued">
+    <div class="flex items-center gap-3 px-4 py-3">
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-medium text-primary"><%= t("pages.dashboard.home.needs_review") %></p>
+        <p class="text-sm text-secondary privacy-sensitive">
+          <%= t("pages.dashboard.home.needs_review_count", count: snapshot.needs_review_count) %>
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center justify-end gap-2">
         <%= render DS::Link.new(
           text: t("pages.dashboard.home.review_transactions"),
           href: transactions_categorize_path,
@@ -27,90 +61,58 @@
         <% if snapshot.pending_proposal_count.positive? %>
           <%= render DS::Link.new(
             text: t("pages.dashboard.home.pending_proposals", count: snapshot.pending_proposal_count),
-            href: rules_path,
+            href: ai_proposals_path,
             size: "sm"
           ) %>
         <% end %>
+        <% if snapshot.needs_review_count.positive? %>
+          <%= ask_chip t("pages.dashboard.home.ask_review"), hint: t("pages.dashboard.home.ask_review_hint") %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if snapshot.show_bills? %>
+      <div class="flex items-center gap-3 px-4 py-3">
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-medium text-primary"><%= t("pages.dashboard.home.bills_next_seven") %></p>
+          <% if snapshot.upcoming_bills.any? %>
+            <p class="text-sm text-secondary truncate">
+              <%= snapshot.upcoming_bills.first(3).map { |bill| bill.name }.to_sentence %>
+            </p>
+          <% else %>
+            <p class="text-sm text-secondary"><%= t("pages.dashboard.home.no_bills") %></p>
+          <% end %>
+        </div>
+        <div class="flex flex-wrap items-center justify-end gap-2">
+          <%= render DS::Link.new(text: t("pages.dashboard.home.view_bills"), href: bills_path, size: "sm") %>
+          <%= ask_chip t("pages.dashboard.home.ask_bills"), hint: t("pages.dashboard.home.ask_bills_hint") %>
+        </div>
       </div>
     <% end %>
 
-    <% if snapshot.budget_chips.any? %>
-      <%= render DS::Card.new(class: "gap-3") do %>
-        <p class="text-xs font-medium uppercase text-secondary"><%= t("pages.dashboard.home.budget_hot") %></p>
-        <div class="flex flex-wrap gap-2">
-          <% snapshot.budget_chips.each do |chip| %>
-            <%= render DS::Link.new(
-              text: t("pages.dashboard.home.chip", name: chip.name, percent: chip.percent),
-              href: chip.href,
-              variant: "outline",
-              size: "sm"
-            ) %>
-          <% end %>
-        </div>
-      <% end %>
-    <% elsif snapshot.current_budget %>
-      <%= render DS::Card.new(class: "gap-3") do %>
-        <p class="text-xs font-medium uppercase text-secondary"><%= t("pages.dashboard.home.budget_hot") %></p>
-        <p class="text-sm text-secondary"><%= t("pages.dashboard.home.budget_on_track") %></p>
-      <% end %>
-    <% else %>
-      <%= render DS::Card.new(class: "gap-3") do %>
-        <p class="text-xs font-medium uppercase text-secondary"><%= t("pages.dashboard.home.budget_hot") %></p>
-        <p class="text-sm text-secondary"><%= t("pages.dashboard.home.no_budget") %></p>
+    <div class="flex items-center gap-3 px-4 py-3">
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-medium text-primary"><%= t("pages.dashboard.home.budget_hot") %></p>
+        <% if snapshot.budget_chips.any? %>
+          <div class="flex flex-wrap gap-2 mt-1">
+            <% snapshot.budget_chips.each do |chip| %>
+              <%= render DS::Link.new(
+                text: t("pages.dashboard.home.chip", name: chip.name, percent: chip.percent),
+                href: chip.href,
+                variant: "outline",
+                size: "sm"
+              ) %>
+            <% end %>
+          </div>
+        <% elsif snapshot.current_budget %>
+          <p class="text-sm text-secondary"><%= t("pages.dashboard.home.budget_on_track") %></p>
+        <% else %>
+          <p class="text-sm text-secondary"><%= t("pages.dashboard.home.no_budget") %></p>
+        <% end %>
+      </div>
+      <% unless snapshot.current_budget %>
         <%= render DS::Link.new(text: t("pages.dashboard.home.open_budget"), href: budgets_path, size: "sm") %>
       <% end %>
-    <% end %>
+    </div>
   </div>
-
-  <% if snapshot.show_bills? && snapshot.upcoming_bills.any? %>
-    <%= render DS::Card.new(class: "gap-3") do %>
-      <div class="flex items-center justify-between gap-2">
-        <p class="text-xs font-medium uppercase text-secondary"><%= t("pages.dashboard.home.bills_next_seven") %></p>
-        <%= render DS::Link.new(text: t("pages.dashboard.home.view_bills"), href: bills_path, size: "sm") %>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        <% snapshot.upcoming_bills.each do |bill| %>
-          <%= render DS::Link.new(
-            text: t("pages.dashboard.home.bill_item",
-                    name: bill.name,
-                    amount: format_money(bill.amount),
-                    date: l(bill.due_on, format: :short)),
-            href: bill.href,
-            variant: "outline",
-            size: "sm"
-          ) %>
-        <% end %>
-      </div>
-    <% end %>
-  <% end %>
-
-  <% if snapshot.show_briefing? %>
-    <%= render DS::Card.new(class: "gap-3") do %>
-      <div class="flex items-center gap-2">
-        <p class="text-xs font-medium uppercase text-secondary"><%= t("pages.dashboard.home.briefing") %></p>
-        <%= render DS::Pill.new(label: t("shared.preview"), marker: false) %>
-      </div>
-      <h2 class="text-base font-medium text-primary"><%= snapshot.weekly_briefing.headline %></h2>
-      <ul class="space-y-2">
-        <% snapshot.weekly_briefing.items.each do |item| %>
-          <li class="text-sm">
-            <p class="font-medium text-primary"><%= item["title"] %></p>
-            <p class="text-secondary"><%= item["body"] %></p>
-          </li>
-        <% end %>
-      </ul>
-      <% if snapshot.weekly_briefing.suggested_prompts.any? %>
-        <div class="flex flex-wrap gap-2">
-          <% snapshot.weekly_briefing.suggested_prompts.each do |prompt| %>
-            <%= render DS::Link.new(
-              text: prompt["text"],
-              href: new_chat_path(message_hint: prompt["text"]),
-              variant: "outline",
-              size: "sm"
-            ) %>
-          <% end %>
-        </div>
-      <% end %>
-    <% end %>
-  <% end %>
 </div>

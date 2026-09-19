@@ -4,12 +4,14 @@ en:
     show:
       title: Plan
       subtitle: Decide where your money goes — what you spend, what you save, and what comes due.
+      ask_hint: How is my plan tracking this month?
       tabs:
         budget: Budget
         goals: Goals
         bills: Bills
         debt: Debt
         forecast: Forecast
+        cash_flow: Cash flow
       preview_nudge:
         title: More planning tools
         body: Goals, bills, debt, and a 30-day forecast are in preview. Turn them on when you want to try them.
@@ -26,6 +28,8 @@ en:
       view_budget: View full budget
       empty_body: Set a monthly spending target and per-category limits to see how this month is tracking.
       set_up: Set up this month's budget
+      ask: Adjust this budget
+      ask_hint: Draft a budget adjustment for categories that are over or near their limit. Leave it as a proposal I can approve, edit, or dismiss.
       mode_aria: Budget view
       mode_categories: Categories
       mode_spending_plan: Spending plan
@@ -82,6 +86,8 @@ en:
       funded_from: "from %{category}"
       runway: "%{months} mo runway · %{pace}/mo"
       all_goals: All goals
+      ask: How should I fund this?
+      ask_hint: How should I fund my goals this month without overdrawing cash? Leave any transfer as a proposal.
     bills_card:
       title: Bills & Recurrings
       left_to_pay: left to pay this month
@@ -95,6 +101,8 @@ en:
       view_bills: View bills
       disabled_title: Recurring bills are off
       disabled_body: This household turned off recurring detection, so there is nothing to list here.
+      ask_due: What's due soon?
+      ask_due_hint: What bills are due soon, and which subscriptions look safe to cancel? Do not change any bill.
     debt_card:
       title: Debt
       total_owed: total owed
@@ -105,6 +113,8 @@ en:
       empty_title: No debt accounts
       empty_body: Add a credit card or loan to track balances and a payoff plan.
       add_account: Add account
+      ask_what_if: Explain this payoff plan
+      ask_what_if_hint: Explain this debt what-if and what changes if I pay extra. Do not change balances.
     forecast_card:
       title: Forecast
       after_bills: after scheduled bills
@@ -118,3 +128,5 @@ en:
       empty_title: No cash accounts
       empty_body: Add a checking or savings account to project cash after upcoming bills.
       add_account: Add account
+      ask_narration: Walk through this forecast
+      ask_narration_hint: Narrate the next 30 days of cash after bills. Call out any tight days.

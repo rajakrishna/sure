@@ -16,8 +16,10 @@ class CategorizeJobTest < ActiveJob::TestCase
     end
   end
 
-  test "skips families without preview" do
-    ApplyAllRulesJob.expects(:perform_now).never
+  test "runs for families even when the preview preference is off" do
+    ApplyAllRulesJob.expects(:perform_now).once
+    Family::RuleSuggestFromCorrection.any_instance.stubs(:scan_recent)
+    Family.any_instance.stubs(:auto_categorize_transactions)
 
     CategorizeJob.perform_now(family_id: @family.id)
   end

@@ -1,0 +1,38 @@
+<%# locals: (item:) %>
+<% children = Array(item[:children]) %>
+<% if children.any? %>
+  <%= render DS::Disclosure.new(
+        variant: :inline,
+        open: item[:active],
+        body_class: "mt-0.5 ml-4 pl-3 border-l border-primary space-y-0.5",
+        class: "group"
+      ) do |disclosure| %>
+    <% disclosure.with_summary_content do %>
+      <div class="flex w-full items-center gap-2 px-2 py-1.5 rounded-lg text-sm <%= item[:active] ? "text-primary bg-container-inset" : "text-secondary hover:bg-container-inset-hover hover:text-primary" %>">
+        <%= icon(item[:icon], size: "sm", color: "current") %>
+        <span class="flex-1 font-medium truncate"><%= item[:name] %></span>
+        <%= icon "chevron-right", size: "sm", color: "current", class: "group-open:rotate-90 motion-safe:transition-transform" %>
+      </div>
+    <% end %>
+    <% children.each do |child| %>
+      <%= link_to child[:path],
+            class: class_names(
+              "block px-2 py-1.5 rounded-lg text-sm focus-ring",
+              child[:active] ? "text-primary font-medium bg-container-inset" : "text-secondary hover:text-primary hover:bg-container-inset-hover"
+            ),
+            aria: { current: ("page" if child[:active]) } do %>
+        <%= child[:name] %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% else %>
+  <%= link_to item[:path],
+        class: class_names(
+          "flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm focus-ring",
+          item[:active] ? "text-primary font-medium bg-container-inset" : "text-secondary hover:text-primary hover:bg-container-inset-hover"
+        ),
+        aria: { current: ("page" if item[:active]) } do %>
+    <%= icon(item[:icon], size: "sm", color: "current") if item[:icon] %>
+    <span class="truncate"><%= item[:name] %></span>
+  <% end %>
+<% end %>

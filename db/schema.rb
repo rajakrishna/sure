@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_19_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_19_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -446,6 +446,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_160000) do
     t.string "classification_unused", default: "expense", null: false
     t.string "color", default: "#6172F3", null: false
     t.datetime "created_at", null: false
+    t.string "emoji"
+    t.boolean "exclude_from_budget", default: false, null: false
     t.uuid "family_id", null: false
     t.datetime "last_used_at"
     t.string "lucide_icon", default: "shapes", null: false
@@ -610,6 +612,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_160000) do
     t.string "subtype"
     t.string "tax_treatment", default: "taxable", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "custom_alerts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.jsonb "config", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: true, null: false
+    t.uuid "family_id", null: false
+    t.string "kind", null: false
+    t.datetime "last_triggered_at"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["family_id", "kind"], name: "index_custom_alerts_on_family_id_and_kind"
+    t.index ["family_id"], name: "index_custom_alerts_on_family_id"
   end
 
   create_table "data_enrichments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -868,7 +883,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_160000) do
     t.string "default_account_sharing", default: "shared", null: false
     t.boolean "early_access", default: false
     t.string "enabled_currencies", array: true
+    t.boolean "high_confidence_auto_apply", default: false, null: false
     t.boolean "household_budget_enabled", default: true, null: false
+    t.integer "ai_review_gate_threshold", default: 10, null: false
+    t.string "investment_benchmark_symbol", default: "SPY"
     t.datetime "last_sync_all_attempted_at"
     t.datetime "latest_sync_activity_at", default: -> { "CURRENT_TIMESTAMP" }
     t.datetime "latest_sync_completed_at", default: -> { "CURRENT_TIMESTAMP" }
@@ -1343,6 +1361,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_160000) do
     t.string "currency", default: "USD", null: false
     t.string "dedup_key", null: false
     t.datetime "dismissed_at"
+    t.string "feedback"
     t.jsonb "facts", default: {}, null: false
     t.uuid "family_id", null: false
     t.datetime "generated_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
@@ -2618,8 +2637,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_160000) do
     t.jsonb "locked_attributes", default: {}
     t.uuid "assignee_id"
     t.uuid "merchant_id"
+    t.datetime "reviewed_at"
+    t.uuid "reviewed_by_id"
     t.uuid "transfer_id"
     t.datetime "updated_at", null: false
+    t.index ["reviewed_at"], name: "index_transactions_on_reviewed_at"
+    t.index ["reviewed_by_id"], name: "index_transactions_on_reviewed_by_id"
     t.index "(((extra -> 'goal'::text) ->> 'pledge_id'::text))", name: "ix_transactions_extra_goal_pledge_id", unique: true, where: "(((extra -> 'goal'::text) ->> 'pledge_id'::text) IS NOT NULL)"
     t.index ["assignee_id"], name: "index_transactions_on_assignee_id"
     t.index ["category_id"], name: "index_transactions_on_category_id"
@@ -2845,6 +2868,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_160000) do
   add_foreign_key "budgets", "families"
   add_foreign_key "budgets", "users", on_delete: :cascade
   add_foreign_key "categories", "families"
+  add_foreign_key "custom_alerts", "families"
   add_foreign_key "chats", "users"
   add_foreign_key "coinbase_accounts", "coinbase_items"
   add_foreign_key "coinbase_items", "families"

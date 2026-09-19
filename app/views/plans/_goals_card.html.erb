@@ -9,11 +9,9 @@
     <% if goals.any? %>
       <span class="text-xs text-subdued">· <%= t(".active_count", count: goals.size) %></span>
     <% end %>
-    <% if goals.any? && linkable_account_count > 0 %>
-      <div class="ml-auto shrink-0">
-        <%# Same weight as the budget card's edit control (DS::Link,
-            secondary, sm) so the two cards' header actions read as one
-            family, not two different conventions. %>
+    <div class="ml-auto shrink-0 flex flex-wrap items-center gap-2">
+      <%= ask_chip t(".ask"), hint: t(".ask_hint") %>
+      <% if goals.any? && linkable_account_count > 0 %>
         <%= render DS::Link.new(
           text: t(".new_goal"),
           variant: "secondary",
@@ -22,8 +20,8 @@
           href: new_goal_path,
           frame: :modal
         ) %>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
 
   <% if goals.empty? %>

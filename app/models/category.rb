@@ -40,6 +40,7 @@ class Category < ApplicationRecord
       .order(:name, :id)
   }
   scope :roots, -> { where(parent_id: nil) }
+  scope :budget_included, -> { where(exclude_from_budget: false) }
   # Legacy scopes - classification removed; these now return all categories
   scope :incomes, -> { all }
   scope :expenses, -> { all }
@@ -373,6 +374,14 @@ class Category < ApplicationRecord
 
   def display_name
     self.class.localized_default_name_for(name)
+  end
+
+  def budget_group_name
+    parent&.display_name || display_name
+  end
+
+  def display_label
+    emoji.present? ? "#{emoji} #{display_name}" : display_name
   end
 
   def display_name_with_parent

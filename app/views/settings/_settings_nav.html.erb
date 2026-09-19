@@ -20,6 +20,7 @@ nav_sections = [
       { label: t(".rules_label"), path: rules_path, icon: "git-branch" },
       { label: t(".merchants_label"), path: family_merchants_path, icon: "store" },
       { label: t(".recurring_transactions_label"), path: recurring_transactions_path, icon: "repeat" },
+      { label: t(".alerts_label"), path: custom_alerts_path, icon: "bell" },
       { label: t(".statement_vault_label"), path: account_statements_path, icon: "archive", if: Current.user&.admin? }
     ]
   },
@@ -53,7 +54,7 @@ nav_sections = [
 ]
 %>
 
-<div class="space-y-4">
+<div class="space-y-3">
   <div class="hidden lg:flex items-center gap-2 p-1.5">
     <%= render DS::Link.new(
       text: t("settings.settings_nav_link_large.previous"),

@@ -3,7 +3,7 @@ require "test_helper"
 class AssistantTest < ActiveSupport::TestCase
   include ProviderTestHelper
 
-  test "default registry includes the analytical read tools and gates preview reads" do
+  test "default registry includes the analytical read tools and former preview reads" do
     default_classes = Assistant.function_classes
 
     assert_includes default_classes, Assistant::Function::GetMerchants
@@ -15,19 +15,10 @@ class AssistantTest < ActiveSupport::TestCase
     assert_includes default_classes, Assistant::Function::EnqueueAutoCategorize
     assert_includes default_classes, Assistant::Function::EnqueueDetectMerchants
     assert_includes default_classes, Assistant::Function::CreateRule
-    assert_not_includes default_classes, Assistant::Function::GetInsights
-    assert_not_includes default_classes, Assistant::Function::GetValuations
-
-    preview_user = users(:family_admin)
-    preview_user.update!(preferences: (preview_user.preferences || {}).merge("preview_features_enabled" => true))
-    preview_classes = Assistant.function_classes(preview_user)
-
-    assert_includes preview_classes, Assistant::Function::GetInsights
-    assert_includes preview_classes, Assistant::Function::GetValuations
-    assert_includes preview_classes, Assistant::Function::GetGoals
-    assert_includes preview_classes, Assistant::Function::CreateGoal
-    assert_not_includes default_classes, Assistant::Function::GetGoals
-    assert_not_includes default_classes, Assistant::Function::CreateGoal
+    assert_includes default_classes, Assistant::Function::GetInsights
+    assert_includes default_classes, Assistant::Function::GetValuations
+    assert_includes default_classes, Assistant::Function::GetGoals
+    assert_includes default_classes, Assistant::Function::CreateGoal
   end
 
   setup do

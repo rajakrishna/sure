@@ -1,5 +1,21 @@
 class AiProposalsController < ApplicationController
-  before_action :set_proposal
+  before_action :set_proposal, only: %i[update approve dismiss]
+
+  def index
+    @kind = params[:kind].presence
+    @source = params[:source].presence
+    scope = Current.family.ai_proposals.pending.recent
+    scope = scope.where(kind: @kind) if @kind.present?
+    scope = scope.where(source: @source) if @source.present?
+    @ai_proposals = scope.limit(100)
+    @kinds = Current.family.ai_proposals.pending.distinct.pluck(:kind)
+    @quality_stats = AiProposal.quality_stats(Current.family)
+    @breadcrumbs = [
+      [ t("breadcrumbs.home"), root_path ],
+      [ t("breadcrumbs.transactions"), transactions_path ],
+      [ t("ai_proposals.index.title"), nil ]
+    ]
+  end
 
   def update
     @proposal.update_payload!(proposal_params)
@@ -14,6 +30,18 @@ class AiProposalsController < ApplicationController
   def dismiss
     @proposal.dismiss!(Current.user)
     respond_to_card(notice: t(".dismissed"))
+  end
+
+  def bulk_approve
+    ids = Array(params[:proposal_ids])
+    AiProposal.bulk_approve!(family: Current.family, ids: ids, actor: Current.user)
+    redirect_to ai_proposals_path, notice: t(".success", count: ids.size)
+  end
+
+  def bulk_dismiss
+    ids = Array(params[:proposal_ids])
+    AiProposal.bulk_dismiss!(family: Current.family, ids: ids, actor: Current.user)
+    redirect_to ai_proposals_path, notice: t(".dismissed", count: ids.size)
   end
 
   private
@@ -31,7 +59,7 @@ class AiProposalsController < ApplicationController
     def respond_to_card(notice: nil)
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_back_or_to rules_path, notice: notice }
+        format.html { redirect_back_or_to ai_proposals_path, notice: notice }
       end
     end
 end

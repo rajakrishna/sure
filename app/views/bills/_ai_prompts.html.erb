@@ -1,21 +1,22 @@
 <%# locals: (prompts:) %>
-<%# Quick prompts that seed the chat sidebar with a bills question. Each chip
-    POSTs chats#create into the sidebar frame (the same mechanism the chat's
-    own sample questions use) and makes sure the sidebar is visible. Hidden
-    entirely without AI consent + a configured provider. %>
 <% if bills_one_shot_ai_available? %>
+  <% visible_prompts = Array(prompts).first(2) %>
+  <% extra_prompts = Array(prompts).drop(2) %>
   <div class="flex flex-wrap items-center gap-2">
-    <% prompts.each do |prompt| %>
-      <%= render DS::Button.new(
-            variant: :outline,
-            text: t(".#{prompt}"),
-            icon: "sparkles",
-            href: chats_path,
-            class: "rounded-full",
-            params: { chat: { content: t(".#{prompt}"), ai_model: default_ai_model } },
-            form: { data: { turbo_frame: chat_frame } },
-            data: { action: "app-layout#openRightSidebar" }
-          ) %>
+    <% visible_prompts.each do |prompt| %>
+      <%= ask_chip t(".#{prompt}"), hint: t(".#{prompt}") %>
+    <% end %>
+    <% if extra_prompts.any? %>
+      <%= render DS::Disclosure.new(variant: :inline, title: nil, align: "left") do |disclosure| %>
+        <% disclosure.with_summary_content do %>
+          <span class="text-sm text-secondary"><%= t(".more") %></span>
+        <% end %>
+        <div class="flex flex-wrap items-center gap-2 mt-2">
+          <% extra_prompts.each do |prompt| %>
+            <%= ask_chip t(".#{prompt}"), hint: t(".#{prompt}") %>
+          <% end %>
+        </div>
+      <% end %>
     <% end %>
   </div>
 <% end %>

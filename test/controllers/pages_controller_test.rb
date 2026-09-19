@@ -13,6 +13,26 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get root_path
     assert_response :ok
     assert_match I18n.t("pages.dashboard.home.needs_review"), response.body
+    assert_select "[data-testid=home-hero]"
+    assert_select "[data-testid=command-palette-trigger]"
+    assert_select "#home-analytics"
+    assert_select "#cashflow-preview", count: 0
+    assert_select "[data-controller='sankey-chart']", count: 0
+    assert_select "[data-section-key='cashflow_sankey']", count: 0
+    assert_select "#netWorthChart"
+  end
+
+  test "dashboard weekly recap lists briefing items" do
+    @family.weekly_briefings.create!(
+      week_of: Date.current.beginning_of_week,
+      generated_at: Time.current,
+      payload: { "headline" => "A calm week", "items" => [ { "title" => "Dining cooled off" } ], "suggested_prompts" => [] }
+    )
+
+    get root_path
+    assert_response :ok
+    assert_select "#weekly-recap"
+    assert_match "Dining cooled off", response.body
   end
 
   test "dashboard renders the net worth chart as drag-selectable, opting it out of card drag-and-drop" do
@@ -110,63 +130,6 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get intro_path
 
     assert_response :ok
-  end
-
-  test "dashboard renders sankey chart with subcategories" do
-    # Create parent category with subcategory
-    parent_category = @family.categories.create!(name: "Shopping", color: "#FF5733")
-    subcategory = @family.categories.create!(name: "Groceries", parent: parent_category, color: "#33FF57")
-
-    # Create transactions using helper
-    create_transaction(account: @family.accounts.first, name: "General shopping", amount: 100, category: parent_category)
-    create_transaction(account: @family.accounts.first, name: "Grocery store", amount: 50, category: subcategory)
-
-    get root_path
-    assert_response :ok
-    assert_select "[data-controller='sankey-chart']"
-  end
-
-  test "dashboard renders sankey chart zoom controls and stable node ids" do
-    parent_category = @family.categories.create!(name: "Shopping", color: "#FF5733")
-    subcategory = @family.categories.create!(name: "Groceries", parent: parent_category, color: "#33FF57")
-
-    create_transaction(account: @family.accounts.first, name: "General shopping", amount: 100, category: parent_category)
-    create_transaction(account: @family.accounts.first, name: "Grocery store", amount: 50, category: subcategory)
-
-    get root_path
-
-    assert_response :ok
-    assert_select "[data-sankey-chart-target='zoomOutButton'][hidden]", count: 2
-
-    chart = css_select("[data-controller='sankey-chart']").first
-    sankey_data = JSON.parse(chart["data-sankey-chart-data-value"])
-
-    assert_includes sankey_data.fetch("nodes").map { |node| node.fetch("id") }, "cash_flow_node"
-    assert sankey_data.fetch("nodes").any? { |node| node.fetch("id").start_with?("expense_") }
-  end
-
-  test "dashboard sankey nodes carry a stable filter_value, including opposite-direction subcategories" do
-    parent_category = @family.categories.create!(name: "Shopping", color: "#FF5733")
-    subcategory = @family.categories.create!(name: "Rebate Program", parent: parent_category, color: "#33FF57")
-
-    # Parent nets as an expense; the subcategory nets as income (more refunded than spent),
-    # which routes it into the "opposite_subs" branch as its own standalone node.
-    create_transaction(account: @family.accounts.first, name: "Shopping trip", amount: 100, category: parent_category)
-    create_transaction(account: @family.accounts.first, name: "Rebate refund", amount: -30, category: subcategory)
-
-    get root_path
-    assert_response :ok
-
-    chart = css_select("[data-controller='sankey-chart']").first
-    sankey_data = JSON.parse(chart["data-sankey-chart-data-value"])
-    nodes = sankey_data.fetch("nodes")
-
-    opposite_node = nodes.find { |node| node.fetch("id").start_with?("income_sub_") }
-    assert_not_nil opposite_node, "expected an opposite-direction subcategory node"
-    assert_equal subcategory.name, opposite_node["filter_value"]
-
-    parent_node = nodes.find { |node| node.fetch("id") == "expense_#{parent_category.id}" }
-    assert_equal parent_category.name, parent_node["filter_value"]
   end
 
   test "dashboard renders money flow widget" do
@@ -442,6 +405,8 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     # The chart needs the selected month's own length to label only its days
     # on narrow (mobile) widths.
     assert_equal selected_month.end_of_month.day, chart.fetch("current_days")
+    assert chart.fetch("ideal").any?
+    assert_equal selected_month.end_of_month.day, chart.fetch("ideal").size
   end
 
   test "dashboard spending trend widget caps an in-progress month at today" do

@@ -385,7 +385,7 @@ class McpControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "tools/list omits preview tools for a user without preview features" do
+  test "tools/list includes former preview tools even when the preference is off" do
     @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
 
     with_mcp_env do
@@ -397,7 +397,7 @@ class McpControllerTest < ActionDispatch::IntegrationTest
 
       assert_includes tool_names, "get_transactions"
       Assistant::PREVIEW_FUNCTION_CLASSES.each do |fn_class|
-        assert_not_includes tool_names, fn_class.name
+        assert_includes tool_names, fn_class.name
       end
     end
   end
@@ -420,7 +420,7 @@ class McpControllerTest < ActionDispatch::IntegrationTest
 
   # -- tools/call --
 
-  test "tools/call rejects a preview tool for a user without preview features" do
+  test "tools/call accepts a former preview tool when the preference is off" do
     @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
 
     with_mcp_env do
@@ -429,8 +429,7 @@ class McpControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :ok
       body = JSON.parse(response.body)
-      assert_equal(-32602, body["error"]["code"])
-      assert_includes body["error"]["message"], "list_account_statements"
+      assert body["result"].present?, body.inspect
     end
   end
 

@@ -6,42 +6,14 @@ class GenerateInsightsJobTest < ActiveJob::TestCase
     enable_preview_features(@family)
   end
 
-  test "without args enqueues one job per preview-enabled family" do
-    assert_operator Family.count, :>, Family.with_preview_features.count,
-      "fixture setup should leave some families without preview access"
+  test "without args enqueues one job per family" do
+    assert_equal Family.count, Family.with_preview_features.count
 
-    assert_enqueued_jobs Family.with_preview_features.count, only: GenerateInsightsJob do
+    assert_enqueued_jobs Family.count, only: GenerateInsightsJob do
       GenerateInsightsJob.perform_now
     end
 
     assert_enqueued_with(job: GenerateInsightsJob, args: [ { family_id: @family.id } ])
-  end
-
-  # Insights is a preview feature and the job manufactures data (and can spend
-  # LLM budget) per family, so families with nobody opted in are skipped
-  # entirely rather than generated for and hidden.
-  test "without args enqueues nothing when no family has preview access" do
-    disable_preview_features(@family)
-
-    assert_no_enqueued_jobs only: GenerateInsightsJob do
-      GenerateInsightsJob.perform_now
-    end
-  end
-
-  test "does nothing for a family without preview access" do
-    disable_preview_features(@family)
-
-    assert_no_difference "Insight.count" do
-      GenerateInsightsJob.perform_now(family_id: @family.id)
-    end
-  end
-
-  test "does not broadcast for a family without preview access" do
-    disable_preview_features(@family)
-
-    Turbo::StreamsChannel.expects(:broadcast_replace_to).never
-
-    GenerateInsightsJob.perform_now(family_id: @family.id)
   end
 
   test "generates for a family where only one member opted in" do
@@ -91,16 +63,9 @@ class GenerateInsightsJobTest < ActiveJob::TestCase
 
   test "enqueues notifications for newly created high priority insights" do
     Rails.application.config.stubs(:app_mode).returns("managed".inquiry)
-    opted_in_user, opted_out_user = @family.users.to_a
-    set_preview_features(opted_out_user, false)
+    opted_in_user = @family.users.first
     subscription = opted_in_user.push_subscriptions.create!(
       token: "ab" * 32,
-      environment: "sandbox",
-      platform: "ios",
-      last_registered_at: Time.current
-    )
-    opted_out_user.push_subscriptions.create!(
-      token: "cd" * 32,
       environment: "sandbox",
       platform: "ios",
       last_registered_at: Time.current

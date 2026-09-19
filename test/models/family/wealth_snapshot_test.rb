@@ -7,5 +7,6 @@ class Family::WealthSnapshotTest < ActiveSupport::TestCase
 
     assert snapshot.net_worth_money.present?
     assert snapshot.allocation.is_a?(Array)
+    assert snapshot.sparkline_series.is_a?(Array)
   end
 end

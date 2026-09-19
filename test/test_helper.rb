@@ -84,7 +84,10 @@ module ActiveSupport
     # later tests and causes order-dependent failures (e.g. Settings::Hostings
     # reading a stale "" where nil is expected). Reset the cache before every
     # test so each starts from the rolled-back DB state.
-    setup { Setting.clear_cache }
+    setup do
+      Setting.clear_cache
+      ensure_tailwind_build
+    end
 
     include SqlQueryCapture
 

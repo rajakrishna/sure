@@ -12,6 +12,7 @@ class ReportsController < ApplicationController
 
     # Build reports sections for collapsible/reorderable UI
     @reports_sections = build_reports_sections
+    @ai_proposals = Current.family.ai_proposals.pending.where(kind: %w[budget_adjust]).recent
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.reports"), nil ] ]
   end
@@ -143,11 +144,11 @@ class ReportsController < ApplicationController
 
       # Build navigation links for period switching
       @nav = build_period_navigation
-      @saved_reports = preview_features_enabled? ? Current.family.saved_reports.order(:name) : []
+      @saved_reports = Current.family.saved_reports.order(:name)
     end
 
     def apply_saved_report
-      return if params[:saved_report_id].blank? || !preview_features_enabled?
+      return if params[:saved_report_id].blank?
 
       report = Current.family.saved_reports.find_by(id: params[:saved_report_id])
       return unless report
@@ -517,7 +518,9 @@ class ReportsController < ApplicationController
         period_withdrawals: period_totals.withdrawals,
         top_holdings: investment_statement.top_holdings(limit: 5),
         accounts: investment_accounts.to_a,
-        gains_by_tax_treatment: build_gains_by_tax_treatment(investment_statement)
+        gains_by_tax_treatment: build_gains_by_tax_treatment(investment_statement),
+        benchmark_symbol: Current.family.investment_benchmark_symbol.presence || "SPY",
+        benchmark_return: Family::InvestmentBenchmark.new(Current.family, period: @period).return_percent
       }
     end
 

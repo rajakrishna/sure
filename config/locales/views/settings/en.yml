@@ -215,6 +215,11 @@ en:
           none: No access
           read_only: View only
           read_write: Can edit
+        intelligence_title: Intelligence
+        intelligence_subtitle: Review stays first. Auto-apply is off unless you turn it on.
+        investment_benchmark: Investment benchmark ticker
+        high_confidence_auto_apply: Auto-apply high-confidence categories
+        high_confidence_auto_apply_hint: Only after you have accepted enough suggestions. Off by default.
         currencies_title: "%{moniker} Currencies"
         currencies_subtitle: Choose which currencies appear in money fields for your %{moniker}
         base_currency_label: Base currency
@@ -237,9 +242,6 @@ en:
         sharing_default_label: Default sharing for new accounts
         sharing_shared: Share with all members
         sharing_private: Keep private by default
-        preview:
-          title: Enable preview features
-          description: Opt in to Plan tools still in preview (Goals, Bills & Recurrings, Debt, Forecast) and other in-progress features tagged preview or canary.
     budget_shares:
       update:
         success: Budget sharing settings updated
@@ -365,6 +367,7 @@ en:
       preferences_label: Preferences
       profile_label: Profile Info
       recurring_transactions_label: Recurring
+      alerts_label: Alerts
       rules_label: Rules
       mcp_label: MCP
       security_label: Security

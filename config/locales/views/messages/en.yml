@@ -24,6 +24,10 @@ en:
         insights: Insights
         categorize: Uncategorized
         recurring: Recurring
+        rule: Draft a rule
+        split: Draft a split
+        report: Draft a report
+        debt: Debt what-if
       prompts:
         biggest: What was my biggest expense this month?
         smallest: What was my smallest expense this month?
@@ -35,3 +39,7 @@ en:
         insights: What should I know about my finances?
         categorize: Help me categorize recent transactions
         recurring: What recurring payments do I have?
+        rule: Draft a rule from my recent category corrections. Do not apply it — leave it as a proposal I can approve, edit, or dismiss.
+        split: Draft a split for the selected transaction. Do not write it — leave it as a proposal I can approve, edit, or dismiss.
+        report: Draft a saved report from what I describe. Do not save it — leave it as a proposal I can approve, edit, or dismiss.
+        debt: Explain this debt payoff what-if and what would change if I pay extra.

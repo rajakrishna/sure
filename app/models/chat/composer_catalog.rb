@@ -54,7 +54,6 @@ class Chat::ComposerCatalog
     end
 
     def bills
-      return [] unless user.preview_features_enabled?
       return [] if user.family.recurring_transactions_disabled?
 
       user.family.recurring_transactions
@@ -74,8 +73,6 @@ class Chat::ComposerCatalog
     end
 
     def goals
-      return [] unless user.preview_features_enabled?
-
       user.family.goals.includes(:linked_accounts).where.not(state: "archived").order(:name).limit(GOAL_LIMIT).map do |goal|
         {
           type: "goal",

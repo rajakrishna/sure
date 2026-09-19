@@ -3,12 +3,12 @@
     the viewport. Viewport breakpoints kept 3 columns in a narrow center
     column and crushed the cards. %>
 <div class="@container space-y-8 pb-6 lg:pb-12">
-  <header>
-    <div class="flex items-center gap-2">
+  <header class="flex items-start justify-between gap-4">
+    <div>
       <h1 class="text-2xl font-semibold text-primary"><%= t(".title") %></h1>
-      <%= render DS::Pill.new(label: t("shared.preview"), size: :md) %>
+      <p class="text-sm text-secondary mt-1"><%= t(".subtitle") %></p>
     </div>
-    <p class="text-sm text-secondary mt-1"><%= t(".subtitle") %></p>
+    <%= ask_chip t(".ask"), hint: t(".ask_hint") %>
   </header>
 
   <% if @counts["all"].zero? %>

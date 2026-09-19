@@ -1,14 +1,11 @@
 <%# locals: (nudges:) %>
 <% if nudges.present? %>
-  <div class="space-y-2">
+  <div class="flex flex-wrap items-center gap-2">
     <% nudges.each do |nudge| %>
-      <%= render DS::Alert.new(
-            title: t("budget_nudges.#{nudge.status}_title", name: nudge.name, percent: nudge.percent),
-            variant: nudge.status == "over" ? :warning : :info
-          ) do %>
-        <p><%= t("budget_nudges.#{nudge.status}_body", days: nudge.days_remaining) %></p>
-        <%= render DS::Link.new(text: t("budget_nudges.review"), href: nudge.href, variant: "ghost") %>
-      <% end %>
+      <%= ask_chip(
+            t("budget_nudges.#{nudge.status}_title", name: nudge.name, percent: nudge.percent),
+            hint: t("budget_nudges.ask_adjust_hint", name: nudge.name)
+          ) %>
     <% end %>
   </div>
 <% end %>

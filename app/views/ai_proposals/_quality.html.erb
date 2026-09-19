@@ -1,0 +1,17 @@
+<%# locals: (stats:) %>
+<div class="rounded-xl border border-primary bg-container p-4" data-testid="proposal-quality">
+  <p class="text-sm font-medium text-primary"><%= t("ai_proposals.quality.title") %></p>
+  <% if stats[:reviewed].positive? %>
+    <p class="text-sm text-secondary mt-1">
+      <%= t("ai_proposals.quality.counts", accepted: stats[:approved], dismissed: stats[:dismissed]) %>
+    </p>
+    <p class="text-sm text-primary mt-1">
+      <%= t("ai_proposals.quality.accept_rate", percent: (stats[:accept_rate] * 100).round) %>
+    </p>
+  <% else %>
+    <p class="text-sm text-secondary mt-1"><%= t("ai_proposals.quality.empty") %></p>
+  <% end %>
+  <% if stats[:pending].positive? %>
+    <p class="text-xs text-secondary mt-1"><%= t("ai_proposals.quality.pending", count: stats[:pending]) %></p>
+  <% end %>
+</div>

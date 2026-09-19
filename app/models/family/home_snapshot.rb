@@ -20,7 +20,7 @@ class Family::HomeSnapshot
   end
 
   def needs_review_count
-    @needs_review_count ||= accessible_entries.uncategorized_transactions.count
+    @needs_review_count ||= Transaction::Inbox.uncategorized_for(family, account_ids: user.accessible_accounts.select(:id)).count
   end
 
   def pending_proposal_count
@@ -84,11 +84,11 @@ class Family::HomeSnapshot
   end
 
   def show_bills?
-    user.preview_features_enabled? && !family.recurring_transactions_disabled?
+    !family.recurring_transactions_disabled?
   end
 
   def show_briefing?
-    user.preview_features_enabled? && weekly_briefing.present?
+    weekly_briefing.present?
   end
 
   def current_budget

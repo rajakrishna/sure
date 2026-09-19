@@ -2,14 +2,16 @@
 en:
   ai_proposals:
     list:
-      title: Waiting for your approval
-      description: AI suggested these changes. Approve, edit, or dismiss them — nothing is saved until you do.
+      title: Suggestions
+      description: Accept, edit, or dismiss — nothing is saved until you do.
     kinds:
       categorize: Category
       create_rule: Rule
       mutation: Change
       refund_match: Refund
       set_merchant: Merchant
+      split: Split
+      budget_adjust: Budget
     sources:
       chat: From chat
       auto_categorize: AI categorize
@@ -17,6 +19,10 @@ en:
       rule_suggest: From your edits
       refund_match: Refund match
       merchant_detect: Merchant detect
+      draft_tool: Draft
+      receipt_vision: Receipt
+      mcp: Assistant
+      idle_cash: Idle cash
     refund_tag: Refund
     refund_note: "Matched refund with %{counterpart}"
     statuses:
@@ -28,14 +34,16 @@ en:
       create_rule: "Create rule “%{name}”"
       refund_match: "Match %{expense} with refund %{refund}"
       set_merchant: "Set merchant on %{name} to %{merchant}"
+      split: "Split %{name} into %{count} lines"
+      budget_adjust: Adjust this month's budget
       unnamed_transaction: this transaction
       unnamed_rule: new rule
       mutation: "Apply “%{function}”"
     card:
       amount_on_date: "%{amount} on %{date}"
       edit: Edit
-      approve: Approve
-      approve_and_create_rule: Approve and create rule
+      approve: Accept
+      approve_and_create_rule: Accept and create rule
       dismiss: Dismiss
     edit:
       rule_name: Rule name

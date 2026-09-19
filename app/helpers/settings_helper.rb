@@ -14,6 +14,7 @@ module SettingsHelper
     { name: -> { t("settings.settings_nav.rules_label") }, path: :rules_path },
     { name: -> { t("settings.settings_nav.merchants_label") }, path: :family_merchants_path },
     { name: -> { t("settings.settings_nav.recurring_transactions_label") }, path: :recurring_transactions_path },
+    { name: -> { t("settings.settings_nav.alerts_label") }, path: :custom_alerts_path },
     { name: -> { t("settings.settings_nav.statement_vault_label") }, path: :account_statements_path, condition: :admin_user? },
     # Advanced section
     { name: -> { t("settings.settings_nav.ai_prompts_label") }, path: :settings_ai_prompts_path, condition: :admin_user? },

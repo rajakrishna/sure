@@ -1,23 +1,23 @@
 <% content_for :page_header do %>
   <div class="space-y-4 mb-6">
     <header class="flex justify-between items-center text-primary font-medium gap-4">
-      <div class="space-y-1">
-        <h1 class="text-xl lg:text-3xl font-medium text-primary">
+      <div class="space-y-0.5 min-w-0">
+        <h1 class="text-xl font-medium text-primary">
           <%= t("reports.index.title") %>
         </h1>
-        <p class="text-sm lg:text-base text-secondary">
+        <p class="text-sm text-secondary">
           <%= t("reports.index.subtitle") %>
         </p>
       </div>
 
-      <%# Flash messages %>
       <% if flash[:alert].present? %>
         <div class="p-3 rounded-lg bg-destructive-surface text-sm text-destructive">
           <%= flash[:alert] %>
         </div>
       <% end %>
 
-      <%# Print Report Button %>
+      <div class="flex items-center gap-2">
+        <%= ask_chip t("reports.index.ask_report"), hint: t("saved_reports.ask_draft_hint") %>
         <%= render DS::Link.new(
           href: print_reports_path(period_type: @period_type, start_date: @start_date, end_date: @end_date),
           icon: "printer",
@@ -28,6 +28,7 @@
           aria: { label: t("reports.index.print_report") },
           class: "hidden sm:inline-flex"
         ) %>
+      </div>
     </header>
 
     <%= render "reports/saved_reports",
@@ -35,9 +36,8 @@
           period_type: @period_type,
           start_date: @start_date,
           end_date: @end_date,
-          view_key: (preview_features_enabled? ? shared_view.key : "ours") %>
+          view_key: shared_view.key %>
 
-    <%# Period Navigation Tabs %>
     <div class="flex items-center justify-between gap-4">
       <%= render DS::SegmentedControl.new(aria_label: t("reports.index.period_aria", default: "Report period"), class: "overflow-x-auto no-scrollbar") do |sc| %>
         <% %i[monthly quarterly ytd last_6_months custom].each do |ptype| %>
@@ -49,7 +49,6 @@
       <% end %>
     </div>
 
-    <%# Custom Date Range Picker (only shown when custom is selected) %>
     <% if @period_type == :custom %>
       <%= form_with url: reports_path, method: :get, data: { controller: "auto-submit-form" }, class: "flex items-center gap-3 bg-surface-inset p-3 rounded-lg" do |f| %>
         <%= f.hidden_field :period_type, value: :custom %>
@@ -74,7 +73,6 @@
       <% end %>
     <% end %>
 
-    <%# Period Display %>
     <% if @nav %>
       <div class="flex items-center gap-1 mb-4">
         <div class="flex items-center gap-2">
@@ -128,15 +126,42 @@
 
 <div class="w-full space-y-6 lg:pb-6">
   <% if Current.family.transactions.any? %>
-    <%# Summary Dashboard - Always visible, not collapsible %>
-    <section>
+    <div data-testid="reports-hero">
+      <%= render DS::Card.new(class: "gap-4") do %>
+        <div class="min-w-0 space-y-1">
+          <p class="text-xs font-medium uppercase tracking-wide text-secondary"><%= t("reports.summary.net_savings") %></p>
+          <p class="text-3xl font-medium privacy-sensitive <%= @summary_metrics[:net_savings] >= 0 ? "text-success" : "text-destructive" %>">
+            <%= @summary_metrics[:net_savings].format %>
+          </p>
+          <div class="flex flex-wrap gap-4 text-sm text-secondary">
+            <p>
+              <%= t("reports.summary.total_income") %>
+              <span class="text-primary tabular-nums privacy-sensitive"><%= @summary_metrics[:current_income].format %></span>
+            </p>
+            <p>
+              <%= t("reports.summary.total_expenses") %>
+              <span class="text-primary tabular-nums privacy-sensitive"><%= @summary_metrics[:current_expenses].format %></span>
+            </p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%= render "ai_proposals/list", proposals: @ai_proposals %>
+
+    <%= render DS::Disclosure.new(
+          title: t("reports.index.snapshot"),
+          align: "left",
+          variant: :card,
+          open: false,
+          id: "reports-snapshot"
+        ) do %>
       <%= render partial: "reports/summary_dashboard", locals: {
         metrics: @summary_metrics,
         period_type: @period_type
       } %>
-    </section>
+    <% end %>
 
-    <%# Collapsible & Reorderable Sections %>
     <div data-controller="reports-sortable" data-action="dragover->reports-sortable#dragOver drop->reports-sortable#drop" role="list" aria-label="Reports sections">
       <% @reports_sections.each do |section| %>
         <% next unless section[:visible] %>
@@ -188,7 +213,6 @@
       <% end %>
     </div>
   <% else %>
-    <%# Empty State %>
     <section>
       <%= render partial: "reports/empty_state" %>
     </section>

@@ -192,7 +192,7 @@ class Settings::HostingsControllerTest < ActionDispatch::IntegrationTest
       assert_equal "1234567890", Setting.twelve_data_api_key
 
       patch settings_hosting_url, params: { setting: { twelve_data_api_key: "" } }
-      assert_nil Setting.twelve_data_api_key
+      assert_predicate Setting.twelve_data_api_key, :blank?
     end
   end
 
@@ -238,7 +238,7 @@ class Settings::HostingsControllerTest < ActionDispatch::IntegrationTest
 
       patch settings_hosting_url, params: { setting: { openai_access_token: "" } }
 
-      assert_nil Setting.openai_access_token
+      assert_predicate Setting.openai_access_token, :blank?
     end
   end
 

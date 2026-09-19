@@ -76,19 +76,13 @@ class BillsFeedsControllerTest < ActionDispatch::IntegrationTest
     assert_match "BEGIN:VCALENDAR", response.body
   end
 
-  # The feed is sessionless, so the preview gate has to travel with the token:
-  # a retained calendar URL must die the moment its member opts out, not only
-  # after an explicit token reset.
-  test "a retained URL stops working when the member opts out of preview" do
+  test "a retained URL still works when the unused preview preference is off" do
     token = @family.bills_feed_token_for(@user)
 
     @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
     get bills_feed_url(token: token)
-    assert_response :not_found
-
-    @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => true))
-    get bills_feed_url(token: token)
     assert_response :success
+    assert_match "BEGIN:VCALENDAR", response.body
   end
 
   test "the feed honors the family recurring switch" do

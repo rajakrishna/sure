@@ -1,17 +1,18 @@
 <div class="space-y-6 pb-6">
   <header class="flex flex-wrap items-start justify-between gap-4">
     <div>
-      <div class="flex items-center gap-2">
-        <h1 class="text-2xl font-semibold text-primary"><%= t(".title") %></h1>
-        <%= render DS::Pill.new(label: t("shared.preview"), size: :md) %>
-      </div>
+      <h1 class="text-2xl font-semibold text-primary"><%= t(".title") %></h1>
       <p class="text-sm text-secondary mt-1"><%= t(".subtitle", count: @assigned_to_me) %></p>
     </div>
     <div class="flex flex-wrap items-center gap-3">
       <%= render "shared/shared_view_switcher", path: transactions_inbox_path %>
+      <%= ask_chip t(".ask_bulk"), hint: t(".ask_bulk_hint") %>
+      <%= ask_chip t(".ask_rules"), hint: t(".ask_rules_hint") %>
       <%= render DS::Link.new(text: t(".all_transactions"), href: transactions_path, variant: "outline") %>
     </div>
   </header>
+
+  <%= render "ai_proposals/list", proposals: @ai_proposals %>
 
   <%= form_with url: transactions_inbox_path, method: :get, class: "flex flex-wrap items-end gap-3" do %>
     <%= hidden_field_tag :view, shared_view.key %>
@@ -37,6 +38,13 @@
             </div>
             <div class="flex items-center gap-3 shrink-0">
               <span class="text-sm tabular-nums privacy-sensitive text-primary"><%= format_money(entry.amount_money) %></span>
+              <%= render DS::Button.new(
+                text: t(".mark_reviewed"),
+                href: transactions_review_path(transaction_id: transaction.id),
+                method: :post,
+                variant: "ghost",
+                size: "sm"
+              ) %>
               <%= form_with model: entry, url: transaction_path(transaction), method: :patch, class: "min-w-40" do |form| %>
                 <%= form.hidden_field :entryable_type, value: "Transaction" %>
                 <%= form.fields_for :entryable, transaction do |tf| %>
@@ -53,6 +61,10 @@
       </ul>
     <% end %>
   <% else %>
-    <%= render DS::EmptyState.new(icon: "inbox", title: t(".empty_title"), description: t(".empty_body")) %>
+    <%= render DS::EmptyState.new(icon: "inbox", title: t(".empty_title"), description: t(".empty_body")) do |es| %>
+      <% es.with_action do %>
+        <%= ask_chip t(".ask_categorize"), hint: t(".ask_categorize_hint") %>
+      <% end %>
+    <% end %>
   <% end %>
 </div>

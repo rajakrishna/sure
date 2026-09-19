@@ -44,6 +44,31 @@ class AiProposalTest < ActiveSupport::TestCase
     assert_equal "bayes", @transaction.data_enrichments.find_by(attribute_name: "category_id").source
   end
 
+  test "quality_stats reports accept rate from reviewed proposals" do
+    AiProposal.propose_categorize!(
+      family: @family,
+      transaction: @transaction,
+      category_id: @category.id,
+      source: "auto_categorize"
+    )
+    @family.ai_proposals.pending.sole.approve!(@user)
+
+    other = create_transaction(account: @account, name: "Dismiss Me").transaction
+    AiProposal.propose_categorize!(
+      family: @family,
+      transaction: other,
+      category_id: @category.id,
+      source: "auto_categorize"
+    )
+    @family.ai_proposals.pending.sole.dismiss!(@user)
+
+    stats = AiProposal.quality_stats(@family)
+    assert_equal 1, stats[:approved]
+    assert_equal 1, stats[:dismissed]
+    assert_equal 0, stats[:pending]
+    assert_in_delta 0.5, stats[:accept_rate]
+  end
+
   test "dismiss leaves the transaction untouched" do
     AiProposal.propose_categorize!(
       family: @family,

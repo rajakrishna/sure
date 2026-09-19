@@ -41,13 +41,10 @@
         <% if @user.family.uses_custom_month_start? %>
           <%= render DS::Alert.new(message: t(".month_start_day_warning"), variant: :warning) %>
         <% end %>
-        <% if Current.user.admin? && preview_features_enabled? %>
+        <% if Current.user.admin? %>
           <div class="flex items-center justify-between">
             <div class="space-y-1">
-              <p class="text-sm flex items-center gap-1.5">
-                <%= t(".personal_budgets") %>
-                <%= render DS::Pill.new(label: t("shared.preview"), size: :sm) %>
-              </p>
+              <p class="text-sm"><%= t(".personal_budgets") %></p>
               <p class="text-secondary text-sm"><%= t(".personal_budgets_hint") %></p>
             </div>
             <%= family_form.toggle :personal_budgets,
@@ -69,7 +66,7 @@
     <% end %>
   </div>
 <% end %>
-<% if @user.family.personal_budgets? && preview_features_enabled? %>
+<% if @user.family.personal_budgets? %>
   <%= settings_section title: t(".budget_sharing_title"), subtitle: t(".budget_sharing_subtitle") do %>
     <% if @family_members.any? %>
       <%= styled_form_with url: settings_budget_shares_path, method: :patch, class: "space-y-4", data: { controller: "auto-submit-form" } do |form| %>
@@ -102,6 +99,30 @@
       <p class="text-sm text-secondary"><%= t(".budget_sharing_no_members", moniker: family_moniker_downcase) %></p>
     <% end %>
   <% end %>
+<% end %>
+<%= settings_section title: t(".intelligence_title"), subtitle: t(".intelligence_subtitle") do %>
+  <div>
+    <%= styled_form_with model: @user, class: "space-y-4", data: { controller: "auto-submit-form" } do |form| %>
+      <%= form.hidden_field :redirect_to, value: "preferences" %>
+      <%= form.fields_for :family do |family_form| %>
+        <%= family_form.text_field :investment_benchmark_symbol,
+            label: t(".investment_benchmark"),
+            placeholder: "SPY",
+            data: { auto_submit_form_target: "auto" } %>
+        <div class="flex items-center justify-between">
+          <div class="space-y-1">
+            <p class="text-sm"><%= t(".high_confidence_auto_apply") %></p>
+            <p class="text-secondary text-sm"><%= t(".high_confidence_auto_apply_hint") %></p>
+          </div>
+          <%= family_form.toggle :high_confidence_auto_apply,
+              data: { auto_submit_form_target: "auto" } %>
+        </div>
+      <% end %>
+    <% end %>
+    <div class="mt-4">
+      <%= render "ai_proposals/quality", stats: @proposal_quality %>
+    </div>
+  </div>
 <% end %>
 <% if Current.user.admin? %>
   <%= settings_section title: t(".currencies_title", moniker: family_moniker), subtitle: t(".currencies_subtitle", moniker: family_moniker_downcase) do %>
@@ -262,31 +283,5 @@
         <% end %>
       <% end %>
     </div>
-  <% end %>
-<% end %>
-
-<%# Preview features toggle — visible to all users, not just admins. Lives at
-    the bottom of Preferences as a standalone card (no section header) so the
-    toggle row is the entire surface. Posts directly to
-    settings#preferences#update via the Settings::PreferencesController,
-    matching the auto-submit pattern used on the Appearance page. %>
-<%= settings_section do %>
-  <%= form_with url: settings_preferences_path, method: :patch,
-        data: { controller: "auto-submit-form" } do |f| %>
-    <%# Wrapping the row in <label for=…> makes the title + description
-        themselves a click target for the toggle, so the cursor-pointer
-        affordance on the container is honest. %>
-    <label for="user_preview_features_enabled" class="flex cursor-pointer items-center gap-4 justify-between">
-      <div class="text-sm space-y-1">
-        <p class="text-primary font-medium"><%= t(".preview.title") %></p>
-        <p class="text-secondary"><%= t(".preview.description") %></p>
-      </div>
-      <%= render DS::Toggle.new(
-            id: "user_preview_features_enabled",
-            name: "user[preview_features_enabled]",
-            checked: @user.preview_features_enabled?,
-            data: { auto_submit_form_target: "auto" }
-      ) %>
-    </label>
   <% end %>
 <% end %>

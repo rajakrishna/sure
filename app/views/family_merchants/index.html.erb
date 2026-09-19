@@ -21,6 +21,7 @@
     href: new_family_merchant_path,
     frame: :modal
   ) %>
+  <%= ask_chip t(".ask_detect"), hint: t(".ask_detect_hint") %>
 <% end %>
 
 <div class="bg-container rounded-xl shadow-border-xs p-4 space-y-6">
@@ -97,22 +98,14 @@
       <p><%= @all_provider_merchants.count %></p>
     </div>
 
-    <div class="p-4 bg-container-inset border border-secondary rounded-lg">
-      <div class="flex items-start gap-2">
-        <%= icon "info", class: "w-5 h-5 text-link mt-0.5 flex-shrink-0" %>
-        <p class="text-xs text-secondary leading-relaxed"><%= t(".provider_info") %></p>
-      </div>
-    </div>
+    <p class="text-xs text-secondary px-4"><%= t(".provider_info") %></p>
 
     <% if @enhanceable_count > 0 && @llm_available %>
-      <div class="flex items-center justify-between p-4 bg-container-inset border border-secondary rounded-lg">
-        <div class="flex items-start gap-2">
-          <%= icon "sparkles", class: "w-5 h-5 text-link mt-0.5 flex-shrink-0" %>
-          <p class="text-xs text-secondary leading-relaxed"><%= t(".enhance_info", count: @enhanceable_count) %></p>
-        </div>
+      <div class="flex flex-wrap items-center justify-between gap-3 px-4">
+        <p class="text-xs text-secondary"><%= t(".enhance_info", count: @enhanceable_count) %></p>
         <%= render DS::Button.new(
           text: t(".enhance_button"),
-          variant: :outline,
+          variant: :ghost,
           size: :sm,
           icon: "sparkles",
           href: enhance_family_merchants_path
@@ -179,12 +172,7 @@
         <p><%= @unlinked_merchants.count %></p>
       </div>
 
-      <div class="p-4 bg-container-inset border border-secondary rounded-lg">
-        <div class="flex items-start gap-2">
-          <%= icon "info", class: "w-5 h-5 text-subdued mt-0.5 flex-shrink-0" %>
-          <p class="text-xs text-secondary leading-relaxed"><%= t(".unlinked_info") %></p>
-        </div>
-      </div>
+      <p class="text-xs text-secondary px-4"><%= t(".unlinked_info") %></p>
 
       <div class="rounded-xl bg-container-inset space-y-1 p-1">
         <div class="bg-container rounded-lg shadow-border-xs overflow-x-auto">

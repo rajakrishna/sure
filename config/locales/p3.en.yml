@@ -6,6 +6,9 @@ en:
   budget_nudges:
     over_title: "%{name} is over budget (%{percent}%)"
     over_body: There are %{days} days left in this month.
+    ask_why: Why is %{name} over?
+    ask_adjust: Draft an adjustment
+    ask_adjust_hint: Why did %{name} go over budget, and draft an adjustment I can approve, edit, or dismiss. Do not apply it.
     near_title: "%{name} is near its limit (%{percent}%)"
     near_body: There are %{days} days left in this month.
     review: Review category
@@ -30,23 +33,38 @@ en:
   saved_reports:
     heading: Saved reports
     help: Save this period and household view to reopen later.
+    empty: No saved views yet.
+    save_this: Save this view
     name_placeholder: Report name
     save: Save report
     delete: Delete
     created: Report saved
     destroyed: Report deleted
+    ask_draft: Describe a report
+    ask_draft_hint: Draft a saved report from this description. Do not save it — leave it as a proposal I can accept, edit, or dismiss.
   wealth:
     show:
       title: Wealth
-      subtitle: Net worth, allocation, and a local financial health score.
+      subtitle: One number, then the moves that would change it.
       net_worth: Net worth
+      net_worth_trend: Net worth over the last 30 days
       assets: Assets
       liabilities: Liabilities
-      health_score: Health score
+      health_score: Health
       allocation: Allocation
       empty_allocation: Add accounts to see allocation.
       health_components: What drives this score
       forecast_title: Cash forecast
+      suggest: Suggest a move
+      suggest_done: Checked for idle cash. Review any new suggestions below.
+      ask_idle_cash: Why is cash sitting idle?
+      ask_idle_cash_hint: Which accounts have idle cash, and should any of it move toward a goal? Propose a move as a draft I can accept, edit, or dismiss.
+      ask_allocation: Explain this allocation
+      ask_allocation_hint: Explain my current asset allocation and what looks off. Do not change anything.
+      ask_health: What would raise this score?
+      ask_health_hint: What is dragging my financial health score, and what should I do first?
+      ask_focus: What should I do?
+      ask_focus_hint: "%{detail} Propose the first move as a draft I can accept, edit, or dismiss."
   advisor_invites:
     not_authorized: Only household admins can invite advisors.
     create:
@@ -83,6 +101,12 @@ en:
         unassigned: Unassigned
         empty_title: Inbox is clear
         empty_body: Uncategorized transactions you can review will show up here.
+        ask_categorize: Suggest categories
+        ask_categorize_hint: Suggest categories for the transactions in my inbox. Leave each as a proposal I can accept, edit, or dismiss.
+        ask_rules: Draft rules for repeats
+        ask_rules_hint: Draft rules from repeated inbox merchants. Do not apply them — leave each as a proposal.
+        ask_bulk: Help me review these
+        ask_bulk_hint: Help me bulk-review uncategorized transactions. Propose categories and rules only.
   settings:
     profiles:
       show:

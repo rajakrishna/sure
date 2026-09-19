@@ -1,0 +1,23 @@
+<%# locals: (cash_flow:) %>
+<%= render DS::Card.new(class: "gap-4") do %>
+  <div>
+    <h2 class="text-sm font-medium text-primary"><%= t("plans.cash_flow.title") %></h2>
+    <p class="text-xs text-secondary mt-1"><%= t("plans.cash_flow.vs_prior") %></p>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div>
+      <p class="text-xs text-secondary"><%= t("plans.cash_flow.income") %></p>
+      <p class="text-xl font-medium text-primary tabular-nums privacy-sensitive"><%= format_money(cash_flow[:income].to_d) %></p>
+    </div>
+    <div>
+      <p class="text-xs text-secondary"><%= t("plans.cash_flow.spending") %></p>
+      <p class="text-xl font-medium text-primary tabular-nums privacy-sensitive"><%= format_money(cash_flow[:spending].to_d) %></p>
+    </div>
+    <div>
+      <p class="text-xs text-secondary"><%= t("plans.cash_flow.net") %></p>
+      <p class="text-xl font-medium tabular-nums privacy-sensitive <%= cash_flow[:net_savings].to_d.negative? ? "text-destructive" : "text-primary" %>">
+        <%= format_money(cash_flow[:net_savings].to_d) %>
+      </p>
+    </div>
+  </div>
+<% end %>

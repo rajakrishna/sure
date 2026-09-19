@@ -10,6 +10,10 @@ class OnboardingsController < ApplicationController
   def preferences
   end
 
+  def recurrings
+    @board = Family::RecurringBoard.new(Current.family, user: Current.user)
+  end
+
   def trial
   end
 

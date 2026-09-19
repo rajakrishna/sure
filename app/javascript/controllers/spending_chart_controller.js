@@ -10,6 +10,7 @@ import { CHART_TOOLTIP_CLASSES } from "utils/chart_tooltip";
 // tooltip positioning).
 const CURRENT_COLOR = "var(--color-success)";
 const PREVIOUS_COLOR = "var(--color-gray-400)";
+const IDEAL_COLOR = "var(--color-warning)";
 
 export default class extends Controller {
   static values = {
@@ -17,6 +18,7 @@ export default class extends Controller {
     currency: { type: String, default: "USD" },
     currentLabel: { type: String, default: "Current" },
     previousLabel: { type: String, default: "Previous" },
+    idealLabel: { type: String, default: "Ideal" },
   };
 
   _resizeObserver = null;
@@ -52,6 +54,7 @@ export default class extends Controller {
       axis_labels: axisLabels = [],
       current = [],
       previous = [],
+      ideal = [],
     } = this.dataValue || {};
 
     if (width < 50 || height < 50) return;
@@ -74,7 +77,7 @@ export default class extends Controller {
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    const maxValue = d3.max([...current, ...previous], (d) => d.value) || 0;
+    const maxValue = d3.max([...current, ...previous, ...ideal], (d) => d.value) || 0;
     if (maxValue <= 0) return;
 
     const x = d3.scaleLinear().domain([1, days]).range([0, innerWidth]);
@@ -92,6 +95,19 @@ export default class extends Controller {
       .x((d) => x(d.day))
       .y((d) => y(d.value))
       .curve(d3.curveMonotoneX);
+
+    if (ideal.length > 0) {
+      group
+        .append("path")
+        .datum(ideal)
+        .attr("fill", "none")
+        .attr("stroke", IDEAL_COLOR)
+        .attr("stroke-width", 1.5)
+        .attr("stroke-dasharray", "4, 4")
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-linecap", "round")
+        .attr("d", line);
+    }
 
     // Previous month first so the current month always draws on top.
     if (previous.length > 0) {
@@ -133,6 +149,7 @@ export default class extends Controller {
       y,
       current,
       previous,
+      ideal,
       innerWidth,
       innerHeight,
     );
@@ -201,7 +218,7 @@ export default class extends Controller {
       );
   }
 
-  _installTooltip(group, x, y, current, previous, innerWidth, innerHeight) {
+  _installTooltip(group, x, y, current, previous, ideal, innerWidth, innerHeight) {
     const tooltip = d3
       .select(this.element)
       .append("div")
@@ -209,8 +226,13 @@ export default class extends Controller {
 
     const currentByDay = new Map(current.map((d) => [d.day, d]));
     const previousByDay = new Map(previous.map((d) => [d.day, d]));
+    const idealByDay = new Map((ideal || []).map((d) => [d.day, d]));
     const hoverDays = [
-      ...new Set([...currentByDay.keys(), ...previousByDay.keys()]),
+      ...new Set([
+        ...currentByDay.keys(),
+        ...previousByDay.keys(),
+        ...idealByDay.keys(),
+      ]),
     ].sort((a, b) => a - b);
 
     const bisectDay = d3.bisector((d) => d).center;
@@ -229,7 +251,8 @@ export default class extends Controller {
 
         const currentPoint = currentByDay.get(day);
         const previousPoint = previousByDay.get(day);
-        const labelPoint = currentPoint || previousPoint;
+        const idealPoint = idealByDay.get(day);
+        const labelPoint = currentPoint || previousPoint || idealPoint;
 
         const estimatedTooltipWidth = 220;
         const pageWidth = document.body.clientWidth;
@@ -254,6 +277,7 @@ export default class extends Controller {
         for (const [point, color] of [
           [currentPoint, CURRENT_COLOR],
           [previousPoint, PREVIOUS_COLOR],
+          [idealPoint, IDEAL_COLOR],
         ]) {
           if (!point) continue;
           group
@@ -267,7 +291,7 @@ export default class extends Controller {
         }
 
         tooltip
-          .html(this._tooltipTemplate(labelPoint, currentPoint, previousPoint))
+          .html(this._tooltipTemplate(labelPoint, currentPoint, previousPoint, idealPoint))
           .style("opacity", 1)
           .style("left", `${adjustedX}px`)
           .style("top", `${event.pageY - 10}px`);
@@ -284,7 +308,7 @@ export default class extends Controller {
       });
   }
 
-  _tooltipTemplate(labelPoint, currentPoint, previousPoint) {
+  _tooltipTemplate(labelPoint, currentPoint, previousPoint, idealPoint) {
     const row = (point, color, label) => {
       if (!point) return "";
       return `
@@ -300,6 +324,7 @@ export default class extends Controller {
       <div class="space-y-1">
         ${row(currentPoint, CURRENT_COLOR, this.currentLabelValue)}
         ${row(previousPoint, PREVIOUS_COLOR, this.previousLabelValue)}
+        ${row(idealPoint, IDEAL_COLOR, this.idealLabelValue)}
       </div>
     `;
   }

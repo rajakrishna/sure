@@ -11,6 +11,10 @@
       icon_custom: true,
       title: t("insights.index.empty.title"),
       description: t("insights.index.empty.description")
-    ) %>
+    ) do |es| %>
+      <% es.with_action do %>
+        <%= ask_chip t("insights.index.empty.ask"), hint: t("insights.index.empty.ask_hint") %>
+      <% end %>
+    <% end %>
   <% end %>
 </div>

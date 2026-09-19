@@ -15,6 +15,39 @@ class TransactionsControllerTest < ActionDispatch::IntegrationTest
     assert_match I18n.t("transactions.show.ask_in_chat"), response.body
   end
 
+  test "transaction drawer shows the Intelligence badge after Bayes enrichment" do
+    @entry.transaction.data_enrichments.create!(
+      attribute_name: "category_id",
+      source: "bayes",
+      value: @entry.transaction.category_id
+    )
+
+    get transaction_url(@entry), headers: { "Turbo-Frame" => "drawer" }
+
+    assert_response :success
+    assert_match I18n.t("transactions.transaction.intelligence"), response.body
+    assert_match I18n.t("transactions.show.explain"), response.body
+  end
+
+  test "index surfaces pending category suggestions as accept cards" do
+    ensure_tailwind_build
+    transaction = @entry.transaction
+    category = @user.family.categories.expenses.first
+    AiProposal.propose_categorize!(
+      family: @user.family,
+      transaction: transaction,
+      category_id: category.id,
+      source: "auto_categorize"
+    )
+
+    get transactions_url
+
+    assert_response :success
+    assert_select "#ai-proposals", 1
+    assert_match CGI.escapeHTML(I18n.t("ai_proposals.card.approve")), response.body
+    assert_match CGI.escapeHTML(I18n.t("ai_proposals.card.dismiss")), response.body
+  end
+
   # Bills has always linked out to transactions. Until now nothing linked back,
   # so a transaction that settled a bill was a dead end. The link-back is part
   # of the preview-gated bills surface, so the viewer needs the flag.
@@ -56,7 +89,7 @@ class TransactionsControllerTest < ActionDispatch::IntegrationTest
     assert_match(/für die am .* fällige Rechnung/, response.body)
   end
 
-  test "the bill link-back stays hidden without preview access" do
+  test "the bill link-back renders when a payment is applied" do
     series = @user.family.recurring_transactions.create!(
       account: accounts(:depository), name: "Watson Property", amount: 2000,
       currency: "USD", expected_day_of_month: 9, status: "active", manual: true,
@@ -74,8 +107,7 @@ class TransactionsControllerTest < ActionDispatch::IntegrationTest
     get transaction_url(@entry), headers: { "Turbo-Frame" => "drawer" }
 
     assert_response :success
-    assert_no_match bill_path(series), response.body,
-      "the preview-gated bill link must not render for a user without the flag"
+    assert_match bill_path(series), response.body
   end
 
   test "index groups subcategories immediately after their parent in the category filter" do
@@ -1495,6 +1527,55 @@ end
     get transactions_url
     assert_match(/Provider Merchant Renamed/, response.body,
       "updating the provider merchant must not leave a stale cached projected-recurring list")
+  ensure
+    Rails.cache = original_cache
+  end
+
+  test "index renders when a linked recurring series has payment_url" do
+    recurring = recurring_transactions(:netflix_subscription)
+    recurring.update!(payment_url: "https://netflix.com/account")
+    occurrence = recurring.recurring_occurrences.create!(
+      family: @user.family,
+      original_due_on: Date.current,
+      due_on: Date.current,
+      currency: "USD",
+      expected_amount: recurring.amount,
+      status: "scheduled"
+    )
+    RecurringTransaction::Allocator.new(occurrence).allocate!(entry: @entry)
+
+    get transactions_url
+
+    assert_response :success
+    assert_match(/#{Regexp.escape(recurring.merchant.name)}/, response.body)
+  end
+
+  test "index does not raise when cached projected recurring omits payment_url" do
+    original_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+
+    recurring = recurring_transactions(:netflix_subscription)
+    recurring.update!(payment_url: "https://netflix.com/account")
+
+    incomplete = RecurringTransaction
+      .select(RecurringTransaction.column_names - [ "payment_url" ])
+      .includes(:merchant)
+      .where(id: recurring.id)
+      .to_a
+    assert incomplete.first && !incomplete.first.has_attribute?(:payment_url)
+
+    original_fetch = Rails.cache.method(:fetch)
+    Rails.cache.define_singleton_method(:fetch) do |key, *args, **kwargs, &block|
+      if key.to_s.include?("projected_recurring")
+        incomplete
+      else
+        original_fetch.call(key, *args, **kwargs, &block)
+      end
+    end
+
+    get transactions_url
+    assert_response :success
+    assert_match(/#{Regexp.escape(recurring.merchant.name)}/, response.body)
   ensure
     Rails.cache = original_cache
   end

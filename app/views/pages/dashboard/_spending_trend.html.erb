@@ -9,7 +9,8 @@
     current_days: data[:current_days],
     axis_labels: data[:axis_labels],
     current: data[:current],
-    previous: data[:previous]
+    previous: data[:previous],
+    ideal: data[:ideal] || []
   }
   previous_label = data[:previous_label]
   previous_comparison_day = data[:previous_comparison_day]
@@ -84,7 +85,8 @@
       data-spending-chart-data-value="<%= chart_data.to_json %>"
       data-spending-chart-currency-value="<%= Current.family.currency %>"
       data-spending-chart-current-label-value="<%= I18n.l(data[:month], format: :month_year).capitalize %>"
-      data-spending-chart-previous-label-value="<%= previous_label %>">
+      data-spending-chart-previous-label-value="<%= previous_label %>"
+      data-spending-chart-ideal-label-value="<%= t(".ideal") %>">
     </div>
   <% else %>
     <div class="w-full h-52 flex items-center justify-center">

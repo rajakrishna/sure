@@ -1,9 +1,6 @@
 class PlansController < ApplicationController
   include BudgetOwnership
 
-  # Plan is the GA planning spine (Budget tab). Goals, Bills, Debt and
-  # Forecast stay behind the per-user preview toggle — see PlanHub::PREVIEW_TABS.
-  # Spending plan, flex, cash-flow calendar, and debt payoff are preview too.
   def show
     @active_tab = PlanHub.tab_for(params[:tab], preview: preview_features_enabled?)
     @budget_mode = PlanHub.budget_mode_for(params[:budget_mode])
@@ -11,11 +8,8 @@ class PlansController < ApplicationController
     @editable = @budget.editable_by?(Current.user)
     @switch_options = budget_switch_options(@budget)
     @top_budget_categories = @budget.initialized? ? @budget.top_spending_categories : []
-    @budget_nudges = Family::BudgetNudge.new(@budget).items if preview_features_enabled?
-
-    if preview_features_enabled?
-      load_preview_tabs
-    end
+    @budget_nudges = Family::BudgetNudge.new(@budget).items
+    load_preview_tabs
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.plan"), nil ] ]
   end
@@ -51,6 +45,10 @@ class PlansController < ApplicationController
         extra_payment: params[:extra_payment]
       ).result
       @forecast_explain = Current.family.forecast_explains.order(generated_at: :desc).first
+      @cash_flow = IncomeStatement::CashFlow.new(
+        IncomeStatement.new(Current.family, user: Current.user),
+        month: Date.current.beginning_of_month
+      ).as_json
     end
 
     def calendar_month

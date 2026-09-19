@@ -8,7 +8,7 @@
     cell) instead of overflowing them. %>
 <div class="min-w-0">
   <%= render DS::Pill.new(
-        label: category.display_name,
+        label: category.display_label,
         custom_color: category.color,
         icon: category.lucide_icon.presence,
         icon_size: "sm",

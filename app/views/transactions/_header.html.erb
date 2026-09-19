@@ -32,14 +32,42 @@
       <% end %>
     </div>
   </div>
-  <%= render DS::Link.new(
-    text: t("transactions.show.ask_in_chat"),
-    href: new_chat_path(
-      message_hint: t("transactions.show.ask_hint"),
-      composer_context: [ { type: "transaction", id: entry.transaction.id } ].to_json
-    ),
-    icon: "sparkles",
-    variant: "outline",
-    size: "sm"
-  ) %>
+  <div class="flex flex-wrap items-center justify-end gap-1">
+    <% if entry.transaction.intelligence_source.present? %>
+      <%= render DS::Pill.new(
+        label: t("transactions.transaction.intelligence"),
+        tone: :info,
+        marker: false,
+        icon: "sparkles",
+        title: t("transactions.show.intelligence")
+      ) %>
+    <% end %>
+    <%= ask_chip t("transactions.show.explain"),
+          hint: t("transactions.show.explain_hint"),
+          context: [ { type: "transaction", id: entry.transaction.id } ] %>
+    <%= ask_chip t("transactions.show.ask_in_chat"),
+          hint: t("transactions.show.ask_hint"),
+          context: [ { type: "transaction", id: entry.transaction.id } ] %>
+    <% if entry.transaction.splittable? %>
+      <%= ask_chip t("transactions.index.ask_split"),
+            hint: t("transactions.show.ask_split_hint"),
+            context: [ { type: "transaction", id: entry.transaction.id } ] %>
+    <% end %>
+    <%= render DS::Menu.new do |menu| %>
+      <% menu.with_item(
+            variant: "link",
+            text: t("transactions.index.ask_merchant"),
+            href: ask_in_chat_href(t("transactions.show.ask_merchant_hint"), [ { type: "transaction", id: entry.transaction.id } ]),
+            icon: "sparkles",
+            frame: :sidebar_chat,
+            data: { action: "click->app-layout#openRightSidebar" }) %>
+      <% menu.with_item(
+            variant: "link",
+            text: t("transactions.index.ask_rule"),
+            href: ask_in_chat_href(t("transactions.show.ask_rule_hint"), [ { type: "transaction", id: entry.transaction.id } ]),
+            icon: "sparkles",
+            frame: :sidebar_chat,
+            data: { action: "click->app-layout#openRightSidebar" }) %>
+    <% end %>
+  </div>
 </div>

@@ -45,6 +45,11 @@
         <% else %>
           <p class="text-xl font-semibold text-secondary"><%= t("reports.investment_performance.no_data") %></p>
         <% end %>
+        <% if investment_metrics[:benchmark_return] %>
+          <p class="text-xs text-secondary mt-1"><%= t("reports.investment_performance.benchmark", symbol: investment_metrics[:benchmark_symbol]) %>: <%= investment_metrics[:benchmark_return] %>%</p>
+        <% elsif investment_metrics[:benchmark_symbol] %>
+          <p class="text-xs text-secondary mt-1"><%= t("reports.investment_performance.no_benchmark", symbol: investment_metrics[:benchmark_symbol]) %></p>
+        <% end %>
       </div>
 
       <%# Period Contributions Card %>

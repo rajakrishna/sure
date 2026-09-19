@@ -44,7 +44,7 @@ class AiProposal < ApplicationRecord
     true
   end
 
-  def self.propose_categorize!(family:, transaction:, category_id:, source:, user: nil)
+  def self.propose_categorize!(family:, transaction:, category_id:, source:, user: nil, confidence: nil, reason: nil, alternatives: [])
     category = family.categories.find_by(id: category_id)
     return false unless category
 
@@ -65,11 +65,40 @@ class AiProposal < ApplicationRecord
         "entry_name" => entry&.name,
         "amount" => entry&.amount,
         "date" => entry&.date&.iso8601,
+        "confidence" => confidence,
+        "reason" => reason,
+        "alternatives" => Array(alternatives),
         "suggested_rule" => suggested_rule_payload(entry, category)
       }
     )
     proposal.save!
     true
+  end
+
+  def self.bulk_approve!(family:, ids:, actor:)
+    family.ai_proposals.pending.where(id: ids).find_each.map do |proposal|
+      proposal.approve!(actor)
+      proposal
+    end
+  end
+
+  def self.bulk_dismiss!(family:, ids:, actor:)
+    family.ai_proposals.pending.where(id: ids).find_each.map do |proposal|
+      proposal.dismiss!(actor)
+      proposal
+    end
+  end
+
+  def confidence
+    payload["confidence"]&.to_f
+  end
+
+  def reason
+    payload["reason"]
+  end
+
+  def alternatives
+    Array(payload["alternatives"])
   end
 
   def self.propose_split!(family:, transaction:, splits:, source: "draft_tool", user: nil)
@@ -153,6 +182,21 @@ class AiProposal < ApplicationRecord
     raise ArgumentError, "Proposal is not pending" unless pending?
 
     update!(status: "dismissed", reviewed_at: Time.current, reviewed_by: actor)
+  end
+
+  def self.quality_stats(family)
+    approved = family.ai_proposals.where(status: "approved").count
+    dismissed = family.ai_proposals.where(status: "dismissed").count
+    pending = family.ai_proposals.pending.count
+    reviewed = approved + dismissed
+
+    {
+      pending: pending,
+      approved: approved,
+      dismissed: dismissed,
+      reviewed: reviewed,
+      accept_rate: reviewed.zero? ? 0.0 : (approved.to_f / reviewed)
+    }
   end
 
   def update_payload!(attributes)

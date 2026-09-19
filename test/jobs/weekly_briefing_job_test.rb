@@ -26,8 +26,8 @@ class WeeklyBriefingJobTest < ActiveJob::TestCase
     assert briefing.headline.present?
   end
 
-  test "skips families without preview" do
-    assert_no_difference "WeeklyBriefing.count" do
+  test "writes a briefing even when the preview preference is off" do
+    assert_difference "@family.weekly_briefings.count", 1 do
       WeeklyBriefingJob.perform_now(family_id: @family.id)
     end
   end

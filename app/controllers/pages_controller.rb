@@ -42,24 +42,15 @@ class PagesController < ApplicationController
     @investment_statement = Current.family.investment_statement
     @accounts = Current.user.accessible_accounts.visible.with_attached_logo
 
-    family_currency = Current.family.currency
-
-    # Use IncomeStatement for all cashflow data (now includes categorized trades)
     income_statement = Current.family.income_statement
     income_totals = income_statement.income_totals(period: @period)
     expense_totals = income_statement.expense_totals(period: @period)
     net_totals = income_statement.net_category_totals(period: @period)
 
-    @cashflow_sankey_data = build_cashflow_sankey_data(net_totals, income_totals, expense_totals, family_currency)
     @outflows_data = build_outflows_donut_data(net_totals)
-    # Preview-gated: skip the query outright rather than loading rows the
-    # section won't be built from.
-    @feed_insights = preview_features_enabled? ? Current.family.insights.visible.ordered.limit(Insight::FEED_LIMIT) : Insight.none
+    @feed_insights = Current.family.insights.visible.ordered.limit(Insight::FEED_LIMIT)
 
     @money_flow_accounts = income_statement.eligible_accounts
-    # TransactionsController's default (account_ids absent) scopes to this
-    # broader set, not @money_flow_accounts, so the view needs it to know
-    # when the drill-down links can safely omit account_ids.
     @money_flow_accessible_account_ids = Current.user.accessible_accounts.pluck(:id).map(&:to_s)
     @money_flow_month = money_flow_month_param
     @money_flow_account_ids = money_flow_account_ids_param
@@ -131,13 +122,7 @@ class PagesController < ApplicationController
       end
     end
 
-    # Preview-gated, and omitted from the section list entirely rather than
-    # left in it with `visible: false`. Dropping it here means the two
-    # downstream behaviors fall out for free: the saved-order lookup finds
-    # nothing to map, and the insights_feed unshift special-case never fires.
     def insights_feed_section
-      return nil unless preview_features_enabled?
-
       {
         key: "insights_feed",
         title: "pages.dashboard.insights_feed.title",
@@ -152,15 +137,6 @@ class PagesController < ApplicationController
     def build_dashboard_sections
       all_sections = [
         insights_feed_section,
-        {
-          key: "cashflow_sankey",
-          title: "pages.dashboard.cashflow_sankey.title",
-          partial: "pages/dashboard/cashflow_sankey",
-          layout: section_layout("cashflow_sankey"),
-          locals: { sankey_data: @cashflow_sankey_data, period: @period },
-          visible: @accounts.any?,
-          collapsible: true
-        },
         {
           key: "money_flow",
           title: "pages.dashboard.money_flow.title",
@@ -517,7 +493,13 @@ class PagesController < ApplicationController
       previous_total = comparison_days.positive? ? previous_header_series[comparison_days - 1][:value] : 0
       previous_comparison_day = comparison_days if comparison_days.positive? && comparison_days < previous_header_series.size
       currency = income_statement.family.currency
-
+      ideal_total = current_budget_spend_target(income_statement.family)
+      ideal_series = (1..axis_days).map do |day|
+        {
+          day: day,
+          value: ideal_total.positive? ? (ideal_total * day / axis_days.to_f) : 0
+        }
+      end
 
       {
         month: month_start,
@@ -528,6 +510,7 @@ class PagesController < ApplicationController
         axis_labels: spending_trend_axis_labels(month_start, axis_days),
         current: current_series,
         previous: previous_series,
+        ideal: ideal_series,
         current_total: Money.new(current_total, currency),
         previous_total: Money.new(previous_total, currency),
         delta: Money.new(current_total - previous_total, currency),
@@ -638,6 +621,13 @@ class PagesController < ApplicationController
         balance: selected_totals.income_money - selected_totals.expense_money,
         account_ids: account_ids
       }
+    end
+
+    def current_budget_spend_target(family)
+      start_date, end_date = Budget.period_for(Date.current, family: family)
+      owner = family.personal_budgets? ? Current.user : nil
+      budget = family.budgets.find_by(start_date: start_date, end_date: end_date, user: owner)
+      (budget&.budgeted_spending || 0).to_d
     end
 
     def ensure_intro_guest!

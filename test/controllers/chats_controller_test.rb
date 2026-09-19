@@ -7,9 +7,32 @@ class ChatsControllerTest < ActionDispatch::IntegrationTest
     sign_in @user
   end
 
-  test "gets index" do
+  test "index restores the last viewed chat" do
+    chat = chats(:one)
+    @user.update!(last_viewed_chat: chat)
+
     get chats_url
+
+    assert_redirected_to chat_path(chat)
+  end
+
+  test "index opens a new chat when the user has none" do
+    @user.chats.destroy_all
+    @user.update!(last_viewed_chat: nil)
+
+    get chats_url
+
+    assert_redirected_to new_chat_path
+  end
+
+  test "index lists chats inside the sidebar frame" do
+    chat = chats(:one)
+
+    get chats_url, headers: { "Turbo-Frame" => "sidebar_chat" }
+
     assert_response :success
+    assert_select "h1", text: I18n.t("chats.index.chats")
+    assert_select "a[href=?]", chat_path(chat)
   end
 
   test "gets new chat with a localized German default title" do
@@ -86,6 +109,10 @@ class ChatsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "/categorize", response.body
     assert_match "/recurring", response.body
+    assert_match "/rule", response.body
+    assert_match "/split", response.body
+    assert_match "/report", response.body
+    assert_match "/debt", response.body
   end
 
   test "destroys chat" do

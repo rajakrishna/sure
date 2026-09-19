@@ -3,7 +3,7 @@
     <h1 class="text-xl"><%= t(".title") %></h1>
     <div class="flex items-center gap-5">
       <div class="flex items-center gap-2">
-        <% if preview_features_enabled? && @uncategorized_count.to_i.positive? %>
+        <% if @uncategorized_count.to_i.positive? %>
           <%= render DS::Link.new(
             text: t(".inbox"),
             icon: "inbox",
@@ -22,6 +22,9 @@
           <% if @uncategorized_count > 0 %>
             <% menu.with_item(variant: "link", text: t(".categorize_button", count: @uncategorized_count), href: transactions_categorize_path, icon: "tag", data: { turbo_frame: :_top }) %>
           <% end %>
+          <% menu.with_item(variant: "link", text: t(".ask_merchant"), href: ask_in_chat_href(t(".ask_merchant_hint")), icon: "sparkles", frame: :sidebar_chat, data: { action: "click->app-layout#openRightSidebar" }) %>
+          <% menu.with_item(variant: "link", text: t(".ask_split"), href: ask_in_chat_href(t(".ask_split_hint")), icon: "sparkles", frame: :sidebar_chat, data: { action: "click->app-layout#openRightSidebar" }) %>
+          <% menu.with_item(variant: "link", text: t(".ask_rule"), href: ask_in_chat_href(t(".ask_rule_hint")), icon: "sparkles", frame: :sidebar_chat, data: { action: "click->app-layout#openRightSidebar" }) %>
         <% end %>
 
         <div class="hidden md:flex">
@@ -53,6 +56,14 @@
       </div>
     </div>
   </header>
+
+  <% if @uncategorized_count.to_i.positive? %>
+    <div class="flex flex-wrap items-center gap-2">
+      <%= ask_chip t(".ask_categorize"), hint: t(".ask_categorize_hint") %>
+    </div>
+  <% end %>
+
+  <%= render "ai_proposals/list", proposals: @ai_proposals %>
 
   <%= render "summary", totals: @search.totals %>
   <% if Current.family.recurring_transactions_disabled? %>

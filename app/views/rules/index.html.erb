@@ -36,6 +36,7 @@
     icon: "plus",
     frame: :modal
   ) %>
+  <%= ask_chip t(".ask_from_corrections"), hint: t(".ask_from_corrections_hint") %>
 <% end %>
 
 <% if @ai_proposals.any? %>
@@ -103,6 +104,7 @@
             icon: "plus",
             frame: :modal
           ) %>
+          <%= ask_chip t(".ask_from_corrections"), hint: t(".ask_from_corrections_hint") %>
         </div>
       </div>
     </div>

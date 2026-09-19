@@ -60,6 +60,21 @@ en:
         bill_item: "%{name} · %{amount} · %{date}"
         view_bills: View bills
         briefing: Weekly briefing
+        needs_review_count:
+          zero: Nothing waiting
+          one: 1 transaction needs a category
+          other: "%{count} transactions need a category"
+        no_bills: Nothing due in the next 7 days
+        ask_review: Suggest categories
+        ask_review_hint: Suggest categories for uncategorized transactions. Leave each as a proposal I can approve, edit, or dismiss.
+        ask_bills: What's due soon?
+        ask_bills_hint: What bills are due in the next 7 days, and which ones can I safely skip or cancel? Do not change any bill.
+        ask_unusual: What's unusual?
+        ask_unusual_hint: What looks unusual in my spending this week? Point me at the transactions or bills I should review.
+        ask_start: How should I start?
+        ask_start_hint: I have no accounts yet. What should I add first so the home briefing is useful?
+      priority_aria_label: "What needs attention"
+      analytics: Charts
       sections_aria_label: "Dashboard sections"
       drag_to_reorder: "Drag to reorder section"
       toggle_section: "Toggle section visibility"
@@ -127,6 +142,7 @@ en:
         title: "No accounts yet"
         description: "Add accounts to display net worth data"
         add_account: "Add account"
+        ask_start: How should I start?
       outflows_donut:
         title: "Outflows"
         total_outflows: "Total Outflows"

@@ -31,6 +31,8 @@ en:
       last_day: last day
     identify_patterns: Identify Patterns
     cleanup_stale: Clean Up Stale
+    ask_patterns: What looks recurring?
+    ask_patterns_hint: Which transactions look like bills or subscriptions I have not confirmed? Propose them as drafts I can accept, edit, or dismiss.
     actions:
       edit_payment_link: Edit payment link
       pause: Pause
@@ -186,8 +188,8 @@ en:
         one: "seen once"
         other: "seen %{count} times"
       collapsed_hint: Tap to review
-      confirm: Add bill
-      dismiss: Not a bill
+      confirm: Accept
+      dismiss: Dismiss
     confirmed: Bill added to your recurring transactions
     dismissed: "Dismissed. This pattern won't be suggested again."
     badges:

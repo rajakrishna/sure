@@ -2,19 +2,16 @@
 # Budget and goals keep their existing controller-loaded objects; this PORO
 # only gathers the extra planning snapshots so the hub controller stays thin.
 class PlanHub
-  TABS = %w[budget goals bills debt forecast].freeze
-  PREVIEW_TABS = %w[goals bills debt forecast].freeze
+  TABS = %w[budget goals bills debt forecast cash_flow].freeze
+  PREVIEW_TABS = %w[goals bills debt forecast cash_flow].freeze
   BUDGET_MODES = %w[categories spending_plan].freeze
   DEBT_ACCOUNT_TYPES = %w[CreditCard Loan].freeze
   FORECAST_HORIZON_DAYS = 30
   NEXT_UP_LIMIT = 4
 
-  def self.tab_for(tab, preview:)
+  def self.tab_for(tab, preview: true)
     candidate = tab.to_s
-    return "budget" unless TABS.include?(candidate)
-    return "budget" if PREVIEW_TABS.include?(candidate) && !preview
-
-    candidate
+    TABS.include?(candidate) ? candidate : "budget"
   end
 
   def self.budget_mode_for(mode)

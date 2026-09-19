@@ -7,10 +7,14 @@ en:
     index:
       title: Insights
       subtitle: What's happening across your finances, refreshed nightly.
+      ask: What's worth a look?
+      ask_hint: What should I review first based on my recent transactions, bills, and idle cash?
       refresh: Check for new insights
       empty:
         title: No insights yet
         description: Insights appear here once there's enough activity in your accounts. They refresh automatically every night.
+        ask: What should I look at first?
+        ask_hint: I have no insights yet. What should I review first based on my recent transactions and bills?
     refresh:
       queued: We're generating fresh insights. Check back in a minute.
       checking: Checking…

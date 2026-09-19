@@ -10,6 +10,7 @@ class TransactionsController < ApplicationController
   def show
     super
     assign_mark_recurring_state
+    @related_proposals = Current.family.ai_proposals.pending.where(target_type: "Transaction", target_id: @entry.entryable_id)
   end
 
   def new
@@ -79,17 +80,8 @@ class TransactionsController < ApplicationController
       Current.accessible_entries.uncategorized_transactions.count
     end
 
-    # Load projected recurring transactions for next 10 days
-    @projected_recurring = Rails.cache.fetch(projected_recurring_cache_key, expires_in: 1.day) do
-      Current.family.recurring_transactions
-                    .accessible_by(Current.user)
-                    .active
-                    .where("next_expected_date <= ? AND next_expected_date >= ?",
-                           10.days.from_now.to_date,
-                           Date.current)
-                    .includes(:merchant)
-                    .to_a
-    end
+    @projected_recurring = load_projected_recurring
+    @ai_proposals = Current.family.ai_proposals.pending.where(kind: %w[categorize set_merchant split refund_match]).recent.limit(8)
 
     @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("breadcrumbs.transactions"), nil ] ]
   end
@@ -503,10 +495,37 @@ class TransactionsController < ApplicationController
     # cached records are preloaded with :merchant and rendered with its
     # name/logo, but editing a FamilyMerchant or a shared ProviderMerchant
     # doesn't touch `recurring_transactions`.
+    # Cache IDs only. Marshaled RecurringTransaction rows go stale when a
+    # column is added (payment_url after the bills merge) and then raise
+    # ActiveRecord::MissingAttributeError in the upcoming/pay_action views.
     def projected_recurring_cache_key
-      "transactions_projected_recurring/v5/#{Current.family.id}/#{Current.user.id}/#{Date.current}/" \
+      "transactions_projected_recurring/v6/#{Current.family.id}/#{Current.user.id}/#{Date.current}/" \
         "#{Current.family.recurring_transactions_version}/#{Current.family.accounts_status_version}/" \
         "#{Current.family.recurring_transaction_merchants_version}/#{Current.account_share_version}"
+    end
+
+    def load_projected_recurring
+      cached = Rails.cache.fetch(projected_recurring_cache_key, expires_in: 1.day) do
+        projected_recurring_window_scope.pluck(:id)
+      end
+
+      ids = Array(cached).filter_map { |item| item.respond_to?(:id) ? item.id : item }
+      return [] if ids.empty?
+
+      Current.family.recurring_transactions
+            .accessible_by(Current.user)
+            .where(id: ids)
+            .includes(:merchant)
+            .to_a
+    end
+
+    def projected_recurring_window_scope
+      Current.family.recurring_transactions
+            .accessible_by(Current.user)
+            .active
+            .where("next_expected_date <= ? AND next_expected_date >= ?",
+                   10.days.from_now.to_date,
+                   Date.current)
     end
 
     # The "Mark as Recurring" block is only ever rendered under these same

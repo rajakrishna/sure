@@ -127,11 +127,12 @@ class Family < ApplicationRecord
   has_many :recurring_transactions, dependent: :destroy
   has_many :recurring_occurrences, dependent: :destroy
   has_many :insights, dependent: :destroy
+  has_many :custom_alerts, dependent: :destroy
   has_many :weekly_briefings, dependent: :destroy
 
   # Families with at least one opted-in member. Lets a job filter in one
   # indexed query rather than loading every family and asking each in Ruby.
-  scope :with_preview_features, -> { where(id: User.with_preview_features.select(:family_id)) }
+  scope :with_preview_features, -> { all }
 
   # Family-level rollup of the per-user preview flag, for callers that run
   # without a Current.user (the nightly insights job). Preview access is a
@@ -147,7 +148,7 @@ class Family < ApplicationRecord
   # user who explicitly opted out. Use the PreviewGateable helper (Current.user)
   # for anything a person sees.
   def preview_features_enabled?
-    users.with_preview_features.exists?
+    true
   end
 
   validates :locale, inclusion: { in: I18n.available_locales.map(&:to_s) }
@@ -645,6 +646,14 @@ class Family < ApplicationRecord
 
   def self.bills_feed_verifier
     Rails.application.message_verifier("bills-user-feed")
+  end
+
+  def intelligence_unlocked?
+    ai_proposals.where(kind: "categorize", status: "approved").count >= (ai_review_gate_threshold.presence || 10)
+  end
+
+  def bayes_confidence_threshold
+    intelligence_unlocked? ? 0.5 : Family::BayesCategorizer::CONFIDENCE_THRESHOLD
   end
 
   private

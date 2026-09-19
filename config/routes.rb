@@ -375,6 +375,7 @@ Rails.application.routes.draw do
     collection do
       get :preferences
       get :goals
+      get :recurrings
       get :trial
     end
   end
@@ -449,7 +450,9 @@ Rails.application.routes.draw do
   end
 
   resources :saved_reports, only: %i[create destroy]
-  resource :wealth, only: :show, controller: :wealth
+  resource :wealth, only: :show, controller: :wealth do
+    post :suggest
+  end
 
   resources :advisor_invites, only: %i[create destroy]
   get "advisor/:id", to: "advisor_portals#show", as: :advisor_portal
@@ -547,6 +550,7 @@ Rails.application.routes.draw do
     resource :bulk_deletion, only: :create
     resource :bulk_update, only: %i[new create]
     resource :inbox, only: :show, controller: "inbox"
+    resource :review, only: :create, controller: "reviews"
     resource :categorize, only: %i[show create] do
       patch :assign_entry, on: :collection
       get :preview_rule, on: :collection
@@ -615,6 +619,7 @@ Rails.application.routes.draw do
       # POST only: all three mutate. They accepted GET while DS::Link's method
       # option was inert, which left destructive work sitting behind a plain
       # URL and outside CSRF protection. Every call site passes method: :post.
+      get :board
       post :identify
       post :cleanup
       post :smart_fill, to: "recurring_transactions/smart_fills#create"
@@ -636,6 +641,7 @@ Rails.application.routes.draw do
     member do
       patch :acknowledge
       patch :unacknowledge
+      patch :feedback
     end
   end
 
@@ -667,12 +673,18 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :ai_proposals, only: [ :update ] do
+  resources :ai_proposals, only: [ :index, :update ] do
+    collection do
+      post :bulk_approve
+      post :bulk_dismiss
+    end
     member do
       post :approve
       post :dismiss
     end
   end
+
+  resources :custom_alerts, only: %i[index create update destroy]
 
   resources :accounts, only: %i[index new show destroy], shallow: true do
     member do
