@@ -1,0 +1,54 @@
+<%# locals: (hub:) %>
+
+<%= render DS::Card.new do %>
+  <div class="flex flex-wrap items-center gap-2 mb-4">
+    <%= render "plans/card_heading", icon_name: "hand-coins", title: t(".title"), preview: true %>
+  </div>
+
+  <% if hub.debt_accounts.empty? %>
+    <%= render DS::EmptyState.new(
+          icon: "hand-coins",
+          title: t(".empty_title"),
+          description: t(".empty_body"),
+          class: "py-10"
+        ) do |es| %>
+      <% es.with_action do %>
+        <%= render DS::Link.new(
+          text: t(".add_account"),
+          variant: "primary",
+          href: new_account_path(return_to: plan_path(tab: "debt")),
+          icon: "plus"
+        ) %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <div class="flex items-baseline gap-2">
+      <span class="text-3xl font-medium text-primary tabular-nums privacy-sensitive">
+        <%= format_money(hub.debt_total) %>
+      </span>
+      <span class="text-sm text-subdued"><%= t(".total_owed") %></span>
+    </div>
+    <p class="text-xs text-subdued mt-1 mb-4">
+      <%= t(".account_count", count: hub.debt_accounts.size) %>
+    </p>
+
+    <p class="mt-6 mb-1 text-[11px] font-medium uppercase tracking-wide text-secondary"><%= t(".accounts") %></p>
+    <div class="flex-1">
+      <% hub.debt_accounts.each_with_index do |account, index| %>
+        <%= link_to account_path(account), class: "flex items-center gap-3 py-2.5 group #{"border-b border-divider" unless index == hub.debt_accounts.size - 1}" do %>
+          <span class="w-7 h-7 rounded-lg bg-surface-inset text-secondary flex items-center justify-center shrink-0">
+            <%= icon(account.accountable.class.icon, size: "sm") %>
+          </span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-primary truncate"><%= account.name %></p>
+            <p class="text-xs text-subdued"><%= account.accountable.class.singular_display_name %></p>
+          </div>
+          <span class="shrink-0 text-xs tabular-nums text-primary privacy-sensitive">
+            <%= format_money(account.balance_money) %>
+          </span>
+          <%= icon("chevron-right", size: "sm", class: "text-subdued shrink-0") %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

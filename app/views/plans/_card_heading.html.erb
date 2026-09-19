@@ -1,0 +1,8 @@
+<%# locals: (icon_name:, title:, preview: false) %>
+<span class="w-7 h-7 rounded-lg bg-surface-inset text-secondary flex items-center justify-center shrink-0">
+  <%= icon(icon_name, size: "sm") %>
+</span>
+<h2 class="text-sm font-medium text-primary shrink-0"><%= title %></h2>
+<% if preview %>
+  <%= render DS::Pill.new(label: t("shared.preview")) %>
+<% end %>

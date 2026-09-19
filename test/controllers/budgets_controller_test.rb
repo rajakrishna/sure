@@ -111,21 +111,11 @@ class BudgetsControllerTest < ActionDispatch::IntegrationTest
                   text: /\+\$20\.00 rolled over/
   end
 
-  test "breadcrumbs include the Plan hub for preview users" do
-    @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => true))
-
+  test "breadcrumbs include the Plan hub" do
     get budget_url(Budget.date_to_param(Date.current))
 
     assert_response :success
     assert_select "a[href=?]", plan_path, minimum: 1
-  end
-
-  test "renders no Plan links without preview features" do
-    get budget_url(Budget.date_to_param(Date.current))
-
-    assert_response :success
-    assert_select "a[href=?]", plan_path, count: 0
-    assert_select "a[href=?]", budgets_path, minimum: 1
   end
   # --- Lot A3: cash on hand ---
 

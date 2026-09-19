@@ -37,12 +37,48 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
                  "the depleted reserve's bar stayed neutral"
   end
 
-  test "redirects users without preview access to budgets" do
+  test "renders the budget tab without preview access" do
     @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
 
     get plan_url
 
-    assert_redirected_to budgets_path
+    assert_response :success
+    assert_match I18n.t("plans.budget_card.title"), response.body
+    assert_match I18n.t("plans.show.preview_nudge.title"), response.body
+    assert_select "[data-testid=?]", "plan-hub-tabs", count: 0
+    assert_select "nav p", text: I18n.t("layouts.application.nav.plan")
+    assert_no_match I18n.t("plans.goals_card.title"), response.body
+  end
+
+  test "renders all plan tabs for preview users" do
+    get plan_url
+
+    assert_response :success
+    assert_select "[data-testid=?]", "plan-hub-tabs"
+    assert_match I18n.t("plans.show.tabs.budget"), response.body
+    assert_match I18n.t("plans.show.tabs.goals"), response.body
+    assert_match I18n.t("plans.show.tabs.bills"), response.body
+    assert_match I18n.t("plans.show.tabs.debt"), response.body
+    assert_match I18n.t("plans.show.tabs.forecast"), response.body
+  end
+
+  test "keeps bills off the main nav" do
+    get plan_url
+
+    assert_response :success
+    assert_select "nav p", text: I18n.t("layouts.application.nav.plan")
+    assert_select "nav p", text: I18n.t("layouts.application.nav.bills"), count: 0
+    assert_select "nav p", text: I18n.t("layouts.application.nav.budgets"), count: 0
+  end
+
+  test "falls back to the budget tab when a preview tab is requested without preview" do
+    @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => false))
+
+    get plan_url(tab: "goals")
+
+    assert_response :success
+    assert_select "[data-testid=?]", "plan-hub-tabs", count: 0
+    assert_match I18n.t("plans.budget_card.title"), response.body
   end
 
   test "renders budget and goals summary cards with drill-in links" do
@@ -92,6 +128,24 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match I18n.t("plans.budget_card.empty_body"), response.body
     assert_select "a[href=?]", edit_budget_path(Budget.date_to_param(Date.current))
+  end
+
+  test "lists credit card and loan accounts on the debt tab" do
+    get plan_url(tab: "debt")
+
+    assert_response :success
+    assert_match accounts(:credit_card).name, response.body
+    assert_match accounts(:loan).name, response.body
+    assert_select "a[href=?]", account_path(accounts(:credit_card))
+    assert_no_match accounts(:other_liability).name, response.body
+  end
+
+  test "links the bills card through to the bills workspace" do
+    get plan_url(tab: "bills")
+
+    assert_response :success
+    assert_match I18n.t("plans.bills_card.title"), response.body
+    assert_select "a[href=?]", bills_path
   end
 end
 

@@ -239,7 +239,7 @@ en:
         sharing_private: Keep private by default
         preview:
           title: Enable preview features
-          description: Opt in to in-progress features tagged preview or canary.
+          description: Opt in to Plan tools still in preview (Goals, Bills & Recurrings, Debt, Forecast) and other in-progress features tagged preview or canary.
     budget_shares:
       update:
         success: Budget sharing settings updated
