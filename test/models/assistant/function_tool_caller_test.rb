@@ -42,7 +42,7 @@ class Assistant::FunctionToolCallerTest < ActiveSupport::TestCase
 
     assert_difference "AiProposal.count", 1 do
       result = caller.fulfill_requests([ request ]).first
-      assert result.function_result[:pending_approval]
+      assert result.function_result["pending_approval"]
       assert_equal "Hold please", chat.user.family.ai_proposals.pending.last.payload.dig("arguments", "name")
     end
   end
@@ -132,7 +132,7 @@ class Assistant::FunctionToolCallerTest < ActiveSupport::TestCase
     )
 
     result = assert_nothing_raised do
-      @caller.fulfill_requests([ request ]).first
+      caller.fulfill_requests([ request ]).first
     end
 
     assert_equal "exploding failed unexpectedly", result.function_result["error"]

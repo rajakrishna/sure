@@ -167,20 +167,35 @@ class AiProposal < ApplicationRecord
     end
 
     def apply_create_rule!(actor)
-      args = payload["arguments"] || {}
-      result = Assistant::Function::CreateRule.new(actor).call(args)
-      raise ArgumentError, result[:message] || result["message"] if result.is_a?(Hash) && result[:success] == false
+      activate_created_rule!(call_create_rule!(actor, payload["arguments"] || {}))
     end
 
     def apply_suggested_rule!(actor)
       suggested = payload["suggested_rule"]
       return if suggested.blank?
 
-      Assistant::Function::CreateRule.new(actor).call(
-        "name" => suggested["name"],
-        "match_value" => suggested["value"],
-        "category_id" => suggested["action_value"]
+      activate_created_rule!(
+        call_create_rule!(actor, {
+          "name" => suggested["name"],
+          "match_value" => suggested["value"],
+          "category_id" => suggested["action_value"]
+        })
       )
+    end
+
+    def call_create_rule!(actor, args)
+      result = Assistant::Function::CreateRule.new(actor).call(args)
+      if result.is_a?(Hash) && (result[:success] == false || result["success"] == false)
+        raise ArgumentError, result[:message] || result["message"] || result[:error] || result["error"] || "Function failed"
+      end
+      result
+    end
+
+    def activate_created_rule!(result)
+      rule_id = result.is_a?(Hash) ? (result[:rule_id] || result["rule_id"]) : nil
+      return unless rule_id
+
+      family.rules.where(id: rule_id).update_all(active: true, updated_at: Time.current)
     end
 
     def apply_function!(actor)

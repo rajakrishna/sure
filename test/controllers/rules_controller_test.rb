@@ -2,6 +2,7 @@ require "test_helper"
 
 class RulesControllerTest < ActionDispatch::IntegrationTest
   setup do
+    ensure_tailwind_build
     sign_in @user = users(:family_admin)
   end
 

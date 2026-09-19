@@ -75,6 +75,7 @@ class AiProposalTest < ActiveSupport::TestCase
     rule = @family.rules.order(:created_at).last
     assert_equal "Starbucks", rule.name
     assert_equal "transaction_name", rule.conditions.first.condition_type
+    assert rule.active
   end
 
   test "chat mutation is not applied until approved" do

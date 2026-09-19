@@ -50,8 +50,7 @@ class AiProposalsControllerTest < ActionDispatch::IntegrationTest
       payload: { "arguments" => { "name" => "Nope" } }
     )
 
-    assert_raises(ActiveRecord::RecordNotFound) do
-      post approve_ai_proposal_url(other_proposal)
-    end
+    post approve_ai_proposal_url(other_proposal)
+    assert_response :not_found
   end
 end
