@@ -12,6 +12,13 @@ class HoldingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "new redirects to the trade form" do
+    get new_holding_url(account_id: @account.id)
+
+    assert_redirected_to new_trade_path(account_id: @account.id)
+    assert_match(/buy or sell/i, flash[:notice])
+  end
+
   test "gets holding" do
     get holding_path(@holding)
 

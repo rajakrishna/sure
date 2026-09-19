@@ -17,6 +17,10 @@ class AssistantTest < ActiveSupport::TestCase
 
     assert_includes preview_classes, Assistant::Function::GetInsights
     assert_includes preview_classes, Assistant::Function::GetValuations
+    assert_includes preview_classes, Assistant::Function::GetGoals
+    assert_includes preview_classes, Assistant::Function::CreateGoal
+    assert_not_includes default_classes, Assistant::Function::GetGoals
+    assert_not_includes default_classes, Assistant::Function::CreateGoal
   end
 
   setup do

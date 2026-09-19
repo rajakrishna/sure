@@ -42,6 +42,8 @@ en:
       shares: "%{qty} shares"
       unknown: "--"
       no_cost_basis: No cost basis
+    new:
+      use_trade: Add a buy or sell to record a holding.
     index:
       average_cost: Average cost
       holdings: Holdings

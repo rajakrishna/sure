@@ -10,6 +10,10 @@ class HoldingsController < ApplicationController
     @trade_republic_categories = trade_republic_categories_for(@account)
   end
 
+  def new
+    redirect_to new_trade_path(account_id: params[:account_id]), notice: t(".use_trade")
+  end
+
   def show
     @last_price_updated = @holding.security.prices.maximum(:updated_at)
   end

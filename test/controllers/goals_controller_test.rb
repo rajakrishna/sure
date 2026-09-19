@@ -37,6 +37,7 @@ class GoalsControllerTest < ActionDispatch::IntegrationTest
     get goal_url(@goal)
     assert_response :success
     assert_match(@goal.name, response.body)
+    assert_match(/Ask in chat/i, response.body)
   end
 
   test "new renders the modal form" do

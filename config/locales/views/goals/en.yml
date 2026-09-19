@@ -121,6 +121,8 @@ en:
       body: If any of this was spent on %{goal}, say so and it stops counting against the target.
       attribute: This was it
     show:
+      ask_in_chat: Ask in chat
+      ask_hint: How is %{name} tracking?
       edit: Edit
       consume: I used some of this money
       pause: Pause

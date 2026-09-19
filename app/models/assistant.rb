@@ -22,6 +22,8 @@ module Assistant
     Function::RecordValuation,
     Function::GetValuations,
     Function::GetInsights,
+    Function::GetGoals,
+    Function::CreateGoal,
     # Bills: the whole subsystem is preview-gated, so its tools ride the same
     # per-user flag as the surfaces they operate on. Each tool additionally
     # re-checks the family's recurring feature gate and the user's
@@ -64,7 +66,6 @@ module Assistant
         Function::GetBudget,
         Function::ImportBankStatement,
         Function::SearchFamilyFiles,
-        Function::CreateGoal,
         Function::GetTags,
         Function::CreateTag,
         Function::UpdateTag,
