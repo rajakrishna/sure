@@ -17,11 +17,11 @@
       <% end %>
 
       <% tabs.with_panel(tab_id: "budget") do %>
-        <%= render "plans/budget_card", budget: @budget, top_budget_categories: @top_budget_categories, editable: @editable, switch_options: @switch_options %>
+        <%= render "plans/budget_card", budget: @budget, top_budget_categories: @top_budget_categories, editable: @editable, switch_options: @switch_options, budget_mode: @budget_mode, spending_plan: @spending_plan %>
       <% end %>
 
       <% tabs.with_panel(tab_id: "goals") do %>
-        <%= render "plans/goals_card", goals: @goals, summary: @goals_summary, linkable_account_count: @linkable_account_count, family_has_goals: @family_has_goals %>
+        <%= render "plans/goals_card", goals: @goals, summary: @goals_summary, linkable_account_count: @linkable_account_count, family_has_goals: @family_has_goals, budget: @budget %>
       <% end %>
 
       <% tabs.with_panel(tab_id: "bills") do %>
@@ -29,11 +29,11 @@
       <% end %>
 
       <% tabs.with_panel(tab_id: "debt") do %>
-        <%= render "plans/debt_card", hub: @plan_hub %>
+        <%= render "plans/debt_card", hub: @plan_hub, planner: @debt_planner %>
       <% end %>
 
       <% tabs.with_panel(tab_id: "forecast") do %>
-        <%= render "plans/forecast_card", hub: @plan_hub, budget: @budget %>
+        <%= render "plans/forecast_card", hub: @plan_hub, budget: @budget, calendar: @cash_flow_calendar %>
       <% end %>
     <% end %>
   <% else %>

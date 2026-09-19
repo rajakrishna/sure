@@ -1,4 +1,4 @@
-<%# locals: (hub:, budget:) %>
+<%# locals: (hub:, budget:, calendar: nil) %>
 
 <%= render DS::Card.new do %>
   <div class="flex flex-wrap items-center gap-2 mb-4">
@@ -67,9 +67,15 @@
       </div>
     <% end %>
 
+    <% if calendar %>
+      <div class="mt-6">
+        <%= render "plans/cash_flow_calendar", calendar: calendar %>
+      </div>
+    <% end %>
+
     <% unless hub.recurring_disabled? %>
       <%= render DS::Link.new(
-        text: t(".view_calendar"),
+        text: t(".view_bills_calendar"),
         variant: "secondary",
         href: bills_path(view: "calendar"),
         icon: "chevron-right",

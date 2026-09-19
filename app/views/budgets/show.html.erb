@@ -51,6 +51,16 @@
         cannot reach and explains a subtraction they have no way to inspect. %>
     <% if preview_features_enabled? %>
       <%= render "budgets/available_cash", budget: @budget %>
+      <%= render "budgets/flex_summary", budget: @budget %>
+      <% if @spending_plan && @budget.initialized? && @budget_mode == "spending_plan" %>
+        <%= render DS::Card.new do %>
+          <div class="flex items-center gap-2 mb-4">
+            <h2 class="text-sm font-medium text-primary"><%= t("plans.spending_plan.title") %></h2>
+            <%= render DS::Pill.new(label: t("shared.preview")) %>
+          </div>
+          <%= render "plans/spending_plan", plan: @spending_plan, budget_mode: @budget_mode %>
+        <% end %>
+      <% end %>
     <% end %>
 
     <%# Bottom Section: Categories full width %>

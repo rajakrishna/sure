@@ -181,6 +181,13 @@
         ) %>
   </section>
 
+  <% if @goal.funding_category %>
+    <%= render DS::Card.new do %>
+      <h2 class="text-sm font-medium text-primary mb-2"><%= t(".budget_funding.heading") %></h2>
+      <p class="text-sm text-secondary"><%= t(".budget_funding.body", category: @goal.funding_category.name) %></p>
+    <% end %>
+  <% end %>
+
   <% if @goal.linked_accounts.any? %>
     <%= render DS::Card.new do %>
       <%= render Goals::FundingAccountsBreakdownComponent.new(goal: @goal) %>

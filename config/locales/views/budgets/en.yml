@@ -32,6 +32,8 @@ en:
       setup_description: "Enter your monthly earnings and planned spending below to setup your budget."
       budgeted_spending: "Budgeted spending"
       expected_income: "Expected income"
+      flex_budgeted: "Flex spending"
+      flex_budgeted_hint: "Optional leftover envelope for spending that has no category budget."
       autosuggest_title: "Autosuggest income & spending budget"
       autosuggest_description: "This will be based on transaction history. AI can make mistakes, verify before continuing."
       continue: "Continue"
@@ -45,6 +47,12 @@ en:
       earmarked: Already earmarked for goals
       free: Really free
       goals_link: View goals
+    flex_summary:
+      heading: Flex
+      subtitle: Dual budget leftover — uncategorized spending against a flex envelope.
+      envelope: Flex envelope
+      spent: Spent from flex
+      left: Flex remaining
     show:
       categories:
         amount: Amount

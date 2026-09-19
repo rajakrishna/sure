@@ -193,7 +193,7 @@ class GoalsController < ApplicationController
   private
     def set_goal
       @goal = Current.family.goals
-                             .includes(:open_pledges, linked_accounts: :account_providers)
+                             .includes(:open_pledges, :funding_category, linked_accounts: :account_providers)
                              .find(params[:id])
     end
 
@@ -202,11 +202,15 @@ class GoalsController < ApplicationController
     end
 
     def goal_params
-      params.require(:goal).permit(:name, :target_amount, :target_date, :color, :icon, :notes, :kind, :target_mode, :target_months)
+      permitted = params.require(:goal).permit(:name, :target_amount, :target_date, :color, :icon, :notes, :kind, :target_mode, :target_months, :funding_category_id)
+      permitted[:funding_category_id] = nil if permitted[:funding_category_id].blank?
+      permitted
     end
 
     def goal_update_params
-      params.require(:goal).permit(:name, :target_amount, :target_date, :color, :icon, :notes, :kind, :target_mode, :target_months)
+      permitted = params.require(:goal).permit(:name, :target_amount, :target_date, :color, :icon, :notes, :kind, :target_mode, :target_months, :funding_category_id)
+      permitted[:funding_category_id] = nil if permitted[:funding_category_id].blank?
+      permitted
     end
 
     def lookup_accounts(ids)

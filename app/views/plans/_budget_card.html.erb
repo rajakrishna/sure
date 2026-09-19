@@ -1,4 +1,4 @@
-<%# locals: (budget:, top_budget_categories:, editable:, switch_options:) %>
+<%# locals: (budget:, top_budget_categories:, editable:, switch_options:, budget_mode: "categories", spending_plan: nil) %>
 
 <%= render DS::Card.new do %>
   <div class="flex flex-wrap items-center gap-2 mb-4">
@@ -21,12 +21,6 @@
 
       <% if editable %>
         <div class="ml-auto shrink-0">
-          <%# The budget donut's trailing pencil (_budget_donut.html.erb) labels
-              the VALUE itself ("$12,850 ✎" — click the number to edit it).
-              This button's label is a static action ("Edit budget"), which
-              takes a leading icon everywhere else in the app: the categories
-              "Edit" on this same page (budgets/show.html.erb) and "Edit
-              split" (transactions/show.html.erb) both do. %>
           <%= render DS::Link.new(
             text: t(".edit_budget"),
             variant: "secondary",
@@ -45,7 +39,18 @@
     </div>
   <% end %>
 
-  <% if budget.initialized? %>
+  <% if spending_plan && budget.initialized? %>
+    <div class="mb-4">
+      <%= render DS::SegmentedControl.new(aria_label: t(".mode_aria")) do |control| %>
+        <% control.with_segment(t(".mode_categories"), active: budget_mode != "spending_plan", href: plan_path(tab: "budget", budget_mode: "categories")) %>
+        <% control.with_segment(t(".mode_spending_plan"), active: budget_mode == "spending_plan", href: plan_path(tab: "budget", budget_mode: "spending_plan")) %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if spending_plan && budget_mode == "spending_plan" && budget.initialized? %>
+    <%= render "plans/spending_plan", plan: spending_plan, budget_mode: budget_mode %>
+  <% elsif budget.initialized? %>
     <div class="flex items-baseline gap-2">
       <span class="text-3xl font-medium text-primary tabular-nums privacy-sensitive">
         <%= format_money(budget.actual_spending_money) %>
@@ -62,6 +67,18 @@
       <div class="h-full rounded-full <%= budget.available_to_spend.negative? ? "bg-destructive" : "bg-inverse" %>"
            style="inline-size: <%= budget.percent_of_budget_spent.clamp(0, 100).round(1) %>%"></div>
     </div>
+
+    <% if spending_plan %>
+      <div class="flex items-center justify-between gap-3 py-2.5 mt-4 border-b border-divider" data-testid="flex-envelope">
+        <div class="min-w-0">
+          <p class="text-sm text-primary"><%= t(".flex_title") %></p>
+          <p class="text-xs text-subdued"><%= t(".flex_hint") %></p>
+        </div>
+        <span class="shrink-0 text-xs tabular-nums text-primary privacy-sensitive">
+          <%= format_money(Money.new(budget.flex_actual_spending, budget.currency)) %><span class="text-subdued">/<%= format_money(budget.flex_envelope_money) %></span>
+        </span>
+      </div>
+    <% end %>
 
     <% if top_budget_categories.any? %>
       <p class="mt-6 mb-1 text-[11px] font-medium uppercase tracking-wide text-secondary"><%= t(".top_categories") %></p>
@@ -113,7 +130,7 @@
   <%= render DS::Link.new(
     text: t(".view_budget"),
     variant: "secondary",
-    href: budget_path(budget, **budget_owner_query),
+    href: budget_path(budget, **budget_owner_query.merge(budget_mode: budget_mode)),
     icon: "chevron-right",
     icon_position: :right,
     full_width: true,

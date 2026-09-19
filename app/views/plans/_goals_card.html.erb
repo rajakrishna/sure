@@ -1,4 +1,4 @@
-<%# locals: (goals:, summary:, linkable_account_count:, family_has_goals:) %>
+<%# locals: (goals:, summary:, linkable_account_count:, family_has_goals:, budget: nil) %>
 
 <%= render DS::Card.new do %>
   <div class="flex flex-wrap items-center gap-2 mb-4">
@@ -91,6 +91,9 @@
               <%= render Goals::StatusPillComponent.new(goal: goal) %>
               <% if goal.open_pledges.any? %>
                 <span class="text-xs text-warning shrink-0">· <%= t(".pending_marker") %></span>
+              <% end %>
+              <% if goal.funding_category %>
+                <span class="text-xs text-subdued truncate">· <%= t(".funded_from", category: goal.funding_category.name) %></span>
               <% end %>
             </div>
             <% if goal.target_amount.to_d.positive? %>

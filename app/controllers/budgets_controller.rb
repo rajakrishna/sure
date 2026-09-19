@@ -12,6 +12,16 @@ class BudgetsController < ApplicationController
     @source_budget = @budget.most_recent_initialized_budget unless @budget.initialized?
     @editable = @budget.editable_by?(Current.user)
     @switch_options = budget_switch_options(@budget)
+    @budget_mode = PlanHub.budget_mode_for(params[:budget_mode])
+    if preview_features_enabled?
+      hub = PlanHub.new(family: Current.family, user: Current.user)
+      @spending_plan = Budget::SpendingPlan.new(
+        budget: @budget,
+        family: Current.family,
+        user: Current.user,
+        hub: hub
+      )
+    end
     @breadcrumbs = plan_breadcrumb_prefix + [ [ t("breadcrumbs.budgets"), nil ] ]
   end
 
@@ -54,7 +64,7 @@ class BudgetsController < ApplicationController
     end
 
     def budget_params
-      params.require(:budget).permit(:budgeted_spending, :expected_income)
+      params.require(:budget).permit(:budgeted_spending, :expected_income, :flex_budgeted)
     end
 
     def set_budget

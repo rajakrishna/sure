@@ -137,6 +137,23 @@ class BudgetsControllerTest < ActionDispatch::IntegrationTest
     assert_match I18n.t("budgets.available_cash.heading"), response.body
     assert_match I18n.t("budgets.available_cash.free"), response.body
   end
+
+  test "preview users see the flex dual-budget panel" do
+    @user.update!(preferences: (@user.preferences || {}).merge("preview_features_enabled" => true))
+
+    get budget_url(Budget.date_to_param(Date.current.beginning_of_month))
+
+    assert_response :success
+    assert_select "[data-testid=?]", "flex-summary"
+  end
+
+  test "update persists a flex envelope" do
+    budget = budgets(:one)
+
+    patch budget_url(budget), params: { budget: { budgeted_spending: 5000, expected_income: 7000, flex_budgeted: 250 } }
+
+    assert_equal 250, budget.reload.flex_budgeted
+  end
 end
 
 class BudgetsControllerSharingTest < ActionDispatch::IntegrationTest

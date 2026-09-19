@@ -14,6 +14,28 @@ class GoalTest < ActiveSupport::TestCase
     assert @goal.valid?
   end
 
+  test "funding category must belong to the goal family" do
+    @goal.funding_category = categories(:food_and_drink)
+    assert @goal.valid?
+
+    other = Family.create!(name: "Other", currency: "USD", locale: "en", country: "US", timezone: "UTC")
+    foreign = other.categories.create!(name: "Foreign", color: "#4da568", lucide_icon: "shapes")
+    @goal.funding_category = foreign
+    assert_not @goal.valid?
+    assert @goal.errors[:funding_category].any?
+  end
+
+  test "monthly budget funding reads the linked category envelope" do
+    budget = budgets(:one)
+    budget.sync_budget_categories
+    bc = budget.budget_categories.find_by(category: categories(:food_and_drink))
+    bc.update!(budgeted_spending: 250)
+
+    @goal.update!(funding_category: categories(:food_and_drink))
+    assert_equal 250, @goal.monthly_budget_funding(budget)
+    assert @goal.funded_from_budget_category?
+  end
+
   # Two whole-account links on ONE account each claim the entire balance, so
   # the account is counted twice. The pro-rata haircut in backing_share_for
   # only scales FIXED earmarks: `others_fixed` sums allocated_amount, and an

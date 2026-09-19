@@ -154,6 +154,48 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
       assert_select "a[href=?]", bills_path
     end
   end
+
+  test "spending plan mode renders safe-to-spend beside categories" do
+    get plan_url(tab: "budget", budget_mode: "spending_plan")
+
+    assert_response :success
+    assert_select "[data-testid=?]", "spending-plan"
+    assert_match I18n.t("plans.spending_plan.safe_to_spend"), response.body
+    assert_match I18n.t("plans.budget_card.mode_categories"), response.body
+  end
+
+  test "category mode shows the flex envelope for preview users" do
+    get plan_url(tab: "budget")
+
+    assert_response :success
+    assert_select "[data-testid=?]", "flex-envelope"
+    assert_select "[data-testid=?]", "spending-plan", count: 0
+  end
+
+  test "forecast tab renders the day-level cash-flow calendar" do
+    get plan_url(tab: "forecast")
+
+    assert_response :success
+    assert_select "[data-testid=?]", "cash-flow-calendar"
+  end
+
+  test "debt tab renders avalanche/snowball what-if planner" do
+    get plan_url(tab: "debt", strategy: "snowball", extra_payment: 50)
+
+    assert_response :success
+    assert_select "[data-testid=?]", "debt-payoff-planner"
+    assert_match I18n.t("plans.debt_planner.snowball"), response.body
+  end
+
+  test "goals tab shows budget category funding when linked" do
+    goal = goals(:vacation_italy)
+    goal.update!(funding_category: categories(:food_and_drink))
+
+    get plan_url(tab: "goals")
+
+    assert_response :success
+    assert_match I18n.t("plans.goals_card.funded_from", category: categories(:food_and_drink).name), response.body
+  end
 end
 
 class PlansControllerHouseholdSwitchingTest < ActionDispatch::IntegrationTest

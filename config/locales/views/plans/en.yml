@@ -26,6 +26,43 @@ en:
       view_budget: View full budget
       empty_body: Set a monthly spending target and per-category limits to see how this month is tracking.
       set_up: Set up this month's budget
+      mode_aria: Budget view
+      mode_categories: Categories
+      mode_spending_plan: Spending plan
+      flex_title: Flex
+      flex_hint: Uncategorized spend against leftover or a set flex envelope
+    spending_plan:
+      title: Spending plan
+      safe_to_spend: safe to spend
+      subtitle: Income minus bills, goal funding, and spending so far this month.
+      lines:
+        income: Income
+        bills: Bills remaining
+        goals: Goals this month
+        spent: Already spent
+        flex: Flex envelope
+    cash_flow_calendar:
+      previous_month: Previous month
+      next_month: Next month
+      month_net: "Net %{amount}"
+      empty_month: No scheduled cash flow this month.
+    debt_planner:
+      title: Payoff plan
+      strategy_aria: Payoff strategy
+      avalanche: Avalanche
+      snowball: Snowball
+      avalanche_hint: Highest interest first. Extra payments hit the costliest balance.
+      snowball_hint: Smallest balance first. Extra payments clear the nearest win.
+      extra_payment: Extra payment per month
+      update: Update what-if
+      debt_free: Debt-free
+      no_date: Not in range
+      capped: Plan hits the 30-year cap. Raise the extra payment to finish sooner.
+      interest: Interest remaining
+      saved: Interest saved vs. minimums
+      rate: "%{percent}%"
+      min: "%{amount} min"
+      still_open: Still open
     goals_card:
       title: Your goals
       new_goal: New goal
@@ -42,6 +79,7 @@ en:
       all_on_pace: Everything on pace
       active_goals: Active goals
       pending_marker: pending
+      funded_from: "from %{category}"
       runway: "%{months} mo runway · %{pace}/mo"
       all_goals: All goals
     bills_card:
@@ -65,7 +103,7 @@ en:
         other: "%{count} accounts"
       accounts: Accounts
       empty_title: No debt accounts
-      empty_body: Add a credit card or loan to track balances here. Payoff plans come later.
+      empty_body: Add a credit card or loan to track balances and a payoff plan.
       add_account: Add account
     forecast_card:
       title: Forecast
@@ -76,6 +114,7 @@ en:
       budget_remaining: Budget remaining this month
       upcoming: Upcoming
       view_calendar: Bills calendar
+      view_bills_calendar: Bills calendar
       empty_title: No cash accounts
       empty_body: Add a checking or savings account to project cash after upcoming bills.
       add_account: Add account

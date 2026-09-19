@@ -1098,4 +1098,32 @@ class GoalsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to goals_path
     assert_equal I18n.t("goals.errors.not_found"), flash[:alert]
   end
+
+  test "create links a funding category from the family" do
+    account = unclaimed_account("Category funded pot")
+
+    post goals_url, params: {
+      goal: {
+        name: "Category funded",
+        target_amount: "1000",
+        color: "#4da568",
+        account_ids: [ account.id ],
+        funding_category_id: categories(:food_and_drink).id
+      }
+    }
+
+    goal = Goal.order(created_at: :desc).first
+    assert_redirected_to goal_path(goal)
+    assert_equal categories(:food_and_drink).id, goal.funding_category_id
+  end
+
+  test "show renders the budget funding card" do
+    @goal.update!(funding_category: categories(:food_and_drink))
+
+    get goal_url(@goal)
+
+    assert_response :success
+    assert_match I18n.t("goals.show.budget_funding.heading"), response.body
+    assert_match categories(:food_and_drink).name, response.body
+  end
 end

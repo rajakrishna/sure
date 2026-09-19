@@ -20,10 +20,12 @@ class Budget < ApplicationRecord
   validates :start_date, :end_date, uniqueness: { scope: [ :family_id, :user_id ] }
 
   monetize :available_cash, :earmarked_for_goals, :free_cash
-  monetize :budgeted_spending, :expected_income, :allocated_spending,
+  monetize :budgeted_spending, :expected_income, :flex_budgeted, :allocated_spending,
            :actual_spending, :available_to_spend, :available_to_allocate,
            :estimated_spending, :estimated_income, :actual_income, :remaining_expected_income,
-           :total_rolled_over
+           :total_rolled_over, :flex_actual_spending, :flex_available
+
+  validates :flex_budgeted, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
   class << self
     def date_to_param(date)
@@ -296,7 +298,8 @@ class Budget < ApplicationRecord
     Budget.transaction do
       update!(
         budgeted_spending: source_budget.budgeted_spending,
-        expected_income: source_budget.expected_income
+        expected_income: source_budget.expected_income,
+        flex_budgeted: source_budget.flex_budgeted
       )
 
       target_by_category = budget_categories.index_by(&:category_id)
@@ -454,7 +457,30 @@ class Budget < ApplicationRecord
   end
 
   def available_to_allocate
-    (budgeted_spending || 0) - allocated_spending
+    (budgeted_spending || 0) - allocated_spending - (flex_budgeted || 0)
+  end
+
+  def flex_budgeted
+    super || 0
+  end
+
+  # Uncategorized spending is the dual-budget flex pool's actuals: envelopes
+  # cover named categories, flex covers everything else.
+  def flex_actual_spending
+    uncategorized_budget_category.actual_spending
+  end
+
+  def flex_available
+    flex_envelope - flex_actual_spending
+  end
+
+  # Explicit flex envelope, or leftover ready-to-assign when flex is unset.
+  def flex_envelope
+    flex_budgeted.positive? ? flex_budgeted : [ available_to_allocate + flex_budgeted, 0 ].max
+  end
+
+  def flex_envelope_money
+    Money.new(flex_envelope, currency)
   end
 
   # Informational aggregate only -- deliberately kept out of
