@@ -69,6 +69,10 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
     assert_select "nav p", text: I18n.t("layouts.application.nav.plan")
     assert_select "nav p", text: I18n.t("layouts.application.nav.bills"), count: 0
     assert_select "nav p", text: I18n.t("layouts.application.nav.budgets"), count: 0
+    assert_select "nav.shrink-0 a[href=?]", chats_path do |links|
+      assert links.any? { |link| link.text.include?(I18n.t("layouts.application.nav.assistant")) },
+        "expected desktop left nav to keep Assistant after the Plan hub nav change"
+    end
   end
 
   test "falls back to the budget tab when a preview tab is requested without preview" do
@@ -134,18 +138,21 @@ class PlansControllerTest < ActionDispatch::IntegrationTest
     get plan_url(tab: "debt")
 
     assert_response :success
-    assert_match accounts(:credit_card).name, response.body
-    assert_match accounts(:loan).name, response.body
-    assert_select "a[href=?]", account_path(accounts(:credit_card))
-    assert_no_match accounts(:other_liability).name, response.body
+    assert_select "[data-testid=?] [role=tabpanel][data-id=?]", "plan-hub-tabs", "debt" do
+      assert_select "a[href=?]", account_path(accounts(:credit_card))
+      assert_select "a[href=?]", account_path(accounts(:loan))
+      assert_select "a[href=?]", account_path(accounts(:other_liability)), count: 0
+    end
   end
 
   test "links the bills card through to the bills workspace" do
     get plan_url(tab: "bills")
 
     assert_response :success
-    assert_match I18n.t("plans.bills_card.title"), response.body
-    assert_select "a[href=?]", bills_path
+    assert_select "[data-testid=?] [role=tabpanel][data-id=?]", "plan-hub-tabs", "bills" do
+      assert_select "h2", text: I18n.t("plans.bills_card.title")
+      assert_select "a[href=?]", bills_path
+    end
   end
 end
 

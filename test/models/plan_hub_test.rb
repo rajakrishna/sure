@@ -19,6 +19,7 @@ class PlanHubTest < ActiveSupport::TestCase
 
     assert_includes hub.debt_accounts.map(&:name), accounts(:credit_card).name
     assert_includes hub.debt_accounts.map(&:name), accounts(:loan).name
+    assert_not_includes hub.debt_accounts.map(&:id), accounts(:other_liability).id
     assert_equal Money.new(501_000, @family.currency), hub.debt_total
   end
 
