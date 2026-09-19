@@ -10,7 +10,7 @@ en:
       add_context: Add context
       attach_file: Attach file
       mention: Mention an account or transaction
-      commands: Commands
+      commands_label: Commands
       page_context: Add this page to chat
       search_context: Search accounts and transactions
       attached_only: Please review the attached file.
