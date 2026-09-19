@@ -25,7 +25,7 @@
     <div class="flex items-center justify-between gap-1">
       <div class="relative flex items-center gap-1">
         <%= render DS::Button.new(variant: "icon", icon: "plus", type: "button", title: t(".add_context"), aria_label: t(".add_context"), data: { action: "chat-composer#togglePicker", testid: "chat-add-context" }) %>
-        <%= render DS::Button.new(variant: "icon", icon: "command", type: "button", title: t(".commands"), aria_label: t(".commands"), data: { action: "chat-composer#toggleCommands", testid: "chat-commands" }) %>
+        <%= render DS::Button.new(variant: "icon", icon: "command", type: "button", title: t(".commands_label"), aria_label: t(".commands_label"), data: { action: "chat-composer#toggleCommands", testid: "chat-commands" }) %>
         <%= render DS::Button.new(variant: "icon", icon: "at-sign", type: "button", title: t(".mention"), aria_label: t(".mention"), data: { action: "chat-composer#togglePicker", testid: "chat-mention" }) %>
         <%= render DS::Button.new(variant: "icon", icon: "mouse-pointer-click", type: "button", title: t(".page_context"), aria_label: t(".page_context"), data: { action: "chat-composer#addPageContext", testid: "chat-page-context" }) %>
 
@@ -40,7 +40,7 @@
           <div class="mt-1 max-h-56 overflow-y-auto" data-chat-composer-target="pickerList"></div>
         </div>
 
-        <div class="absolute bottom-full left-0 mb-2 hidden z-50 w-72 max-w-[calc(100vw-2rem)] shadow-border-lg bg-container rounded-lg py-1" data-chat-composer-target="commands" role="listbox" aria-label="<%= t(".commands") %>">
+        <div class="absolute bottom-full left-0 mb-2 hidden z-50 w-72 max-w-[calc(100vw-2rem)] shadow-border-lg bg-container rounded-lg py-1" data-chat-composer-target="commands" role="listbox" aria-label="<%= t(".commands_label") %>">
           <% chat_slash_commands.each do |command| %>
             <button type="button" class="flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm text-primary hover:bg-container-hover rounded-md" data-action="chat-composer#insertCommand" data-prompt="<%= command[:prompt] %>">
               <span class="font-mono text-xs text-secondary">/<%= command[:id] %></span>
