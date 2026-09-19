@@ -1,5 +1,6 @@
 class ReportsController < ApplicationController
   include Periodable
+  include SharedViewFilterable
 
   # Allow API key authentication for exports (for Google Sheets integration)
   # Note: We run authentication_for_export which handles both session and API key auth
@@ -99,6 +100,7 @@ class ReportsController < ApplicationController
 
   private
     def setup_report_data(show_flash: false)
+      apply_saved_report
       @period_type = params[:period_type]&.to_sym || :monthly
       @start_date = parse_date_param(:start_date) || default_start_date
       @end_date = parse_date_param(:end_date) || default_end_date
@@ -110,8 +112,8 @@ class ReportsController < ApplicationController
       @period = Period.custom(start_date: @start_date, end_date: @end_date)
       @previous_period = build_previous_period
 
-      # Get aggregated data
-      @income_statement = Current.family.income_statement(user: Current.user)
+      report_accounts = shared_view_accounts.presence
+      @income_statement = Current.family.income_statement(user: Current.user, accounts: report_accounts)
       @current_income_totals = @income_statement.income_totals(period: @period)
       @current_expense_totals = @income_statement.expense_totals(period: @period)
 
@@ -141,6 +143,19 @@ class ReportsController < ApplicationController
 
       # Build navigation links for period switching
       @nav = build_period_navigation
+      @saved_reports = preview_features_enabled? ? Current.family.saved_reports.order(:name) : []
+    end
+
+    def apply_saved_report
+      return if params[:saved_report_id].blank? || !preview_features_enabled?
+
+      report = Current.family.saved_reports.find_by(id: params[:saved_report_id])
+      return unless report
+
+      @saved_report = report
+      report.to_filter_params.each do |key, value|
+        params[key] ||= value
+      end
     end
 
     def preferences_params
@@ -687,7 +702,7 @@ class ReportsController < ApplicationController
     # Filters applicable to both transactions and trades (entry-level + category)
     def apply_entry_filters(scope)
       # Scope to user's finance accounts
-      finance_account_ids = Current.user&.finance_accounts&.pluck(:id) || []
+      finance_account_ids = shared_view.account_ids
       scope = scope.where(entries: { account_id: finance_account_ids })
 
       # Filter by category (including subcategories)

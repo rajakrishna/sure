@@ -14,6 +14,7 @@
       <div class="space-y-2">
         <% [
           ["read", t(".scope_read_only"), t(".scope_read_only_description")],
+          ["draft_write", t(".scope_draft_write"), t(".scope_draft_write_description")],
           ["read_write", t(".scope_read_write"), t(".scope_read_write_description")]
         ].each do |value, label, description| %>
           <div class="bg-surface-inset rounded-lg p-3 border border-primary">

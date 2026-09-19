@@ -5,6 +5,8 @@ module InsightsHelper
     "net_worth_milestone" => "trophy",
     "subscription_audit" => "repeat",
     "savings_rate_change" => "piggy-bank",
+    "subscription_watch" => "repeat",
+    "household_nudge" => "users",
     "idle_cash" => "wallet",
     "budget_at_risk" => "alert-triangle",
     "budget_on_track" => "circle-check",
@@ -101,6 +103,10 @@ module InsightsHelper
     when "idle_cash"
       account = insight.family.accounts.visible.find_by(id: metadata["account_id"])
       account && { text: t("insights.actions.idle_cash"), href: account_path(account) }
+    when "subscription_watch"
+      { text: t("insights.actions.subscription_watch"), href: recurring_transactions_path }
+    when "household_nudge"
+      { text: t("insights.actions.household_nudge"), href: transactions_inbox_path(assignee_id: metadata["user_id"]) }
     when "subscription_audit"
       { text: t("insights.actions.subscription_audit"), href: recurring_transactions_path }
     when "cash_flow_warning"

@@ -102,8 +102,8 @@ class ApiKey < ApplicationRecord
         errors.add(:scopes, "must include at least one permission")
       elsif scopes.is_a?(Array) && scopes.length > 1
         errors.add(:scopes, "can only have one permission level")
-      elsif scopes.is_a?(Array) && !%w[read read_write].include?(scopes.first)
-        errors.add(:scopes, "must be either 'read' or 'read_write'")
+      elsif scopes.is_a?(Array) && !%w[read draft_write read_write].include?(scopes.first)
+        errors.add(:scopes, "must be either 'read', 'draft_write', or 'read_write'")
       end
     end
 

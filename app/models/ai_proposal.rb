@@ -1,6 +1,6 @@
 class AiProposal < ApplicationRecord
-  SOURCES = %w[chat auto_categorize bayes rule_suggest refund_match merchant_detect].freeze
-  KINDS = %w[categorize create_rule mutation refund_match set_merchant].freeze
+  SOURCES = %w[chat auto_categorize bayes rule_suggest refund_match merchant_detect draft_tool receipt_vision mcp idle_cash].freeze
+  KINDS = %w[categorize create_rule mutation refund_match set_merchant split budget_adjust].freeze
   STATUSES = %w[pending approved dismissed].freeze
 
   belongs_to :family
@@ -72,12 +72,48 @@ class AiProposal < ApplicationRecord
     true
   end
 
-  def self.record_from_tool!(family:, user:, chat:, function:, arguments:)
+  def self.propose_split!(family:, transaction:, splits:, source: "draft_tool", user: nil)
+    entry = transaction.entry
+    proposal = family.ai_proposals.pending.find_or_initialize_by(
+      kind: "split",
+      target_type: "Transaction",
+      target_id: transaction.id
+    )
+    proposal.assign_attributes(
+      source: source,
+      user: user,
+      payload: {
+        "transaction_id" => transaction.id,
+        "entry_name" => entry&.name,
+        "amount" => entry&.amount,
+        "date" => entry&.date&.iso8601,
+        "splits" => splits
+      }
+    )
+    proposal.save!
+    proposal
+  end
+
+  def self.propose_budget_adjust!(family:, arguments:, user: nil, source: "draft_tool", target_id: nil)
+    family.ai_proposals.create!(
+      user: user,
+      source: source,
+      kind: "budget_adjust",
+      function_name: "update_budget",
+      target_id: target_id,
+      payload: {
+        "arguments" => arguments,
+        "function_name" => "update_budget"
+      }
+    )
+  end
+
+  def self.record_from_tool!(family:, user:, chat:, function:, arguments:, source: "chat")
     kind = function.name == "create_rule" ? "create_rule" : "mutation"
     family.ai_proposals.create!(
       user: user,
       chat: chat,
-      source: "chat",
+      source: source,
       kind: kind,
       function_name: function.name,
       payload: {
@@ -98,6 +134,10 @@ class AiProposal < ApplicationRecord
       apply_suggested_rule!(actor) if create_rule
     when "create_rule"
       apply_create_rule!(actor)
+    when "split"
+      apply_split!
+    when "budget_adjust"
+      apply_budget_adjust!(actor)
     when "refund_match"
       apply_refund_match!
     when "set_merchant"
@@ -139,6 +179,12 @@ class AiProposal < ApplicationRecord
       I18n.t("ai_proposals.summaries.set_merchant",
         name: payload["entry_name"].presence || I18n.t("ai_proposals.summaries.unnamed_transaction"),
         merchant: payload["merchant_name"])
+    when "split"
+      I18n.t("ai_proposals.summaries.split",
+        name: payload["entry_name"].presence || I18n.t("ai_proposals.summaries.unnamed_transaction"),
+        count: Array(payload["splits"]).size)
+    when "budget_adjust"
+      I18n.t("ai_proposals.summaries.budget_adjust")
     else
       I18n.t("ai_proposals.summaries.mutation", function: human_function_name)
     end
@@ -185,6 +231,11 @@ class AiProposal < ApplicationRecord
         %w[name match_value category_id transaction_type].each do |key|
           payload["arguments"][key] = attrs[key] if attrs[key].present?
         end
+      elsif kind == "split" && attrs["splits"].present?
+        payload["splits"] = attrs["splits"]
+      elsif kind == "budget_adjust"
+        payload["arguments"] ||= {}
+        payload["arguments"].merge!(attrs["arguments"] || attrs)
       elsif payload["arguments"].is_a?(Hash)
         payload["arguments"].merge!(attrs["arguments"] || {})
       else
@@ -239,6 +290,34 @@ class AiProposal < ApplicationRecord
         website_url: payload["website_url"],
         logo_url: payload["logo_url"]
       )
+    end
+
+    def apply_split!
+      transaction = target_transaction
+      raise ActiveRecord::RecordNotFound, "Transaction not found" unless transaction
+      raise ArgumentError, "Transaction is not splittable" unless transaction.splittable?
+
+      entry = transaction.entry
+      splits = Array(payload["splits"]).map do |split|
+        {
+          name: split["name"],
+          amount: split["amount"].to_d,
+          category_id: split["category_id"].presence,
+          excluded: split["excluded"]
+        }
+      end
+      raise ArgumentError, "Split needs at least two lines" if splits.size < 2
+
+      entry.split!(splits)
+      entry.sync_account_later
+    end
+
+    def apply_budget_adjust!(actor)
+      result = Assistant::Function::UpdateBudget.new(actor).call(payload["arguments"] || {})
+      if result.is_a?(Hash) && (result[:success] == false || result["success"] == false)
+        raise ArgumentError, result[:message] || result["message"] || "Budget update failed"
+      end
+      result
     end
 
     def apply_categorize!

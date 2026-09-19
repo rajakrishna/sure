@@ -5,6 +5,7 @@ class Settings::ProfilesController < ApplicationController
     @user = Current.user
     @users = Current.family.users.order(:created_at)
     @pending_invitations = Current.family.invitations.pending
+    @advisor_invites = preview_features_enabled? ? Current.family.advisor_invites.active.order(created_at: :desc) : []
     @breadcrumbs = [
       [ t("breadcrumbs.home"), root_path ],
       [ t("breadcrumbs.profile"), nil ]

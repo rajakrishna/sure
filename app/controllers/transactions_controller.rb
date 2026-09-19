@@ -394,6 +394,18 @@ class TransactionsController < ApplicationController
     redirect_back_or_to transactions_path
   end
 
+  def parse_receipt
+    transaction = accessible_transactions.find(params[:id])
+    return unless require_account_permission!(transaction.entry.account)
+    unless preview_features_enabled?
+      redirect_back_or_to transaction_path(transaction), alert: t("preview.not_enabled")
+      return
+    end
+
+    ReceiptVisionJob.perform_later(transaction.id)
+    redirect_back_or_to transaction_path(transaction), notice: t("transactions.parse_receipt.queued")
+  end
+
   def mark_as_recurring
     transaction = accessible_transactions.includes(entry: :account).find(params[:id])
 
@@ -569,7 +581,7 @@ class TransactionsController < ApplicationController
     def entry_params
       entry_params = params.require(:entry).permit(
         :name, :date, :amount, :currency, :excluded, :notes, :nature, :entryable_type,
-        entryable_attributes: [ :id, :category_id, :merchant_id, :kind, :investment_activity_label, :exchange_rate, { tag_ids: [] } ]
+        entryable_attributes: [ :id, :category_id, :merchant_id, :assignee_id, :kind, :investment_activity_label, :exchange_rate, { tag_ids: [] } ]
       )
 
       nature = entry_params.delete(:nature)

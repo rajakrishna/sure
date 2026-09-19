@@ -34,6 +34,7 @@ class TransactionAttachmentsController < ApplicationController
         attachment_proxy = @transaction.attachments.attach(attachments)
 
         if @transaction.valid?
+          enqueue_receipt_vision_if_needed
           count = new_count
           message = count == 1 ? t("transactions.attachments.uploaded_one") : t("transactions.attachments.uploaded_many", count: count)
           respond_to do |format|
@@ -114,5 +115,13 @@ class TransactionAttachmentsController < ApplicationController
         return nil if param.blank?
         param.respond_to?(:permit) ? param.permit(:file, :filename, :content_type, :description, :metadata) : param
       end
+    end
+
+    def enqueue_receipt_vision_if_needed
+      return unless preview_features_enabled?
+      return unless @transaction.splittable?
+      return unless @transaction.attachments.blobs.any? { |blob| blob.content_type.to_s.start_with?("image/") }
+
+      ReceiptVisionJob.perform_later(@transaction.id)
     end
 end

@@ -88,6 +88,8 @@ en:
     tags: Tags
     trades: Trades
     transactions: Transactions
+    inbox: Inbox
+    wealth: Wealth
     transfer_matches: Transfer matches
     transfers: Transfers
     users: Users

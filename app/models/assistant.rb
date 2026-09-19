@@ -83,10 +83,14 @@ module Assistant
         Function::CreateTransaction,
         Function::DeleteTransaction,
         Function::UpdateBudget,
-        Function::CreateRule
+        Function::CreateRule,
+        Function::CreateRuleDraft,
+        Function::SplitTransactionDraft,
+        Function::ProposeBudgetAdjust
       ]
 
       classes += PREVIEW_FUNCTION_CLASSES if user&.preview_features_enabled?
+      classes += [ Function::ParseReceiptDraft, Function::GetWealthSnapshot, Function::GetFinancialHealth ] if user&.preview_features_enabled?
       classes
     end
 

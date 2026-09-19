@@ -18,15 +18,24 @@
       <% end %>
 
       <%# Print Report Button %>
-        <%= link_to print_reports_path(period_type: @period_type, start_date: @start_date, end_date: @end_date),
-                  target: "_blank",
-                  rel: "noopener",
-                  aria: { label: t("reports.index.print_report") },
-                  class: "font-medium whitespace-nowrap inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-primary border border-secondary bg-transparent hover:bg-surface-hover" do %>
-        <%= icon("printer", size: "sm") %>
-        <span class="hidden sm:inline"><%= t("reports.index.print_report") %></span>
-      <% end %>
+        <%= render DS::Link.new(
+          href: print_reports_path(period_type: @period_type, start_date: @start_date, end_date: @end_date),
+          icon: "printer",
+          variant: "outline",
+          text: t("reports.index.print_report"),
+          target: "_blank",
+          rel: "noopener",
+          aria: { label: t("reports.index.print_report") },
+          class: "hidden sm:inline-flex"
+        ) %>
     </header>
+
+    <%= render "reports/saved_reports",
+          saved_reports: @saved_reports || [],
+          period_type: @period_type,
+          start_date: @start_date,
+          end_date: @end_date,
+          view_key: (preview_features_enabled? ? shared_view.key : "ours") %>
 
     <%# Period Navigation Tabs %>
     <div class="flex items-center justify-between gap-4">
