@@ -1,66 +1,99 @@
 <div class="space-y-6 pb-6">
   <header class="flex flex-wrap items-start justify-between gap-4">
-    <div>
-      <h1 class="text-2xl font-semibold text-primary"><%= t(".title") %></h1>
-      <p class="text-sm text-secondary mt-1"><%= t(".subtitle") %></p>
+    <div class="min-w-0 space-y-0.5">
+      <h1 class="text-xl font-medium text-primary"><%= t(".title") %></h1>
+      <p class="text-sm text-secondary"><%= t(".subtitle") %></p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
+      <%= render DS::Button.new(
+        text: t(".suggest"),
+        href: suggest_wealth_path,
+        method: :post,
+        variant: "secondary",
+        icon: "sparkles"
+      ) %>
       <%= ask_chip t(".ask_idle_cash"), hint: t(".ask_idle_cash_hint") %>
-      <%= ask_chip t(".ask_allocation"), hint: t(".ask_allocation_hint") %>
-      <%= ask_chip t(".ask_health"), hint: t(".ask_health_hint") %>
       <%= render "shared/shared_view_switcher", path: wealth_path %>
     </div>
   </header>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <%= render DS::Card.new do %>
-      <p class="text-sm text-secondary"><%= t(".net_worth") %></p>
-      <p class="text-3xl font-medium text-primary tabular-nums privacy-sensitive mt-2"><%= @snapshot.net_worth_money.format %></p>
-      <div class="flex gap-4 mt-4 text-sm">
-        <div>
-          <p class="text-secondary"><%= t(".assets") %></p>
-          <p class="text-primary tabular-nums privacy-sensitive"><%= @snapshot.assets_money.format %></p>
-        </div>
-        <div>
-          <p class="text-secondary"><%= t(".liabilities") %></p>
-          <p class="text-primary tabular-nums privacy-sensitive"><%= @snapshot.liabilities_money.format %></p>
-        </div>
-      </div>
-    <% end %>
-
-    <%= render DS::Card.new do %>
-      <div class="flex items-center justify-between gap-3">
-        <div>
-          <p class="text-sm text-secondary"><%= t(".health_score") %></p>
-          <p class="text-3xl font-medium text-primary tabular-nums mt-2"><%= @health.score %></p>
-        </div>
-        <%= render DS::ProgressRing.new(
-          percent: @health.score,
-          tone: @health.score >= 70 ? :success : (@health.score >= 40 ? :warning : :destructive),
-          label: t(".health_score")
-        ) %>
-      </div>
-    <% end %>
-
-    <%= render DS::Card.new do %>
-      <p class="text-sm text-secondary mb-3"><%= t(".allocation") %></p>
-      <% if @snapshot.allocation.any? %>
-        <ul class="space-y-2">
-          <% @snapshot.allocation.first(6).each do |slice| %>
-            <li class="flex items-center justify-between gap-3 text-sm">
-              <span class="text-primary truncate"><%= slice.label %></span>
-              <span class="tabular-nums text-secondary privacy-sensitive"><%= slice.weight %>%</span>
-            </li>
+  <div data-testid="wealth-hero">
+    <%= render DS::Card.new(class: "gap-4") do %>
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div class="min-w-0 space-y-1">
+          <p class="text-xs font-medium uppercase tracking-wide text-secondary"><%= t(".net_worth") %></p>
+          <p class="text-3xl font-medium text-primary tabular-nums privacy-sensitive"><%= @snapshot.net_worth_money.format %></p>
+          <div class="flex flex-wrap gap-4 text-sm">
+            <p class="text-secondary">
+              <%= t(".assets") %>
+              <span class="text-primary tabular-nums privacy-sensitive"><%= @snapshot.assets_money.format %></span>
+            </p>
+            <p class="text-secondary">
+              <%= t(".liabilities") %>
+              <span class="text-primary tabular-nums privacy-sensitive"><%= @snapshot.liabilities_money.format %></span>
+            </p>
+          </div>
+          <% if @forecast&.narration.present? %>
+            <p class="text-sm text-primary"><%= @forecast.narration %></p>
           <% end %>
-        </ul>
-      <% else %>
-        <p class="text-sm text-secondary"><%= t(".empty_allocation") %></p>
+        </div>
+        <div class="flex items-center gap-3">
+          <%= render DS::ProgressRing.new(
+            percent: @health.score,
+            tone: @health.score >= 70 ? :success : (@health.score >= 40 ? :warning : :destructive),
+            label: t(".health_score")
+          ) %>
+          <div>
+            <p class="text-xs text-secondary"><%= t(".health_score") %></p>
+            <p class="text-lg font-medium text-primary tabular-nums"><%= @health.score %></p>
+          </div>
+        </div>
+      </div>
+
+      <% if @sparkline_series.size >= 2 %>
+        <div class="text-success">
+          <%= render DS::Sparkline.new(
+            series: @sparkline_series,
+            aria_label: t(".net_worth_trend"),
+            css: "w-full max-w-md text-success"
+          ) %>
+        </div>
       <% end %>
     <% end %>
   </div>
 
-  <%= render DS::Card.new do %>
-    <h2 class="text-sm font-medium text-primary mb-3"><%= t(".health_components") %></h2>
+  <% if Array(@health.actions).any? %>
+    <div class="bg-container rounded-xl shadow-border-xs divide-y divide-subdued">
+      <% Array(@health.actions).first(3).each do |action| %>
+        <div class="flex items-center gap-3 px-4 py-3">
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-primary"><%= t("financial_health.components.#{action["key"]}") %></p>
+            <p class="text-sm text-secondary"><%= action["detail"] %></p>
+          </div>
+          <%= ask_chip t(".ask_focus"), hint: t(".ask_focus_hint", detail: action["detail"]) %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= render "ai_proposals/list", proposals: @ai_proposals %>
+
+  <%= render DS::Disclosure.new(title: t(".allocation"), align: "left", variant: :card, open: true) do %>
+    <% if @snapshot.allocation.any? %>
+      <ul class="space-y-2">
+        <% @snapshot.allocation.first(8).each do |slice| %>
+          <li class="flex items-center justify-between gap-3 text-sm">
+            <span class="text-primary truncate"><%= slice.label %></span>
+            <span class="tabular-nums text-secondary privacy-sensitive"><%= slice.weight %>%</span>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-secondary"><%= t(".empty_allocation") %></p>
+    <% end %>
+  <% end %>
+
+  <%= render DS::Disclosure.new(title: t(".health_components"), align: "left", variant: :card) do %>
     <ul class="space-y-3">
       <% Array(@health.components).each do |component| %>
         <% key = component.respond_to?(:key) ? component.key : component["key"] %>
@@ -75,9 +108,5 @@
         </li>
       <% end %>
     </ul>
-  <% end %>
-
-  <% if @forecast&.narration.present? %>
-    <p class="text-sm text-secondary"><%= @forecast.narration %></p>
   <% end %>
 </div>

@@ -42,6 +42,15 @@ class Family::WealthSnapshot
     end
   end
 
+  def sparkline_series(period: Period.last_30_days, max_points: 12)
+    points = sparkline_points(period: period)
+    return [] if points.size < 2
+
+    sampled = downsample_points(points, max_points)
+    min = sampled.map(&:last).min
+    sampled.map { |date, value| [ date, value.to_f - min.to_f ] }
+  end
+
   def allocation
     groups = if filtered?
       selected_accounts.group_by { |account| account.accountable_type }.map do |type, accounts|
@@ -74,6 +83,14 @@ class Family::WealthSnapshot
 
   private
     attr_reader :family, :user, :account_ids
+
+    def downsample_points(points, max_points)
+      return points if points.size <= max_points
+
+      last_index = points.size - 1
+      indexes = (0...max_points).map { |index| (index * last_index / (max_points - 1.0)).round }.uniq
+      indexes.map { |index| points[index] }
+    end
 
     def filtered?
       account_ids.present?

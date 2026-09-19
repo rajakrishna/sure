@@ -30,7 +30,10 @@ en:
       categories_expenses: Expense categories
       categories_incomes: Income categories
       delete_all: Delete all
-      empty: No categories found
+      empty: No categories yet
+      empty_description: Start with defaults, or add the few you actually use.
+      ask_cleanup: Suggest unused categories
+      ask_cleanup_hint: Which categories look unused or overlapping? Propose merges as drafts I can accept, edit, or dismiss.
       merge: Merge categories
       new: New category
     merge:

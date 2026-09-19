@@ -29,6 +29,8 @@ en:
         one: "%{count} provider merchant is missing website information. Enhance with AI to detect websites, display logos, and merge duplicate merchants."
         other: "%{count} provider merchants are missing website information. Enhance with AI to detect websites, display logos, and merge duplicate merchants."
       enhance_button: Enhance with AI
+      ask_detect: Suggest merchants
+      ask_detect_hint: Detect merchants on recent uncategorized transactions. Leave each as a proposal I can accept, edit, or dismiss.
       search_family_merchants: Search family merchants...
       search_provider_merchants: Search provider merchants...
       no_family_merchants_found: No matching family merchants found

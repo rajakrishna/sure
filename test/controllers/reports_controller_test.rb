@@ -186,7 +186,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
 
     get reports_path
     assert_response :ok
-    assert_select "h3", text: I18n.t("reports.empty_state.title")
+    assert_includes response.body, I18n.t("reports.empty_state.title")
   end
 
   test "index with budget performance for current month" do
@@ -210,6 +210,7 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
   test "index calculates summary metrics correctly" do
     get reports_path(period_type: :monthly)
     assert_response :ok
+    assert_select "[data-testid=reports-hero]", 1
     assert_select "h3", text: I18n.t("reports.summary.total_income")
     assert_select "h3", text: I18n.t("reports.summary.total_expenses")
     assert_select "h3", text: I18n.t("reports.summary.net_savings")

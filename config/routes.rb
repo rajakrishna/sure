@@ -449,7 +449,9 @@ Rails.application.routes.draw do
   end
 
   resources :saved_reports, only: %i[create destroy]
-  resource :wealth, only: :show, controller: :wealth
+  resource :wealth, only: :show, controller: :wealth do
+    post :suggest
+  end
 
   resources :advisor_invites, only: %i[create destroy]
   get "advisor/:id", to: "advisor_portals#show", as: :advisor_portal

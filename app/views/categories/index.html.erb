@@ -1,5 +1,6 @@
 <%= content_for :page_title, t(".categories") %>
 <%= content_for :page_actions do %>
+  <%= ask_chip t(".ask_cleanup"), hint: t(".ask_cleanup_hint") %>
   <%= render DS::Menu.new do |menu| %>
     <% menu.with_item(
         variant: "link",
@@ -36,15 +37,17 @@
                  category_ids_with_transactions: @category_ids_with_transactions %>
     </div>
   <% else %>
-    <div class="flex justify-center items-center py-20">
-      <div class="text-center flex flex-col items-center max-w-[500px]">
-        <p class="text-sm text-secondary mb-4"><%= t(".empty") %></p>
-        <div class="flex items-center gap-2">
+    <%= render DS::EmptyState.new(
+      icon: "shapes",
+      title: t(".empty"),
+      description: t(".empty_description")
+    ) do |es| %>
+      <% es.with_action do %>
+        <div class="flex flex-wrap items-center justify-center gap-2">
           <%= render DS::Button.new(
             text: t(".bootstrap"),
             href: bootstrap_categories_path,
           ) %>
-
           <%= render DS::Link.new(
             text: t(".new"),
             variant: "outline",
@@ -53,7 +56,7 @@
             frame: :modal
           ) %>
         </div>
-      </div>
-    </div>
+      <% end %>
+    <% end %>
   <% end %>
 </div>

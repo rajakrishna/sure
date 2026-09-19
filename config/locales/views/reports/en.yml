@@ -3,10 +3,11 @@ en:
   reports:
     index:
       title: Reports
-      subtitle: Comprehensive insights into your financial health
+      subtitle: Saved views first. Charts when you want them.
       export: Export CSV
       print_report: Print Report
       ask_report: Describe a custom report
+      snapshot: Period snapshot
       drag_to_reorder: "Drag to reorder section"
       toggle_section: "Toggle section visibility"
       periods:
@@ -83,7 +84,7 @@ en:
       no_spending_data: No spending data available for this period
     empty_state:
       title: No Data Available
-      description: Start tracking your finances by adding transactions or connecting your accounts to see comprehensive reports
+      description: Add a transaction or connect an account to see this period.
       add_transaction: Add Transaction
       add_account: Add Account
       ask_report: What report should I start with?

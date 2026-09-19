@@ -17,6 +17,7 @@
       href: identify_recurring_transactions_path,
       method: :post
     ) %>
+    <%= ask_chip t("recurring_transactions.ask_patterns"), hint: t("recurring_transactions.ask_patterns_hint") %>
   <% end %>
 <% end %>
 
@@ -40,41 +41,31 @@
   </div>
 
   <% unless @family.recurring_transactions_disabled? %>
-    <div class="p-4 bg-container-inset border border-secondary rounded-lg">
-      <div class="flex items-start gap-2">
-        <%= icon "info", class: "w-5 h-5 text-link mt-0.5 flex-shrink-0" %>
-        <div>
-          <p class="text-sm font-medium text-primary mb-2"><%= t("recurring_transactions.info.title") %></p>
-          <p class="text-xs text-secondary mb-2"><%= t("recurring_transactions.info.manual_description") %></p>
-          <p class="text-xs text-secondary mb-1"><%= t("recurring_transactions.info.automatic_description") %></p>
-          <ul class="list-disc list-inside text-xs text-secondary space-y-0.5 ml-2">
-            <% t("recurring_transactions.info.triggers").each do |trigger| %>
-              <li><%= trigger %></li>
-            <% end %>
-          </ul>
-        </div>
+    <%= render DS::Disclosure.new(title: t("recurring_transactions.info.title"), align: "left", variant: :card) do %>
+      <p class="text-xs text-secondary mb-2"><%= t("recurring_transactions.info.manual_description") %></p>
+      <p class="text-xs text-secondary mb-1"><%= t("recurring_transactions.info.automatic_description") %></p>
+      <ul class="list-disc list-inside text-xs text-secondary space-y-0.5 ml-2">
+        <% t("recurring_transactions.info.triggers").each do |trigger| %>
+          <li><%= trigger %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if @suggested.any? %>
+      <%= render "recurring_transactions/suggested_series", suggested: @suggested %>
+    <% end %>
+
+    <div class="bg-container rounded-xl shadow-border-xs p-4 flex items-center justify-between gap-4">
+      <div>
+        <p class="text-sm font-medium text-primary"><%= t("recurring_transactions.manage.title") %></p>
+        <p class="text-xs text-secondary"><%= t("recurring_transactions.manage.description") %></p>
       </div>
+      <%= render DS::Link.new(
+            text: t("recurring_transactions.manage.cta"),
+            icon: "receipt",
+            variant: "outline",
+            href: bills_path(view: "all")
+          ) %>
     </div>
-
-      <% if @suggested.any? %>
-        <%= render "recurring_transactions/suggested_series", suggested: @suggested %>
-      <% end %>
-
-      <%# The Bills workspace is preview-gated, so the card that leads into it
-          only renders for opted-in users. %>
-      <% if preview_features_enabled? %>
-        <div class="bg-container rounded-xl shadow-border-xs p-4 flex items-center justify-between gap-4">
-          <div>
-            <p class="text-sm font-medium text-primary"><%= t("recurring_transactions.manage.title") %></p>
-            <p class="text-xs text-secondary"><%= t("recurring_transactions.manage.description") %></p>
-          </div>
-          <%= render DS::Link.new(
-                text: t("recurring_transactions.manage.cta"),
-                icon: "receipt",
-                variant: "outline",
-                href: bills_path(view: "all")
-              ) %>
-        </div>
-      <% end %>
   <% end %>
 </div>
