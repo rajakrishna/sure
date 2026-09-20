@@ -8,6 +8,10 @@ import { Controller } from "@hotwired/stimulus";
 export default class extends Controller {
   static targets = ["link"];
 
+  connect() {
+    this.element.classList.add("cursor-pointer");
+  }
+
   open(event) {
     if (event.target.closest("a, button, input, select, textarea, label")) return;
     // Popover/menu/dropdown panels (category dropdown, account/kebab menu,

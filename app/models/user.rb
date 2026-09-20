@@ -62,15 +62,6 @@ class User < ApplicationRecord
 
   enum :role, { guest: "guest", member: "member", admin: "admin", super_admin: "super_admin" }, validate: true
 
-  # SQL counterpart to #preview_features_enabled?, for callers that filter
-  # users (or their families) in one query instead of loading and iterating.
-  # The `@>` containment operator uses index_users_on_preferences (GIN) and
-  # matches only a JSON boolean true, so it agrees with that predicate's
-  # strict `== true` — a stray "yes" enables neither.
-  # Preview features are generally available. The scope name is kept so
-  # existing job fan-out (`Family.with_preview_features.find_each`) still works.
-  scope :with_preview_features, -> { all }
-
   attribute :ui_layout, :string
   enum :ui_layout, { dashboard: "dashboard", intro: "intro" }, validate: true, prefix: true
 
@@ -679,10 +670,6 @@ class User < ApplicationRecord
     preferences&.dig("disable_modal_click_outside") == true
   end
 
-  def preview_features_enabled?
-    true
-  end
-
   private
     def apply_ui_layout_defaults
       self.ui_layout = (ui_layout.presence || self.class.default_ui_layout)
@@ -726,7 +713,7 @@ class User < ApplicationRecord
     end
 
     def default_dashboard_section_order
-      %w[insights_feed cashflow_sankey outflows_donut net_worth_chart balance_sheet]
+      %w[insights_feed outflows_donut net_worth_chart balance_sheet]
     end
 
     def default_reports_section_order

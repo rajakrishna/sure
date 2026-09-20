@@ -1,24 +1,6 @@
 class Transactions::CategorizesController < ApplicationController
   def show
-    @breadcrumbs = [
-      [ t("breadcrumbs.home"), root_path ],
-      [ t("breadcrumbs.transactions"), transactions_path ],
-      [ t("breadcrumbs.categorize"), nil ]
-    ]
-    @position = [ params[:position].to_i, 0 ].max
-    groups = Transaction::Grouper.strategy.call(
-      Current.accessible_entries,
-      limit: 1,
-      offset: @position
-    )
-
-    if groups.empty?
-      redirect_to transactions_path, notice: t(".all_done") and return
-    end
-
-    @group      = groups.first
-    @categories = Current.family.categories.includes(:parent).alphabetically
-    @total_uncategorized = uncategorized_count
+    redirect_to ai_proposals_path
   end
 
   def create

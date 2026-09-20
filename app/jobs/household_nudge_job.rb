@@ -6,7 +6,7 @@ class HouseholdNudgeJob < ApplicationJob
     if family_id.present?
       generate_for_family(family_id)
     else
-      Family.with_preview_features.find_each do |family|
+      Family.find_each do |family|
         HouseholdNudgeJob.perform_later(family_id: family.id)
       rescue => e
         Rails.logger.error("Failed to enqueue household nudge for family #{family.id}: #{e.message}")
@@ -17,7 +17,6 @@ class HouseholdNudgeJob < ApplicationJob
   private
     def generate_for_family(family_id)
       family = Family.find_by(id: family_id)
-      return unless family&.preview_features_enabled?
 
       I18n.with_locale(family.locale) do
         Insight::Generators::HouseholdNudgeGenerator.new(family).generate.each do |generated|

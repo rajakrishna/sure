@@ -45,6 +45,9 @@ module ApplicationHelper
     )
 
     resolved_key = normalize_icon_key(key)
+    unless as_button || opts[:aria] || opts["aria"] || opts["aria-label"] || opts[:aria_label] || opts["aria-hidden"] || opts[:"aria-hidden"]
+      opts["aria-hidden"] = true
+    end
 
     if custom
       inline_svg_tag("#{resolved_key}.svg", class: icon_classes, **opts)
@@ -77,15 +80,6 @@ module ApplicationHelper
     current_page?(path) || (request.path.start_with?(path) && path != "/")
   end
 
-  # Wraps a nav-item hash so a single call performs both halves of a
-  # preview-gated entry: returns `nil` for users without the flag (so the
-  # entry never reaches the rendered nav), and stamps `preview: true` on
-  # the hash for users with the flag (so the partial paints the violet
-  # dot on the icon). Use inside an `Array#compact` nav-items list.
-  def preview_gated_nav_item(item)
-    item
-  end
-
   def plan_nav_item
     {
       name: t("layouts.application.nav.plan"),
@@ -97,19 +91,30 @@ module ApplicationHelper
     }
   end
 
-  def ask_in_chat_href(hint, context = [])
-    new_chat_path(message_hint: hint, composer_context: Array(context).to_json)
+  def ask_in_chat_href(hint, context = [], auto_submit: true)
+    new_chat_path(
+      message_hint: hint,
+      composer_context: Array(context).to_json,
+      auto_submit: auto_submit ? "1" : nil
+    )
   end
 
-  def ask_chip(text, hint: nil, context: [], variant: "ghost", size: "sm")
+  def ask_link_data
+    {
+      controller: "ask-link",
+      action: "click->app-layout#openRightSidebar click->ask-link#open"
+    }
+  end
+
+  def ask_chip(text, hint: nil, context: [], variant: "ghost", size: "sm", auto_submit: true)
     render DS::Link.new(
       text: text,
-      href: ask_in_chat_href(hint.presence || text, context),
+      href: ask_in_chat_href(hint.presence || text, context, auto_submit: auto_submit),
       icon: "sparkles",
       variant: variant,
       size: size,
       frame: :sidebar_chat,
-      data: { action: "click->app-layout#openRightSidebar" }
+      data: ask_link_data
     )
   end
 

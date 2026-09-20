@@ -13,16 +13,8 @@ class OnboardableTest < ActionDispatch::IntegrationTest
     assert_redirected_to onboarding_path
   end
 
-  test "must have subscription to visit dashboard" do
+  test "onboarded user can visit dashboard without a subscription" do
     @user.update!(onboarded_at: 1.day.ago)
-
-    get root_path
-    assert_redirected_to trial_onboarding_path
-  end
-
-  test "onboarded subscribed user can visit dashboard" do
-    @user.update!(onboarded_at: 1.day.ago)
-    @user.family.start_trial_subscription!
 
     get root_path
     assert_response :success

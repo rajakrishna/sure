@@ -40,6 +40,9 @@
             <li class="text-sm text-secondary"><%= item["title"] || item["text"] %></li>
           <% end %>
         </ul>
+        <%= ask_chip t("pages.dashboard.home.ask_about_week"),
+              hint: t("pages.dashboard.home.ask_about_week_hint"),
+              context: [ { type: "weekly_briefing", id: snapshot.weekly_briefing.id } ] %>
       <% end %>
     <% end %>
   <% end %>
@@ -55,7 +58,7 @@
       <div class="flex flex-wrap items-center justify-end gap-2">
         <%= render DS::Link.new(
           text: t("pages.dashboard.home.review_transactions"),
-          href: transactions_categorize_path,
+          href: ai_proposals_path,
           size: "sm"
         ) %>
         <% if snapshot.pending_proposal_count.positive? %>
@@ -84,7 +87,7 @@
           <% end %>
         </div>
         <div class="flex flex-wrap items-center justify-end gap-2">
-          <%= render DS::Link.new(text: t("pages.dashboard.home.view_bills"), href: bills_path, size: "sm") %>
+          <%= render DS::Link.new(text: t("pages.dashboard.home.view_bills"), href: plan_path(tab: "bills"), size: "sm") %>
           <%= ask_chip t("pages.dashboard.home.ask_bills"), hint: t("pages.dashboard.home.ask_bills_hint") %>
         </div>
       </div>
@@ -111,7 +114,7 @@
         <% end %>
       </div>
       <% unless snapshot.current_budget %>
-        <%= render DS::Link.new(text: t("pages.dashboard.home.open_budget"), href: budgets_path, size: "sm") %>
+        <%= render DS::Link.new(text: t("pages.dashboard.home.open_budget"), href: plan_path(tab: "budget"), size: "sm") %>
       <% end %>
     </div>
   </div>

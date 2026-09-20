@@ -103,6 +103,14 @@ class ChatsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/Coming soon/i, response.body)
   end
 
+  test "new chat marks the form for auto-submit when asked" do
+    get new_chat_url, params: { message_hint: "What's unusual?", auto_submit: "1" }
+
+    assert_response :success
+    assert_select "form[data-auto-submit=true]"
+    assert_select "textarea", text: "What's unusual?"
+  end
+
   test "slash commands include categorize and recurring" do
     get new_chat_url
 

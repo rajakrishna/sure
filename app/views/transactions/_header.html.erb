@@ -42,32 +42,68 @@
         title: t("transactions.show.intelligence")
       ) %>
     <% end %>
-    <%= ask_chip t("transactions.show.explain"),
-          hint: t("transactions.show.explain_hint"),
-          context: [ { type: "transaction", id: entry.transaction.id } ] %>
+
+    <div data-controller="lazy-frame" data-lazy-frame-src-value="<%= transaction_explain_path(entry) %>">
+      <%= render DS::Popover.new(variant: :button, placement: "bottom-end", max_width: "22rem", testid: "explain-trigger") do |popover| %>
+        <% popover.with_button(
+             text: t("transactions.show.explain"),
+             icon: "sparkles",
+             variant: "ghost",
+             size: "sm",
+             data: { action: "click->lazy-frame#load" }
+           ) %>
+        <% popover.with_custom_content do %>
+          <%= turbo_frame_tag dom_id(entry, :explain), data: { lazy_frame_target: "frame" } do %>
+            <div class="p-3 space-y-2" aria-live="polite">
+              <p class="text-sm text-secondary"><%= t("transactions.explains.loading") %></p>
+              <%= render DS::Skeleton.new(lines: 3) %>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
     <%= ask_chip t("transactions.show.ask_in_chat"),
           hint: t("transactions.show.ask_hint"),
           context: [ { type: "transaction", id: entry.transaction.id } ] %>
+
+    <%= render DS::Button.new(
+          text: t("transactions.show.suggest"),
+          href: transaction_ai_action_path(entry, kind: "suggest"),
+          method: :post,
+          variant: "ghost",
+          size: "sm",
+          icon: "sparkles",
+          frame: :modal
+        ) %>
+
     <% if entry.transaction.splittable? %>
-      <%= ask_chip t("transactions.index.ask_split"),
-            hint: t("transactions.show.ask_split_hint"),
-            context: [ { type: "transaction", id: entry.transaction.id } ] %>
+      <%= render DS::Button.new(
+            text: t("transactions.index.ask_split"),
+            href: transaction_ai_action_path(entry, kind: "split"),
+            method: :post,
+            variant: "ghost",
+            size: "sm",
+            icon: "split",
+            frame: :modal
+          ) %>
     <% end %>
+
     <%= render DS::Menu.new do |menu| %>
       <% menu.with_item(
-            variant: "link",
+            variant: "button",
             text: t("transactions.index.ask_merchant"),
-            href: ask_in_chat_href(t("transactions.show.ask_merchant_hint"), [ { type: "transaction", id: entry.transaction.id } ]),
+            href: transaction_ai_action_path(entry, kind: "suggest"),
+            method: :post,
             icon: "sparkles",
-            frame: :sidebar_chat,
-            data: { action: "click->app-layout#openRightSidebar" }) %>
+            frame: :modal) %>
       <% menu.with_item(
-            variant: "link",
+            variant: "button",
             text: t("transactions.index.ask_rule"),
-            href: ask_in_chat_href(t("transactions.show.ask_rule_hint"), [ { type: "transaction", id: entry.transaction.id } ]),
-            icon: "sparkles",
-            frame: :sidebar_chat,
-            data: { action: "click->app-layout#openRightSidebar" }) %>
+            href: transaction_ai_action_path(entry, kind: "rule"),
+            method: :post,
+            icon: "git-branch",
+            frame: :modal) %>
     <% end %>
   </div>
 </div>

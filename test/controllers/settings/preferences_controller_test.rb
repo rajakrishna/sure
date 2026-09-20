@@ -31,15 +31,13 @@ class Settings::PreferencesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "update is a no-op redirect" do
-    patch settings_preferences_url, params: { user: { preview_features_enabled: "0" } }
+    patch settings_preferences_url, params: { user: { locale: "en" } }
 
     assert_redirected_to settings_preferences_url
-    assert users(:family_admin).reload.preview_features_enabled?
   end
 
   test "household budget toggle and sharing card only render once personal_budgets is on" do
     user = users(:family_admin)
-    user.update!(preferences: (user.preferences || {}).merge("preview_features_enabled" => true))
 
     get settings_preferences_url
     assert_response :success

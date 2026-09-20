@@ -1,0 +1,24 @@
+---
+en:
+  custom_alerts:
+    index:
+      title: Alerts
+      subtitle: Get notified for overspend, unusual amounts, payday, fees, and upcoming bills.
+      empty: No custom alerts yet
+      name: Name
+      kind: Kind
+      enabled: Enabled
+      create: Create alert
+      remove: Remove
+    create:
+      created: Alert created
+    update:
+      updated: Alert updated
+    destroy:
+      destroyed: Alert removed
+    kinds:
+      overspend: Overspend
+      unusual_amount: Unusual amount
+      payday: Payday
+      fee_keyword: Fee keyword
+      upcoming_recurring: Upcoming recurring

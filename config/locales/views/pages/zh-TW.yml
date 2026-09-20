@@ -81,12 +81,6 @@ zh-TW:
           liability: 負債
       insights_feed:
         title: 洞察
-      cashflow_sankey:
-        title: 現金流
-        zoom_out: 回到完整現金流
-        no_data_title: 此時段內無現金流資料
-        no_data_description: 新增交易紀錄以顯示現金流資料，或擴大時間範圍
-        add_transaction: 新增交易
       no_accounts:
         title: 尚無帳戶
         description: 新增帳戶以顯示淨資產資料

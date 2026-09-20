@@ -18,7 +18,7 @@ class Settings::SystemHealthNavigationLocalizationTest < ActionDispatch::Integra
       get settings_preferences_url
 
       assert_response :success
-      assert_select "nav a[href='#{admin_system_health_path}']", text: label, count: 2
+      assert_select "nav a[href='#{admin_system_health_path}']", text: label, count: 4
     end
   end
 

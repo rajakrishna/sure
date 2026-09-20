@@ -54,7 +54,7 @@
           <%= render DS::Disclosure.new(
                 variant: :bare,
                 summary_class: "list-none focus-ring flex items-center justify-between gap-4 px-4 py-3 cursor-pointer select-none hover:bg-surface-hover",
-                class: "bg-container-inset rounded-lg overflow-hidden",
+                class: "bg-container-inset rounded-lg overflow-x-auto",
                 data: {
                   controller: "admin-invitation-delete",
                   admin_invitation_delete_delete_all_label_value: t(".invitations.delete_all")

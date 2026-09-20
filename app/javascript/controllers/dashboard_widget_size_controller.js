@@ -13,11 +13,14 @@ export default class extends Controller {
 
   connect() {
     this._closeOnOutsideClick = this._closeOnOutsideClick.bind(this);
+    this._closeOnEscape = this._closeOnEscape.bind(this);
     document.addEventListener("click", this._closeOnOutsideClick);
+    document.addEventListener("keydown", this._closeOnEscape);
   }
 
   disconnect() {
     document.removeEventListener("click", this._closeOnOutsideClick);
+    document.removeEventListener("keydown", this._closeOnEscape);
   }
 
   // Keep Enter/Space/arrow keydowns inside the menu from bubbling to the
@@ -69,6 +72,13 @@ export default class extends Controller {
 
   _closeOnOutsideClick(event) {
     if (this.element.open && !this.element.contains(event.target)) {
+      this.element.open = false;
+    }
+  }
+
+  _closeOnEscape(event) {
+    if (event.key === "Escape" && this.element.open) {
+      event.preventDefault();
       this.element.open = false;
     }
   }

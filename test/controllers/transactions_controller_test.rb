@@ -13,6 +13,15 @@ class TransactionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match I18n.t("transactions.show.ask_in_chat"), response.body
+    assert_select "[data-testid=explain-trigger]"
+  end
+
+  test "transaction rows are pointer-affording" do
+    get transactions_url
+
+    assert_response :success
+    assert_select "[data-testid=transaction-row].cursor-pointer"
+    assert_select "[data-testid=transaction-row].hover\\:bg-surface-hover"
   end
 
   test "transaction drawer shows the Intelligence badge after Bayes enrichment" do

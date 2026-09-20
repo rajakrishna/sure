@@ -6,17 +6,17 @@ class Settings::PaymentsControllerTest < ActionDispatch::IntegrationTest
     @family = @user.family
   end
 
-  test "returns forbidden when family has no stripe_customer_id" do
+  test "redirects to profile when family has no stripe_customer_id" do
     assert_nil @family.stripe_customer_id
 
     get settings_payment_path
-    assert_response :forbidden
+    assert_redirected_to settings_profile_path
   end
 
-  test "shows payment settings when family has stripe_customer_id" do
+  test "redirects to profile when family has stripe_customer_id" do
     @family.update!(stripe_customer_id: "cus_test123")
 
     get settings_payment_path
-    assert_response :success
+    assert_redirected_to settings_profile_path
   end
 end

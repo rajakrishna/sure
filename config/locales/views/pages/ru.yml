@@ -23,12 +23,6 @@ ru:
         title: Баланс
         value: Сумма
         weight: Доля
-      cashflow_sankey:
-        add_transaction: Добавить операцию
-        no_data_description: Добавьте операции или измените период
-        no_data_title: Нет данных за период
-        title: Денежный поток
-        zoom_out: Показать весь поток
       drag_to_reorder: Перетащите для изменения порядка
       investment_summary:
         add_investment: Добавьте инвестиционный счёт для отслеживания портфеля

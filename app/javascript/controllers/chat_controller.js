@@ -19,6 +19,17 @@ export default class extends Controller {
     this.#configureAutoScroll();
     this.#updateSubmitState();
     this.#startUndeliveredWatchdog();
+    this.#autoSubmitIfRequested();
+  }
+
+  #autoSubmitIfRequested() {
+    if (!this.hasFormTarget) return;
+    if (this.formTarget.dataset.autoSubmit !== "true") return;
+    if (!this.#hasContent()) return;
+
+    setTimeout(() => {
+      if (this.hasFormTarget) this.formTarget.requestSubmit();
+    }, 50);
   }
 
   disconnect() {

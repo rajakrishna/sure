@@ -66,12 +66,6 @@ zh-CN:
         classifications:
           asset: 资产
           liability: 负债
-      cashflow_sankey:
-        title: 现金流
-        zoom_out: 返回完整现金流
-        no_data_title: 此时间段内没有现金流数据
-        no_data_description: 添加交易以显示现金流数据，或扩大时间范围
-        add_transaction: 添加交易
       no_accounts:
         title: 暂无账户
         description: 添加账户以显示净资产数据

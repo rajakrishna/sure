@@ -106,7 +106,7 @@ module InsightsHelper
     when "subscription_watch"
       { text: t("insights.actions.subscription_watch"), href: recurring_transactions_path }
     when "household_nudge"
-      { text: t("insights.actions.household_nudge"), href: transactions_inbox_path(assignee_id: metadata["user_id"]) }
+      { text: t("insights.actions.household_nudge"), href: ai_proposals_path }
     when "subscription_audit"
       { text: t("insights.actions.subscription_audit"), href: recurring_transactions_path }
     when "cash_flow_warning"

@@ -334,7 +334,6 @@ Rails.application.routes.draw do
   get "release_highlight", to: "release_highlights#show"
   patch "release_highlight/dismiss", to: "release_highlights#dismiss"
   get "feedback", to: "pages#feedback"
-  get "dashboard/cash_flow", to: "cash_flows#show", as: :dashboard_cash_flow
   patch "dashboard/preferences", to: "pages#update_preferences"
 
   resource :current_session, only: %i[update]
@@ -454,9 +453,6 @@ Rails.application.routes.draw do
     post :suggest
   end
 
-  resources :advisor_invites, only: %i[create destroy]
-  get "advisor/:id", to: "advisor_portals#show", as: :advisor_portal
-
   # Hub page fronting budgets + goals under a single "Plan" nav entry.
   resource :plan, only: :show
 
@@ -528,7 +524,7 @@ Rails.application.routes.draw do
     resources :mappings, only: :update, module: :import
   end
 
-  resources :holdings, only: %i[index new show update destroy] do
+  resources :holdings, only: %i[index show update destroy] do
     member do
       post :unlock_cost_basis
       patch :remap_security
@@ -578,6 +574,9 @@ Rails.application.routes.draw do
       patch :tags, action: :update_tags
       post :parse_receipt
     end
+
+    resource :explain, only: :show, controller: "transactions/explains"
+    resource :ai_action, only: :create, controller: "transactions/ai_actions"
   end
 
   resources :bills, only: %i[index show] do
@@ -681,6 +680,7 @@ Rails.application.routes.draw do
     member do
       post :approve
       post :dismiss
+      post :restore
     end
   end
 

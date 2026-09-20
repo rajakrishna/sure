@@ -11,6 +11,12 @@ class TransactionsController < ApplicationController
     super
     assign_mark_recurring_state
     @related_proposals = Current.family.ai_proposals.pending.where(target_type: "Transaction", target_id: @entry.entryable_id)
+    @similar_entries = similar_entries_for(@entry)
+    @breadcrumbs = [
+      [ t("breadcrumbs.home"), root_path ],
+      [ t("breadcrumbs.transactions"), transactions_back_path ],
+      [ @entry.name, nil ]
+    ]
   end
 
   def new
@@ -389,11 +395,6 @@ class TransactionsController < ApplicationController
   def parse_receipt
     transaction = accessible_transactions.find(params[:id])
     return unless require_account_permission!(transaction.entry.account)
-    unless preview_features_enabled?
-      redirect_back_or_to transaction_path(transaction), alert: t("preview.not_enabled")
-      return
-    end
-
     ReceiptVisionJob.perform_later(transaction.id)
     redirect_back_or_to transaction_path(transaction), notice: t("transactions.parse_receipt.queued")
   end
@@ -747,6 +748,17 @@ class TransactionsController < ApplicationController
       Current.session.prev_transaction_page_params
     end
 
+    def transactions_back_path
+      stored = stored_params
+      return transactions_path if stored.blank?
+
+      transactions_path({
+        q: stored["q"].presence || stored[:q].presence,
+        page: stored["page"].presence || stored[:page].presence,
+        per_page: stored["per_page"].presence || stored[:per_page].presence
+      }.compact)
+    end
+
     # Helper methods for convert_to_trade
 
     def resolve_security_for_conversion
@@ -839,5 +851,20 @@ class TransactionsController < ApplicationController
       end
 
       [ qty, price ]
+    end
+
+    def similar_entries_for(entry)
+      transaction = entry.transaction
+      scope = Current.family.transactions.joins(:entry).where.not(id: transaction.id)
+
+      if transaction.merchant_id.present?
+        scope = scope.where(merchant_id: transaction.merchant_id)
+      elsif entry.name.present?
+        scope = scope.where("LOWER(entries.name) = ?", entry.name.downcase)
+      else
+        return []
+      end
+
+      scope.includes(:entry).order("entries.date DESC").limit(5).filter_map(&:entry)
     end
 end

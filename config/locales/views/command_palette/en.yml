@@ -1,0 +1,24 @@
+---
+en:
+  command_palette:
+    title: Jump to
+    placeholder: Search pages or Ask…
+    home: Home
+    transactions: Transactions
+    review: AI Review
+    review_hint: Pending suggestions
+    inbox: To Review
+    plan: Plan
+    cash_flow: Cash flow
+    recurrings: Recurrings this month
+    wealth: Wealth
+    reports: Reports
+    settings: Settings
+    ask: Ask the Assistant
+    ask_hint: Open a ready composer
+    ask_query: "Ask:"
+    ask_run: Runs now
+    open_in_chat: Open in chat
+    biggest_expense: Biggest expense this month
+    biggest_expense_hint: Filtered transactions
+    open: Search or Ask

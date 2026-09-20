@@ -1,18 +1,8 @@
 class InsightsController < ApplicationController
-  before_action :require_preview_features!
   before_action :set_insight, only: %i[acknowledge unacknowledge feedback]
 
   def index
-    load_feed
-    @breadcrumbs = [ [ t("breadcrumbs.home"), root_path ], [ t("insights.index.title"), nil ] ]
-
-    # Viewing the feed is what "read" means here; the New badge for this
-    # render comes from @unread_ids captured above. Turbo's hover prefetch
-    # hits this GET before the user actually navigates, so skip the write
-    # for prefetch requests or badges would clear on hover.
-    unless prefetch_request?
-      Current.family.insights.active.update_all(status: "read", read_at: Time.current, updated_at: Time.current)
-    end
+    redirect_to root_path(anchor: "insights-feed")
   end
 
   def acknowledge
@@ -26,7 +16,7 @@ class InsightsController < ApplicationController
 
     respond_to do |format|
       format.turbo_stream
-      format.html { redirect_back_or_to insights_path }
+      format.html { redirect_back_or_to root_path(anchor: "insights-feed") }
     end
   end
 
@@ -37,7 +27,7 @@ class InsightsController < ApplicationController
 
     respond_to do |format|
       format.turbo_stream
-      format.html { redirect_back_or_to insights_path }
+      format.html { redirect_back_or_to root_path(anchor: "insights-feed") }
     end
   end
 
@@ -45,7 +35,7 @@ class InsightsController < ApplicationController
     @insight.record_feedback!(params[:value])
     respond_to do |format|
       format.turbo_stream
-      format.html { redirect_back_or_to insights_path }
+      format.html { redirect_back_or_to root_path(anchor: "insights-feed") }
     end
   end
 
@@ -56,7 +46,7 @@ class InsightsController < ApplicationController
       # Swaps the button into its pending state; the job broadcasts the
       # refreshed list and the idle button back when it finishes.
       format.turbo_stream
-      format.html { redirect_to insights_path, notice: t("insights.refresh.queued") }
+      format.html { redirect_to root_path(anchor: "insights-feed"), notice: t("insights.refresh.queued") }
     end
   end
 

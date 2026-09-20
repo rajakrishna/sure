@@ -5,7 +5,6 @@ class ReceiptVisionJob < ApplicationJob
     transaction = Transaction.find_by(id: transaction_id)
     return unless transaction
     return unless transaction.splittable?
-    return unless transaction.entry.account.family.preview_features_enabled?
 
     Family::ReceiptParser.new(family: transaction.entry.account.family, transaction: transaction).propose!
   rescue => e

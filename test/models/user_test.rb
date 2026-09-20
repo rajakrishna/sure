@@ -613,7 +613,7 @@ class UserTest < ActiveSupport::TestCase
       "Should return false when collapsed_sections key is missing"
 
     # dashboard_section_order should return default order when key is missing
-    assert_equal %w[insights_feed cashflow_sankey outflows_donut net_worth_chart balance_sheet],
+    assert_equal %w[insights_feed outflows_donut net_worth_chart balance_sheet],
       @user.dashboard_section_order,
       "Should return default order when section_order key is missing"
 
@@ -889,15 +889,6 @@ class UserTest < ActiveSupport::TestCase
       User.where(email: %w[concurrent-first@example.com concurrent-second@example.com]).delete_all
       Family.where(id: family_ids).delete_all if family_ids.any?
     end
-  end
-
-  # Preview features preference tests
-  test "preview_features_enabled? is always true" do
-    @user.update!(preferences: {})
-    assert @user.preview_features_enabled?
-
-    @user.update!(preferences: { "preview_features_enabled" => false })
-    assert @user.preview_features_enabled?
   end
 
   # ActiveStorage attachment cleanup tests

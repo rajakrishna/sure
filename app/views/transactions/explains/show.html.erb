@@ -1,0 +1,43 @@
+<%= turbo_frame_tag dom_id(@entry, :explain) do %>
+  <div class="space-y-3 p-3" data-testid="explain-popover">
+    <p class="sr-only" aria-live="polite"><%= t("transactions.explains.ready") %></p>
+    <p class="text-sm font-medium text-primary"><%= @explanation[:name] || @entry.name %></p>
+    <dl class="space-y-1 text-sm">
+      <% if @explanation[:merchant].present? %>
+        <div class="flex justify-between gap-3">
+          <dt class="text-secondary"><%= t("transactions.explains.merchant") %></dt>
+          <dd class="text-primary truncate"><%= @explanation[:merchant] %></dd>
+        </div>
+      <% end %>
+      <% if @explanation[:category].present? %>
+        <div class="flex justify-between gap-3">
+          <dt class="text-secondary"><%= t("transactions.explains.category") %></dt>
+          <dd class="text-primary truncate"><%= @explanation[:category] %></dd>
+        </div>
+      <% end %>
+      <div class="flex justify-between gap-3">
+        <dt class="text-secondary"><%= t("transactions.explains.date") %></dt>
+        <dd class="text-primary"><%= @explanation[:date] %></dd>
+      </div>
+      <% if @explanation[:pending_suggestion].present? %>
+        <div class="flex justify-between gap-3">
+          <dt class="text-secondary"><%= t("transactions.explains.suggestion") %></dt>
+          <dd class="text-primary truncate"><%= @explanation[:pending_suggestion] %></dd>
+        </div>
+      <% end %>
+    </dl>
+    <p class="text-xs text-secondary"><%= t("transactions.explains.read_only") %></p>
+    <% if Array(@explanation[:deep_links]).any? %>
+      <div class="flex flex-wrap gap-2">
+        <% Array(@explanation[:deep_links]).each do |link| %>
+          <% link = link.with_indifferent_access %>
+          <%= render DS::Link.new(text: link[:label], href: link[:path], size: "sm", data: { turbo_frame: "_top" }) if link[:path].present? %>
+        <% end %>
+      </div>
+    <% end %>
+    <%= ask_chip t("transactions.show.open_in_chat"),
+          hint: t("transactions.show.explain_hint"),
+          context: [ { type: "transaction", id: @transaction.id } ],
+          auto_submit: false %>
+  </div>
+<% end %>

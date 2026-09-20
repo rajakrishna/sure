@@ -38,13 +38,17 @@ end %>
         </div>
       <% end %>
 
-      <%= render(
-        "layouts/shared/app_sidebar",
-        family: Current.family,
-        user: Current.user,
-        active_tab: @account_group_tab,
-        mobile: true
-      ) %>
+      <% if content_for?(:sidebar) %>
+        <%= yield :sidebar %>
+      <% else %>
+        <%= render(
+          "layouts/shared/app_sidebar",
+          family: Current.family,
+          user: Current.user,
+          active_tab: @account_group_tab,
+          mobile: true
+        ) %>
+      <% end %>
     </div>
 
     <%# MOBILE - Top nav %>
@@ -117,7 +121,7 @@ end %>
               <%# Prefetch disabled: /insights marks insights read on real visits
                   and deliberately skips prefetch requests, so a prefetched
                   response served on click would never clear the badge. %>
-              <%= link_to insights_path,
+              <%= link_to root_path(anchor: "insights-feed"),
                     class: "relative inline-flex items-center justify-center w-9 h-9 pointer-coarse:w-11 pointer-coarse:h-11 rounded-lg text-secondary hover:text-primary hover:bg-container-inset-hover transition-colors focus-ring",
                     aria: { label: t("layouts.application.insights") },
                     data: { turbo_prefetch: false } do %>
@@ -162,34 +166,16 @@ end %>
         <%= yield :page_header %>
       <% end %>
 
-      <%= yield %>
-    <% end %>
-
-    <%# DESKTOP - Right sidebar %>
-    <%= tag.div class: class_names(
-          "hidden lg:block relative h-full shrink-0 transition-all duration-300 border-divider",
-          Current.user.show_ai_sidebar? ? [expanded_sidebar_class, "border-l"] : [collapsed_sidebar_class, "border-l-0"],
-        ),
-        style: "max-width: var(--right-sidebar-width, 400px)",
-        inert: !Current.user.show_ai_sidebar?,
-        data: { app_layout_target: "rightSidebar", sidebar_resize_target: "rightSidebar" } do %>
-      <%= render "layouts/shared/sidebar_resize_handle", side: "right" %>
-      <%= tag.div id: "chat-container", class: "relative h-full px-4 overflow-y-auto", data: { controller: "chat hotkey", chat_response_timeout_value: Chat.response_timeout_ms, turbo_permanent: true } do %>
-        <div class="flex flex-col h-full justify-between shrink-0">
-          <%= turbo_frame_tag chat_frame, src: chat_view_path(@chat), loading: "lazy", class: "h-full" do %>
-            <div class="flex justify-center items-center h-full px-4">
-              <%= render DS::Skeleton.new(lines: 4, class: "w-full") %>
-            </div>
-          <% end %>
-        </div>
-
-        <% unless Current.user.ai_enabled? %>
-          <div class="absolute backdrop-blur-lg inset-0 h-full w-full flex flex-col justify-center items-center px-4">
-            <%= render "chats/ai_consent" %>
-          </div>
-        <% end %>
+      <% if content_for?(:settings_body) %>
+        <%= yield :settings_body %>
+      <% else %>
+        <%= yield %>
       <% end %>
     <% end %>
+
+    <%= render "layouts/shared/chat_rail",
+          expanded_sidebar_class: expanded_sidebar_class,
+          collapsed_sidebar_class: collapsed_sidebar_class %>
 
     <%# MOBILE - Bottom Nav %>
     <%= tag.nav class: "lg:hidden fixed bottom-0 left-0 right-0 bg-surface z-10 border-t border-tertiary flex justify-around pb-[env(safe-area-inset-bottom)]",

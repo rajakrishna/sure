@@ -77,7 +77,17 @@
         <% end %>
       </div>
 
-      <%# Add split button %>
+      <div class="flex flex-wrap items-center gap-2">
+        <% [ 2, 3, 4 ].each do |count| %>
+          <button type="button"
+                  class="px-2.5 py-1 text-xs font-medium text-secondary hover:text-primary border border-secondary hover:border-primary rounded-md transition-colors"
+                  data-action="click->split-transaction#splitEven"
+                  data-split-transaction-count-param="<%= count %>">
+            <%= t("splits.new.split_even", count: count) %>
+          </button>
+        <% end %>
+      </div>
+
       <button type="button"
               class="flex items-center justify-center gap-1.5 w-full py-2 text-sm font-medium text-secondary hover:text-primary border border-dashed border-secondary hover:border-primary rounded-lg transition-colors"
               data-action="click->split-transaction#addRow">

@@ -28,6 +28,7 @@ class ChatsController < ApplicationController
     )
     @message_hint = params[:message_hint]
     @composer_seed = parse_composer_seed(params[:composer_context])
+    @auto_submit = ActiveModel::Type::Boolean.new.cast(params[:auto_submit])
   end
 
   def create

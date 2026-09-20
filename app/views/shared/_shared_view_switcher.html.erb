@@ -1,5 +1,5 @@
 <%# locals: (path: nil) %>
-<% if preview_features_enabled? && Current.family.users.where.not(role: "guest").many? %>
+<% if Current.family.users.where.not(role: "guest").many? %>
   <%= render DS::SegmentedControl.new(aria_label: t("shared_views.label")) do |control| %>
     <% Family::SharedView.options_for(Current.family).each do |option| %>
       <% control.with_segment(

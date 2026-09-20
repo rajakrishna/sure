@@ -3,7 +3,6 @@
 class Api::V1::SavedReportsController < Api::V1::BaseController
   before_action :ensure_read_scope, only: :index
   before_action :ensure_draft_write_scope, only: :create
-  before_action :require_preview_features_for_api
 
   def index
     reports = current_resource_owner.family.saved_reports.order(:name)
@@ -31,14 +30,6 @@ class Api::V1::SavedReportsController < Api::V1::BaseController
       authorize_scope!(:draft_write)
     end
 
-    def require_preview_features_for_api
-      return if current_resource_owner.preview_features_enabled?
-
-      render_json(
-        { error: "feature_disabled", message: "Preview features are not enabled for this user" },
-        status: :forbidden
-      )
-    end
 
     def saved_report_params
       params.require(:saved_report).permit(

@@ -7,7 +7,6 @@ module SettingsHelper
     { name: -> { t("settings.settings_nav.appearance_label") }, path: :settings_appearance_path },
     { name: -> { t("settings.settings_nav.profile_label") }, path: :settings_profile_path },
     { name: -> { t("settings.settings_nav.security_label") }, path: :settings_security_path },
-    { name: -> { t("settings.settings_nav.payment_label") }, path: :settings_payment_path, condition: :not_self_hosted? },
     # Transactions section
     { name: -> { t("settings.settings_nav.categories_label") }, path: :categories_path },
     { name: -> { t("settings.settings_nav.tags_label") }, path: :tags_path },
@@ -24,7 +23,6 @@ module SettingsHelper
     { name: -> { t("settings.settings_nav.imports_label") }, path: :imports_path, condition: :admin_user? },
     { name: -> { t("settings.settings_nav.exports_label") }, path: :family_exports_path, condition: :admin_user? },
     # More section
-    { name: -> { t("settings.settings_nav.guides_label") }, path: :settings_guides_path },
     { name: -> { t("settings.settings_nav.whats_new_label") }, path: :changelog_path },
     { name: -> { t("settings.settings_nav.feedback_label") }, path: :feedback_path }
   ]

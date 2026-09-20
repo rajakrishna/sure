@@ -24,13 +24,6 @@ tr:
         title: Bilanço
         value: Değer
         weight: Ağırlık
-      cashflow_sankey:
-        add_transaction: İşlem ekle
-        no_data_description: Nakit akışı verilerini görüntülemek için işlem ekleyin
-          veya zaman aralığını genişletin
-        no_data_title: Bu zaman aralığı için nakit akışı verisi yok
-        title: Nakit Akışı
-        zoom_out: Tam nakit akışına dön
       drag_to_reorder: Bölümü yeniden sıralamak için sürükleyin
       insights_feed:
         title: İçgörüler

@@ -11,9 +11,6 @@ module RecurringFeatureGuardable
     # carries the flash that points at Settings -> Preferences. The family's
     # recurring toggle still applies to opted-in users.
     def ensure_recurring_enabled
-      require_preview_features!
-      return if performed?
-
       redirect_to root_path if Current.family.recurring_transactions_disabled?
     end
 

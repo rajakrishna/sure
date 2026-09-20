@@ -18,10 +18,8 @@
       <%= styled_form_with model: @budget, url: budget_path(@budget, **budget_owner_query), class: "space-y-3", data: { controller: "budget-form" } do |f| %>
         <%= f.money_field :budgeted_spending, label: t(".budgeted_spending"), required: true, disable_currency: true %>
         <%= f.money_field :expected_income, label: t(".expected_income"), required: true, disable_currency: true %>
-        <% if preview_features_enabled? %>
-          <%= f.money_field :flex_budgeted, label: t(".flex_budgeted"), disable_currency: true %>
-          <p class="text-xs text-secondary"><%= t(".flex_budgeted_hint") %></p>
-        <% end %>
+        <%= f.money_field :flex_budgeted, label: t(".flex_budgeted"), disable_currency: true %>
+        <p class="text-xs text-secondary"><%= t(".flex_budgeted_hint") %></p>
 
         <% if @budget.estimated_income && @budget.estimated_spending %>
           <div class="border border-tertiary rounded-lg p-3 flex">

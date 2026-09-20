@@ -372,16 +372,6 @@ class FamilyTest < ActiveSupport::TestCase
       "re-running must not create duplicate shares"
   end
 
-  # Preview access is per-user, but jobs that act on family-scoped data have no
-  # Current.user. One opted-in member enables the family.
-  test "preview_features_enabled? is true for every family" do
-    family = families(:dylan_family)
-    family.users.each { |user| set_preview_features(user, false) }
-
-    assert family.reload.preview_features_enabled?
-    assert_includes Family.with_preview_features, family
-  end
-
   test "rejects a timezone ActiveSupport::TimeZone doesn't recognize" do
     family = families(:dylan_family)
     family.timezone = "Invalid/Timezone"

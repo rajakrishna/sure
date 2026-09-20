@@ -44,13 +44,6 @@ pl:
           other: "%{count} miesiąca"
         title: Obligacje
         total_return: Łączny zwrot
-      cashflow_sankey:
-        add_transaction: Dodaj transakcję
-        no_data_description: Dodaj transakcje, aby wyświetlić dane o przepływach pieniężnych,
-          albo poszerz zakres czasu
-        no_data_title: Brak danych o przepływach pieniężnych dla tego okresu
-        title: Przepływy pieniężne
-        zoom_out: Wróć do pełnego przepływu środków
       drag_to_reorder: Przeciągnij, aby zmienić kolejność sekcji
       insights_feed:
         title: Analizy

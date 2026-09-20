@@ -25,11 +25,6 @@ nl:
         title: "Balans"
         no_items: "Nog geen %{name}"
         add_accounts: "Voeg uw %{name} accounts toe om een volledig overzicht te zien"
-      cashflow_sankey:
-        title: "Cashflow"
-        no_data_title: "Geen cashflow gegevens voor deze periode"
-        no_data_description: "Voeg transacties toe om cashflow gegevens weer te geven of vergroot de periode"
-        add_transaction: "Transactie toevoegen"
       no_accounts:
         title: "Nog geen accounts"
         description: "Voeg accounts toe om netto vermogen gegevens weer te geven"

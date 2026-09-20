@@ -13,16 +13,14 @@ class BudgetsController < ApplicationController
     @editable = @budget.editable_by?(Current.user)
     @switch_options = budget_switch_options(@budget)
     @budget_mode = PlanHub.budget_mode_for(params[:budget_mode])
-    if preview_features_enabled?
-      hub = PlanHub.new(family: Current.family, user: Current.user)
-      @spending_plan = Budget::SpendingPlan.new(
-        budget: @budget,
-        family: Current.family,
-        user: Current.user,
-        hub: hub
-      )
-      @budget_nudges = Family::BudgetNudge.new(@budget).items
-    end
+    hub = PlanHub.new(family: Current.family, user: Current.user)
+    @spending_plan = Budget::SpendingPlan.new(
+      budget: @budget,
+      family: Current.family,
+      user: Current.user,
+      hub: hub
+    )
+    @budget_nudges = Family::BudgetNudge.new(@budget).items
     @breadcrumbs = plan_breadcrumb_prefix + [ [ t("breadcrumbs.budgets"), nil ] ]
   end
 

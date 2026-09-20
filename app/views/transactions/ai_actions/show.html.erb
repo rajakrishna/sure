@@ -1,0 +1,24 @@
+<%= render DS::Dialog.new(variant: "modal", frame: "modal") do |dialog| %>
+  <% dialog.with_header(title: t("transactions.ai_actions.title.#{@kind}")) %>
+  <% dialog.with_body do %>
+    <div class="space-y-4" data-testid="ai-proposal-modal">
+      <p class="sr-only" aria-live="polite"><%= t("transactions.ai_actions.ready") %></p>
+      <%= render "ai_proposals/card", proposal: @proposal %>
+      <div class="flex flex-wrap gap-2">
+        <%= render DS::Link.new(
+          text: t("transactions.show.open_in_chat"),
+          href: ask_in_chat_href(t("transactions.ai_actions.chat_hint.#{@kind}"), [ { type: "transaction", id: @transaction.id } ], auto_submit: false),
+          size: "sm",
+          frame: :sidebar_chat,
+          data: ask_link_data
+        ) %>
+        <%= render DS::Link.new(
+          text: t("transactions.ai_actions.open_transaction"),
+          href: transaction_path(@entry),
+          size: "sm",
+          frame: "drawer"
+        ) %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

@@ -1,5 +1,5 @@
 class AiProposalsController < ApplicationController
-  before_action :set_proposal, only: %i[update approve dismiss]
+  before_action :set_proposal, only: %i[update approve dismiss restore]
 
   def index
     @kind = params[:kind].presence
@@ -24,12 +24,22 @@ class AiProposalsController < ApplicationController
 
   def approve
     @proposal.approve!(Current.user, proposal_params, create_rule: params[:create_rule] == "1")
-    respond_to_card(notice: t(".success"))
+    respond_to_card(notice: t(".success"), location: accept_destination(@proposal))
   end
 
   def dismiss
     @proposal.dismiss!(Current.user)
-    respond_to_card(notice: t(".dismissed"))
+    flash[:notice] = {
+      "message" => t(".dismissed"),
+      "undo_path" => restore_ai_proposal_path(@proposal),
+      "undo_label" => t(".undo")
+    }
+    respond_to_card
+  end
+
+  def restore
+    @proposal.restore!(Current.user)
+    respond_to_card(notice: t(".restored"))
   end
 
   def bulk_approve
@@ -56,10 +66,18 @@ class AiProposalsController < ApplicationController
       )
     end
 
-    def respond_to_card(notice: nil)
+    def respond_to_card(notice: nil, location: nil)
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_back_or_to ai_proposals_path, notice: notice }
+        format.html { redirect_to(location.presence || ai_proposals_path, notice: notice) }
       end
+    end
+
+    def accept_destination(proposal)
+      transaction = proposal.target_transaction
+      return transaction_path(transaction.entry) if transaction&.entry.present?
+      return plan_path(tab: "budget") if proposal.kind == "budget_adjust"
+
+      ai_proposals_path
     end
 end

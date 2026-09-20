@@ -119,7 +119,7 @@ class Assistant::Function::GetBills < Assistant::Function
         bills: shown.map { |series| serialize_series(series).merge(current_occurrence: serialize_occurrence(currents[series])) },
         totals: totals_over(rows, currents)
       }.merge(rows.empty? ? { hint: other_status_hint(params) }.compact : {}),
-      deep_links: [ deep_link(I18n.t("assistant.deep_links.bills"), bills_path) ]
+      deep_links: [ deep_link(I18n.t("assistant.deep_links.bills"), plan_path(tab: "bills")) ]
     )
   end
 

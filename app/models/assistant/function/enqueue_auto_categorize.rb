@@ -82,7 +82,7 @@ class Assistant::Function::EnqueueAutoCategorize < Assistant::Function
         batch_size: batch_size,
         message: "Enqueued #{transaction_ids.size} transactions for categorization. Suggestions will wait for approval."
       },
-      deep_links: [ deep_link(I18n.t("assistant.deep_links.categorize"), transactions_categorize_path) ]
+      deep_links: [ deep_link(I18n.t("assistant.deep_links.categorize"), ai_proposals_path) ]
     )
   end
 

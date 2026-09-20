@@ -1,21 +1,61 @@
 <dialog data-command-palette-target="dialog"
-        class="w-full max-w-lg rounded-xl bg-container shadow-border-xs p-0 backdrop:bg-surface/60"
+        class="w-full max-w-lg rounded-xl bg-container shadow-border-xs p-0 backdrop:bg-surface/60 motion-safe:open:animate-none"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="command-palette-title"
+        data-action="click->command-palette#clickOutside"
         data-testid="command-palette">
+  <h2 id="command-palette-title" class="sr-only"><%= t("command_palette.title") %></h2>
   <div class="p-3 border-b border-tertiary">
     <input type="search"
            autocomplete="off"
            data-command-palette-target="input"
            data-action="input->command-palette#filter"
            placeholder="<%= t("command_palette.placeholder") %>"
-           class="w-full bg-transparent text-primary text-sm focus:outline-hidden">
+           class="w-full bg-transparent text-primary text-sm focus:outline-hidden focus-ring rounded-md min-h-11 px-2"
+           aria-label="<%= t("command_palette.placeholder") %>">
   </div>
   <ul class="max-h-80 overflow-y-auto p-2">
+    <li data-command-palette-target="askItem" hidden>
+      <%= link_to new_chat_path,
+            class: "flex items-center gap-3 px-3 py-2 min-h-11 rounded-lg text-sm text-primary hover:bg-container-inset-hover cursor-pointer",
+            data: {
+              turbo_frame: :sidebar_chat,
+              controller: "ask-link",
+              action: "click->app-layout#openRightSidebar click->ask-link#open command-palette#close"
+            } do %>
+        <%= icon("sparkles", size: "sm") %>
+        <span class="min-w-0 flex-1 truncate">
+          <%= t("command_palette.ask_query") %>
+          <span data-command-palette-target="askLabel"></span>
+        </span>
+        <span class="text-xs text-secondary"><%= t("command_palette.ask_run") %></span>
+      <% end %>
+    </li>
+    <li data-command-palette-target="openChatItem" hidden>
+      <%= link_to new_chat_path,
+            class: "flex items-center gap-3 px-3 py-2 min-h-11 rounded-lg text-sm text-primary hover:bg-container-inset-hover cursor-pointer",
+            data: {
+              turbo_frame: :sidebar_chat,
+              controller: "ask-link",
+              action: "click->app-layout#openRightSidebar click->ask-link#open command-palette#close"
+            } do %>
+        <%= icon("message-square", size: "sm") %>
+        <span class="min-w-0 flex-1 truncate">
+          <%= t("command_palette.open_in_chat") %>
+          <span data-command-palette-target="openChatLabel"></span>
+        </span>
+      <% end %>
+    </li>
     <% CommandPalette.new(user: Current.user).items.each do |item| %>
       <li data-command-palette-target="item"
           data-command-palette-search-value="<%= [item.name, item.hint].compact.join(" ") %>">
         <%= link_to item.path,
-              class: "flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-primary hover:bg-container-inset-hover",
-              data: { action: "command-palette#close" } do %>
+              class: "flex items-center gap-3 px-3 py-2 min-h-11 rounded-lg text-sm text-primary hover:bg-container-inset-hover cursor-pointer focus-ring",
+              data: item.data.merge(
+                action: [item.data[:action], "command-palette#close"].compact.join(" "),
+                turbo_frame: item.frame
+              ).compact do %>
           <%= icon(item.icon, size: "sm") %>
           <span class="min-w-0 flex-1 truncate"><%= item.name %></span>
           <% if item.hint.present? %>

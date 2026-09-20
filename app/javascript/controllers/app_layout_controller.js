@@ -34,6 +34,7 @@ export default class extends Controller {
   // For actions that send content into the chat sidebar (quick prompts,
   // AI review): make sure it is visible, and never close it.
   openRightSidebar() {
+    if (!this.hasRightSidebarTarget) return;
     const isOpen = this.rightSidebarTarget.classList.contains("w-full");
     if (isOpen) return;
 

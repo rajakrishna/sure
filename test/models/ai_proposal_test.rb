@@ -82,6 +82,11 @@ class AiProposalTest < ActiveSupport::TestCase
 
     assert_equal "dismissed", proposal.reload.status
     assert_nil @transaction.reload.category
+
+    proposal.restore!(@user)
+    assert_equal "pending", proposal.reload.status
+    assert_nil proposal.reviewed_by
+    assert_nil @transaction.reload.category
   end
 
   test "approve with create_rule saves a matching rule" do

@@ -23,9 +23,7 @@
     <%= form_with url: bulk_approve_ai_proposals_path, method: :post, class: "space-y-4" do %>
       <div class="flex flex-wrap gap-2">
         <%= render DS::Button.new(text: t(".bulk_approve"), type: :submit, variant: "primary") %>
-        <button type="submit" formaction="<%= bulk_dismiss_ai_proposals_path %>" class="btn btn--ghost">
-          <%= t(".bulk_dismiss") %>
-        </button>
+        <%= render DS::Button.new(text: t(".bulk_dismiss"), type: :submit, variant: "ghost", formaction: bulk_dismiss_ai_proposals_path) %>
       </div>
       <div class="space-y-3">
         <% @ai_proposals.each do |proposal| %>

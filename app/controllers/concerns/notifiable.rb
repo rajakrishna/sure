@@ -40,6 +40,23 @@ module Notifiable
       end
     end
 
+    def notice_notification(message)
+      if message.is_a?(Hash)
+        payload = message.with_indifferent_access
+        {
+          partial: "shared/notifications/notice",
+          locals: {
+            message: payload[:message],
+            description: payload[:description],
+            undo_path: payload[:undo_path],
+            undo_label: payload[:undo_label]
+          }
+        }
+      else
+        { partial: "shared/notifications/notice", locals: { message: message } }
+      end
+    end
+
     def resolve_notifications(type, data)
       case type
       when "alert"
@@ -48,7 +65,7 @@ module Notifiable
         [ resolve_cta(data) ]
       when "notice"
         messages = Array(data)
-        messages.map { |message| { partial: "shared/notifications/notice", locals: { message: message } } }
+        messages.map { |message| notice_notification(message) }
       else
         []
       end

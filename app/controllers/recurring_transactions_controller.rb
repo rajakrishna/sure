@@ -33,16 +33,7 @@ class RecurringTransactionsController < ApplicationController
   end
 
   def board
-    @board = Family::RecurringBoard.new(
-      Current.family,
-      user: Current.user,
-      month: calendar_month
-    )
-    @breadcrumbs = [
-      [ t("breadcrumbs.home"), root_path ],
-      [ t("breadcrumbs.bills"), bills_path ],
-      [ t("recurring_transactions.board.title"), nil ]
-    ]
+    redirect_to plan_path(tab: "bills")
   end
 
   # Detection proposes, the user disposes: confirming makes the suggestion a

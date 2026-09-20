@@ -6,12 +6,11 @@ class PlanHubTest < ActiveSupport::TestCase
     @user = users(:family_admin)
   end
 
-  test "tab_for defaults unknown tabs to budget and keeps former preview tabs" do
-    assert_equal "budget", PlanHub.tab_for(nil, preview: true)
-    assert_equal "budget", PlanHub.tab_for("nope", preview: true)
-    assert_equal "goals", PlanHub.tab_for("goals", preview: true)
-    assert_equal "goals", PlanHub.tab_for("goals", preview: false)
-    assert_equal "budget", PlanHub.tab_for("budget", preview: false)
+  test "tab_for defaults unknown tabs to budget" do
+    assert_equal "budget", PlanHub.tab_for(nil)
+    assert_equal "budget", PlanHub.tab_for("nope")
+    assert_equal "goals", PlanHub.tab_for("goals")
+    assert_equal "budget", PlanHub.tab_for("budget")
   end
 
   test "budget_mode_for defaults unknown modes to categories" do

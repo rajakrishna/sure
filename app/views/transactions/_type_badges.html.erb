@@ -1,0 +1,18 @@
+<%# locals: (entry:, transaction:) %>
+<% if transaction.transfer? %>
+  <span class="inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-md bg-container-inset text-[10px] font-medium text-primary"
+        aria-label="<%= t("transactions.transaction.type_transfer") %>"
+        title="<%= t("transactions.transaction.type_transfer") %>">T</span>
+<% elsif entry.amount.to_d.negative? %>
+  <span class="inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-md bg-container-inset text-[10px] font-medium text-primary"
+        aria-label="<%= t("transactions.transaction.type_income") %>"
+        title="<%= t("transactions.transaction.type_income") %>">I</span>
+<% end %>
+<% recurring = transaction.existing_manual_recurring_transaction %>
+<% if recurring %>
+  <%= link_to plan_path(tab: "bills"),
+        class: "inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-md bg-container-inset text-[10px] font-medium text-primary hover:bg-container-inset-hover",
+        aria: { label: t("transactions.transaction.type_recurring") },
+        title: t("transactions.transaction.type_recurring"),
+        data: { turbo_frame: "_top" } do %>R<% end %>
+<% end %>

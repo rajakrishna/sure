@@ -54,6 +54,23 @@
         <%= render "ai_proposals/list", proposals: @related_proposals %>
       </div>
     <% end %>
+    <% if @similar_entries.present? %>
+      <div class="mx-4 my-3 space-y-2" data-testid="similar-transactions">
+        <p class="text-xs font-medium uppercase tracking-wide text-secondary"><%= t("transactions.show.similar") %></p>
+        <ul class="space-y-1">
+          <% @similar_entries.each do |similar| %>
+            <li>
+              <%= link_to transaction_path(similar),
+                    class: "flex items-center justify-between gap-3 text-sm text-primary hover:bg-surface-hover rounded-lg px-2 py-1.5 min-h-11",
+                    data: { turbo_frame: "drawer" } do %>
+                <span class="truncate"><%= similar.name %></span>
+                <span class="text-secondary shrink-0"><%= format_money(-similar.amount_money) %></span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
     <% unless @entry.transaction.reviewed? %>
       <div class="mx-4 my-3">
         <%= render DS::Button.new(

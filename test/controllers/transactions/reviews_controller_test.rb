@@ -14,7 +14,7 @@ class Transactions::ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_includes Transaction::Inbox.uncategorized_for(@family), @entry.transaction
 
     post transactions_review_url, params: { transaction_id: @entry.transaction.id }
-    assert_redirected_to transactions_inbox_url
+    assert_redirected_to ai_proposals_url
     assert @entry.transaction.reload.reviewed?
     assert_not_includes Transaction::Inbox.uncategorized_for(@family), @entry.transaction
   end

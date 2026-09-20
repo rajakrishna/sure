@@ -3,7 +3,7 @@
 <% is_default = Current.user&.default_account_id == account.id %>
 
 <%= turbo_frame_tag dom_id(account) do %>
-  <div class="relative p-4 flex items-center justify-between gap-3 group/account hover:bg-surface-hover"
+  <div class="relative p-4 flex items-center justify-between gap-3 group/account cursor-pointer hover:bg-surface-hover motion-safe:transition-colors motion-safe:duration-150"
        <% unless account.pending_deletion? %>
          data-controller="clickable-row"
          data-action="click->clickable-row#open"

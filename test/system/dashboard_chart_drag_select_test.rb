@@ -10,11 +10,19 @@ class DashboardChartDragSelectTest < ApplicationSystemTestCase
 
     original_order = page.all("[data-section-key]").map { |el| el["data-section-key"] }
 
+    analytics = find("#home-analytics")
+    analytics.find("summary").click unless analytics.matches_selector?(":open")
+    assert_selector "#netWorthChart", visible: true
+
     # The net worth chart sits inside a `<section draggable="true">` used by
     # dashboard-sortable for card reordering. Without an explicit
     # `draggable="false"` on the chart container, this same gesture would be
     # hijacked by the native HTML5 drag-and-drop instead of the chart's brush.
-    drag_across find("#netWorthChart .drag-select-brush .overlay", visible: :all)
+    overlay = find("#netWorthChart .drag-select-brush .overlay", visible: :all)
+    page.document.synchronize do
+      raise Capybara::ElementNotFound, "chart overlay has no width" if overlay.native.rect.width <= 40
+    end
+    drag_across overlay
 
     assert_current_path(%r{/\?.*start_date=.*end_date=})
 

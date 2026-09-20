@@ -34,10 +34,9 @@
              variant: "link",
              text: t(".ask_in_chat"),
              icon: "sparkles",
-             href: new_chat_path(
-               message_hint: t(".ask_hint", name: @goal.name),
-               composer_context: [ { type: "goal", id: @goal.id } ].to_json
-             )
+             href: ask_in_chat_href(t(".ask_hint", name: @goal.name), [ { type: "goal", id: @goal.id } ]),
+             frame: :sidebar_chat,
+             data: ask_link_data
            ) %>
         <% menu.with_item(variant: "link", text: t(".edit"), icon: "pencil", href: edit_goal_path(@goal), data: { turbo_frame: :modal }) %>
         <% if @goal.may_pause? %>

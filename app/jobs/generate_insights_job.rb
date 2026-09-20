@@ -20,7 +20,7 @@ class GenerateInsightsJob < ApplicationJob
     # families who can't see the result is pure waste. Scoped in SQL rather
     # than checked per family to keep the fan-out a single indexed query.
     def fan_out
-      Family.with_preview_features.find_each do |family|
+      Family.find_each do |family|
         GenerateInsightsJob.perform_later(family_id: family.id)
       rescue => e
         Rails.logger.error("Failed to enqueue insight generation for family #{family.id}: #{e.message}")
@@ -35,7 +35,6 @@ class GenerateInsightsJob < ApplicationJob
       # directly via perform_later(family_id:) from the refresh action and the
       # console. Returning above the lock means a gated family skips the
       # broadcast below too, not just the generation.
-      return unless family.preview_features_enabled?
 
       notifiable_insights = with_advisory_lock(family_id) do
         I18n.with_locale(family.locale) do

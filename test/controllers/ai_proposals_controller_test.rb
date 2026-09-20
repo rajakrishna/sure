@@ -21,7 +21,7 @@ class AiProposalsControllerTest < ActionDispatch::IntegrationTest
 
   test "approve writes the category" do
     post approve_ai_proposal_url(@proposal)
-    assert_redirected_to ai_proposals_url
+    assert_redirected_to transaction_path(@transaction.entry)
     assert_equal @category, @transaction.reload.category
     assert_equal "approved", @proposal.reload.status
   end
@@ -31,6 +31,16 @@ class AiProposalsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to ai_proposals_url
     assert_nil @transaction.reload.category
     assert_equal "dismissed", @proposal.reload.status
+    assert_equal restore_ai_proposal_path(@proposal), flash[:notice]["undo_path"]
+  end
+
+  test "restore returns a dismissed proposal to pending" do
+    post dismiss_ai_proposal_url(@proposal)
+    post restore_ai_proposal_url(@proposal)
+
+    assert_redirected_to ai_proposals_url
+    assert_equal "pending", @proposal.reload.status
+    assert_nil @transaction.reload.category
   end
 
   test "update edits the proposed category" do

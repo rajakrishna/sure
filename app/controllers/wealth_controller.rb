@@ -1,8 +1,6 @@
 class WealthController < ApplicationController
   include SharedViewFilterable
 
-  before_action :require_preview_features!
-
   def show
     load_snapshot
     @ai_proposals = Current.family.ai_proposals.pending.where(kind: %w[budget_adjust]).recent

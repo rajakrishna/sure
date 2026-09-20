@@ -1,5 +1,4 @@
 class SavedReportsController < ApplicationController
-  before_action :require_preview_features!
   before_action :set_saved_report, only: :destroy
 
   def create

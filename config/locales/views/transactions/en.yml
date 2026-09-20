@@ -20,6 +20,29 @@ en:
         tags_label: Tags
         transactions_section: Transactions
     unknown_name: Unknown transaction
+    explains:
+      loading: Explaining…
+      ready: Explanation ready
+      merchant: Merchant
+      category: Category
+      date: Date
+      suggestion: Suggestion
+      read_only: Read-only. Nothing was changed.
+    ai_actions:
+      unavailable: Could not draft a suggestion for this transaction.
+      ready: Suggestion ready
+      categorize_reason: Suggested category %{name}
+      open_transaction: Open transaction
+      title:
+        suggest: Suggested change
+        categorize: Suggested category
+        split: Suggested split
+        rule: Suggested rule
+      chat_hint:
+        suggest: Review this suggested change.
+        categorize: Review this category suggestion.
+        split: Review this split draft.
+        rule: Review this rule draft.
     selection_bar:
       duplicate: Duplicate
       edit: Edit
@@ -64,6 +87,12 @@ en:
       ask_merchant_hint: What do you know about this merchant, and does the charge look like a subscription or a spike? Propose a rule only if it repeats.
       ask_split_hint: Draft a split for this transaction if it looks mixed. Do not write it — leave it as a proposal I can approve, edit, or dismiss.
       ask_rule_hint: Draft a rule from this merchant or name. Do not apply it — leave it as a proposal I can approve, edit, or dismiss.
+      explain: Explain this
+      explain_hint: Explain this transaction. Do not change it.
+      suggest: Suggest
+      open_in_chat: Open in chat
+      similar: Similar transactions
+      intelligence: Categorized by Intelligence
       keep_both: No, keep both
       loan_payment: Loan Payment
       mark_recurring: Mark as Recurring
@@ -150,6 +179,10 @@ en:
       reject_match: Reject match
       transfer_confirmed: Transfer is confirmed
     transaction:
+      needs_review: Needs review
+      type_income: Income
+      type_transfer: Transfer
+      type_recurring: Recurring
       pending: Pending
       pending_tooltip: Pending transaction — may change when posted
       linked_with_provider: Linked with %{provider}

@@ -12,96 +12,12 @@ class Transactions::CategorizesControllerTest < ActionDispatch::IntegrationTest
     @family.accounts.each { |a| a.entries.delete_all }
   end
 
-  # GET /transactions/categorize
+  # GET /transactions/categorize now lands on Review.
 
-  test "show redirects with notice when nothing to categorize" do
-    get transactions_categorize_url
-    assert_redirected_to transactions_url
-    assert_match "categorized", flash[:notice]
-  end
-
-  test "show renders wizard when uncategorized transactions exist" do
+  test "show redirects to the Review inbox" do
     create_transaction(account: @account, name: "Starbucks")
     get transactions_categorize_url
-    assert_response :success
-  end
-
-  test "show groups subcategories immediately after their parent in the category select" do
-    create_transaction(account: @account, name: "Starbucks")
-    get transactions_categorize_url
-
-    assert_response :success
-
-    doc = Nokogiri::HTML::Document.parse(response.body)
-    option_values = doc.css("select[name='category_id'] option").map { |node| node["value"] }
-
-    parent_index = option_values.index(categories(:food_and_drink).id)
-    child_index = option_values.index(categories(:subcategory).id)
-
-    assert_not_nil parent_index
-    assert_not_nil child_index
-    assert_equal parent_index + 1, child_index
-  end
-
-  test "show groups subcategories immediately after their parent in the category pills" do
-    create_transaction(account: @account, name: "Starbucks")
-    get transactions_categorize_url
-
-    assert_response :success
-
-    doc = Nokogiri::HTML::Document.parse(response.body)
-    pill_values = doc.css("button[name='category_id']").map { |node| node["value"] }
-
-    parent_index = pill_values.index(categories(:food_and_drink).id)
-    child_index = pill_values.index(categories(:subcategory).id)
-
-    assert_not_nil parent_index
-    assert_not_nil child_index
-    assert_equal parent_index + 1, child_index
-
-    child_pill = doc.css("button[name='category_id'][value='#{categories(:subcategory).id}']").first
-    assert_includes child_pill.text, categories(:subcategory).display_name_with_parent
-  end
-
-  test "show renders full dates so multi-year lists are unambiguous" do
-    create_transaction(account: @account, name: "Starbucks", date: Date.new(2024, 7, 8))
-
-    get transactions_categorize_url
-
-    assert_response :success
-    # format_date uses the family's date_format preference, every variant of
-    # which includes the year; the previous :short format ("%b %d") did not,
-    # making rows ambiguous when the uncategorized list spans years.
-    expected = Date.new(2024, 7, 8).strftime(@family.date_format)
-    assert_match expected, response.body
-  end
-
-  test "show renders the first group at position 0" do
-    2.times { create_transaction(account: @account, name: "Netflix") }
-    3.times { create_transaction(account: @account, name: "Starbucks") }
-
-    get transactions_categorize_url(position: 0)
-
-    assert_response :success
-    assert_select "h2", text: "Starbucks"
-  end
-
-  test "show at position 1 skips first group" do
-    3.times { create_transaction(account: @account, name: "Starbucks") }
-    2.times { create_transaction(account: @account, name: "Netflix") }
-
-    get transactions_categorize_url(position: 1)
-
-    assert_response :success
-    assert_select "h2", text: "Netflix"
-  end
-
-  test "show redirects when position exceeds available groups" do
-    create_transaction(account: @account, name: "Starbucks")
-
-    get transactions_categorize_url(position: 99)
-
-    assert_redirected_to transactions_url
+    assert_redirected_to ai_proposals_url
   end
 
   test "requires authentication" do
@@ -111,21 +27,6 @@ class Transactions::CategorizesControllerTest < ActionDispatch::IntegrationTest
   end
 
   # Account sharing authorization
-
-  test "show only groups entries from accounts accessible to the user" do
-    accessible_account = accounts(:depository)       # shared with family_member (full_control)
-    inaccessible_account = accounts(:investment)     # not shared with family_member
-
-    create_transaction(account: accessible_account, name: "Starbucks")
-    create_transaction(account: inaccessible_account, name: "Starbucks")
-
-    sign_in users(:family_member)
-    get transactions_categorize_url(position: 0)
-
-    assert_response :success
-    # Only 1 entry should appear in the group — the inaccessible account's entry is hidden
-    assert_select "input[name='entry_ids[]']", count: 1
-  end
 
   test "create does not categorize entries from inaccessible accounts" do
     inaccessible_account = accounts(:investment)     # not shared with family_member

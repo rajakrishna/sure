@@ -1,4 +1,5 @@
 class Assistant::Function::ExplainTransaction < Assistant::Function
+  include Assistant::Function::Presentable
   class << self
     def name
       "explain_transaction"
@@ -32,7 +33,18 @@ class Assistant::Function::ExplainTransaction < Assistant::Function
 
     entry = transaction.entry
     proposal = family.ai_proposals.pending.find_by(target_type: "Transaction", target_id: transaction.id)
-    {
+    links = [ deep_link(I18n.t("assistant.deep_links.transaction"), transaction_path(entry)) ]
+    if transaction.merchant.present?
+      links << deep_link(transaction.merchant.name, transactions_path(q: { merchants: [ transaction.merchant.name ] }))
+    end
+    if transaction.category.present?
+      links << deep_link(transaction.category.display_name, transactions_path(q: { categories: [ transaction.category.name ] }))
+    end
+    if entry&.account.present?
+      links << deep_link(entry.account.name, account_path(entry.account))
+    end
+
+    with_presentation({
       success: true,
       transaction_id: transaction.id,
       name: entry&.name,
@@ -45,6 +57,6 @@ class Assistant::Function::ExplainTransaction < Assistant::Function
       intelligence_source: transaction.intelligence_source,
       pending_suggestion: proposal&.summary,
       notes: entry&.notes
-    }
+    }, deep_links: links)
   end
 end

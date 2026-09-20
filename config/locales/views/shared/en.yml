@@ -5,6 +5,7 @@ en:
       redis_configured: "Redis is now configured properly! You can now setup your Sure application."
   shared:
     preview: Preview
+    undo: Undo
     ask_assistant: Ask
     dot_separator: "·"
     sync_toast:
