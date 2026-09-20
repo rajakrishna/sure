@@ -31,5 +31,4 @@ class Api::V1::InboxController < Api::V1::BaseController
     def ensure_read_scope
       authorize_scope!(:read)
     end
-
 end
