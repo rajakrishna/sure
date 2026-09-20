@@ -36,12 +36,13 @@ class Transactions::AiActionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "rule drafts a proposal without writing" do
-    assert_difference -> { @family.ai_proposals.pending.where(kind: "create_rule").count }, 1 do
-      post transaction_ai_action_url(@entry), params: { kind: "rule" }
+    assert_no_difference -> { @family.rules.count } do
+      assert_difference -> { @family.ai_proposals.pending.where(kind: "create_rule").count }, 1 do
+        post transaction_ai_action_url(@entry), params: { kind: "rule" }
+      end
     end
 
     assert_response :success
     assert_select "[data-testid=ai-proposal-modal]"
-    assert_equal 0, @family.rules.count
   end
 end
