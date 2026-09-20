@@ -118,7 +118,6 @@ class TransactionAttachmentsController < ApplicationController
     end
 
     def enqueue_receipt_vision_if_needed
-      return unless preview_features_enabled?
       return unless @transaction.splittable?
       return unless @transaction.attachments.blobs.any? { |blob| blob.content_type.to_s.start_with?("image/") }
 

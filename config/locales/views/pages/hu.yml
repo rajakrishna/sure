@@ -66,11 +66,6 @@ hu:
           cash_flow: "Pénzforgalom"
           surplus: "Többlet"
           deficit: "Hiány"
-      cashflow_sankey:
-        title: "Pénzforgalom"
-        no_data_title: "Nincs pénzforgalmi adat erre az időszakra"
-        no_data_description: "Adj hozzá tranzakciókat a pénzforgalmi adatok megjelenítéséhez, vagy bővítsd az időszakot"
-        add_transaction: "Tranzakció hozzáadása"
       no_accounts:
         title: "Még nincs számla"
         description: "Adj hozzá számlákat a nettó vagyon adatok megjelenítéséhez"

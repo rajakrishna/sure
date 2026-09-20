@@ -79,12 +79,6 @@ it:
           cash_flow: "Flusso di cassa"
           surplus: "Avanzo"
           deficit: "Disavanzo"
-      cashflow_sankey:
-        title: "Flusso di cassa"
-        zoom_out: "Torna al flusso completo"
-        no_data_title: "Nessun dato di flusso di cassa per questo periodo"
-        no_data_description: "Aggiungi transazioni per visualizzare i dati di flusso di cassa o amplia il periodo"
-        add_transaction: "Aggiungi transazione"
       no_accounts:
         title: "Nessun conto ancora"
         description: "Aggiungi conti per visualizzare i dati del patrimonio netto"

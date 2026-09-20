@@ -19,7 +19,7 @@ class ForecastExplainJob < ApplicationJob
       family = Family.find_by(id: family_id)
       return if family.accounts.none?
 
-      user = family.users.with_preview_features.order(:created_at).first
+      user = family.users.order(:created_at).first
       return unless user
 
       I18n.with_locale(family.locale) do

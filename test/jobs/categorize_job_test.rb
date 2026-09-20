@@ -11,7 +11,7 @@ class CategorizeJobTest < ActiveJob::TestCase
   test "without args enqueues one job per preview family" do
     enable_preview!(@user)
 
-    assert_enqueued_jobs Family.with_preview_features.count, only: CategorizeJob do
+    assert_enqueued_jobs Family.count, only: CategorizeJob do
       CategorizeJob.perform_now
     end
   end

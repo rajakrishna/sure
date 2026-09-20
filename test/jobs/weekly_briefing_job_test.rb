@@ -9,7 +9,7 @@ class WeeklyBriefingJobTest < ActiveJob::TestCase
   test "without args fans out to preview families" do
     enable_preview!(@user)
 
-    assert_enqueued_jobs Family.with_preview_features.count, only: WeeklyBriefingJob do
+    assert_enqueued_jobs Family.count, only: WeeklyBriefingJob do
       WeeklyBriefingJob.perform_now
     end
   end

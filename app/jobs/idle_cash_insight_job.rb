@@ -19,7 +19,7 @@ class IdleCashInsightJob < ApplicationJob
       family = Family.find_by(id: family_id)
       return if family.accounts.none?
 
-      user = family.users.with_preview_features.order(:created_at).first
+      user = family.users.order(:created_at).first
       I18n.with_locale(family.locale) do
         Insight::Generators::IdleCashGenerator.new(family).generate.each do |generated|
           existing = family.insights.find_by(dedup_key: generated.dedup_key)

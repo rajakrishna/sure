@@ -125,6 +125,29 @@ export default class extends Controller {
     })
   }
 
+  splitEven(event) {
+    const count = Number.parseInt(event.params.count, 10)
+    if (!Number.isFinite(count) || count < 2) return
+
+    while (this.rowCount > 1) {
+      this.rowTargets.at(-1).remove()
+    }
+    while (this.rowCount < count) {
+      this.addRow()
+    }
+
+    const cents = Math.round(this.totalValue * 100)
+    const base = Math.floor(cents / count)
+    let leftover = cents - (base * count)
+
+    this.amountInputTargets.forEach((input) => {
+      const extra = leftover > 0 ? 1 : 0
+      leftover -= extra
+      input.value = ((base + extra) / 100).toFixed(2)
+    })
+    this.updateRemaining()
+  }
+
   updateRemaining() {
     const total = this.totalValue
     const sum = this.amountInputTargets.reduce((acc, input) => {

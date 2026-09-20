@@ -184,6 +184,12 @@ class AiProposal < ApplicationRecord
     update!(status: "dismissed", reviewed_at: Time.current, reviewed_by: actor)
   end
 
+  def restore!(_actor = nil)
+    raise ArgumentError, "Proposal is not dismissed" unless status == "dismissed"
+
+    update!(status: "pending", reviewed_at: nil, reviewed_by: nil)
+  end
+
   def self.quality_stats(family)
     approved = family.ai_proposals.where(status: "approved").count
     dismissed = family.ai_proposals.where(status: "dismissed").count

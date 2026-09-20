@@ -81,12 +81,6 @@ pt-PT:
           liability: "Passivos"
       insights_feed:
         title: "Indicadores"
-      cashflow_sankey:
-        title: "Fluxo de caixa"
-        zoom_out: "Voltar ao fluxo de caixa completo"
-        no_data_title: "Sem dados de fluxo de caixa para este período"
-        no_data_description: "Adicione transações para apresentar os dados de fluxo de caixa ou alargue o período de tempo"
-        add_transaction: "Adicionar transação"
       no_accounts:
         title: "Ainda sem contas"
         description: "Adicione contas para apresentar os dados de património líquido"

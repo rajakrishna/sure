@@ -1,22 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-  isNavigableCategoryNode,
-  buildCategoryTransactionsUrl,
-} from "../../../app/javascript/utils/transactions_filter_url.mjs";
-
-test("category nodes are navigable, structural nodes are not", () => {
-  assert.equal(isNavigableCategoryNode("expense_15"), true);
-  assert.equal(isNavigableCategoryNode("income_3"), true);
-  assert.equal(isNavigableCategoryNode("expense_sub_19"), true);
-  assert.equal(isNavigableCategoryNode("income_sub_7"), true);
-  assert.equal(isNavigableCategoryNode("cash_flow_node"), false);
-  assert.equal(isNavigableCategoryNode("surplus_node"), false);
-  // Bare aggregate ids are not category nodes.
-  assert.equal(isNavigableCategoryNode("income"), false);
-  assert.equal(isNavigableCategoryNode("expense"), false);
-});
+import { buildCategoryTransactionsUrl } from "../../../app/javascript/utils/transactions_filter_url.mjs";
 
 test("builds a transactions deep link with category and date range", () => {
   const url = buildCategoryTransactionsUrl({

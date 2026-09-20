@@ -7,8 +7,6 @@ class GenerateInsightsJobTest < ActiveJob::TestCase
   end
 
   test "without args enqueues one job per family" do
-    assert_equal Family.count, Family.with_preview_features.count
-
     assert_enqueued_jobs Family.count, only: GenerateInsightsJob do
       GenerateInsightsJob.perform_now
     end

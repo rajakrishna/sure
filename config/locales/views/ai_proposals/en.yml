@@ -41,6 +41,9 @@ en:
       mutation: "Apply “%{function}”"
     card:
       amount_on_date: "%{amount} on %{date}"
+      match_pair: Matched pair
+      expense: Expense
+      refund: Refund
       edit: Edit
       approve: Accept
       approve_and_create_rule: Accept and create rule
@@ -53,3 +56,6 @@ en:
       success: Change approved
     dismiss:
       dismissed: Suggestion dismissed
+      undo: Undo
+    restore:
+      restored: Suggestion restored

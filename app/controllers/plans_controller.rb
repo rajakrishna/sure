@@ -2,7 +2,7 @@ class PlansController < ApplicationController
   include BudgetOwnership
 
   def show
-    @active_tab = PlanHub.tab_for(params[:tab], preview: preview_features_enabled?)
+    @active_tab = PlanHub.tab_for(params[:tab])
     @budget_mode = PlanHub.budget_mode_for(params[:budget_mode])
     @budget = resolve_budget(Date.current)
     @editable = @budget.editable_by?(Current.user)

@@ -6,7 +6,7 @@ class Transactions::ReviewsController < ApplicationController
 
     respond_to do |format|
       format.turbo_stream
-      format.html { redirect_back_or_to transactions_inbox_path, notice: t(".success", count: transactions.size) }
+      format.html { redirect_back_or_to ai_proposals_path, notice: t(".success", count: transactions.size) }
     end
   end
 end

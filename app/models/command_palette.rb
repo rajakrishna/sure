@@ -20,12 +20,6 @@ class CommandPalette
         hint: I18n.t("command_palette.review_hint")
       ),
       Item.new(
-        name: I18n.t("command_palette.categorize_inbox"),
-        path: "/ai_proposals",
-        icon: "inbox",
-        hint: I18n.t("command_palette.categorize_inbox_hint")
-      ),
-      Item.new(
         name: I18n.t("command_palette.biggest_expense"),
         path: biggest_expense_path,
         icon: "arrow-up-right",

@@ -17,7 +17,19 @@
         <% proposal.alternatives.first(2).each do |alternative| %>
           <p class="text-xs text-secondary"><%= t("ai_proposals.card.alternative", name: alternative["category_name"]) %></p>
         <% end %>
-        <% if proposal.kind.in?(%w[categorize refund_match set_merchant split]) && proposal.payload["amount"].present? %>
+        <% if proposal.kind == "refund_match" %>
+          <div class="rounded-lg border border-secondary bg-container-inset p-3 space-y-1">
+            <p class="text-xs font-medium text-secondary"><%= t("ai_proposals.card.match_pair") %></p>
+            <p class="text-xs text-primary">
+              <%= t("ai_proposals.card.expense") %>:
+              <%= proposal.payload["expense_name"] %>
+            </p>
+            <p class="text-xs text-primary">
+              <%= t("ai_proposals.card.refund") %>:
+              <%= proposal.payload["refund_name"] %>
+            </p>
+          </div>
+        <% elsif proposal.kind.in?(%w[categorize set_merchant split]) && proposal.payload["amount"].present? %>
           <p class="text-xs text-secondary">
             <%= t("ai_proposals.card.amount_on_date",
                   amount: format_money(proposal.payload["amount"].to_d),

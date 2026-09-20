@@ -6,14 +6,7 @@ module Assistant
     "external" => Assistant::External
   }.freeze
 
-  # Tools for users who opted into preview features in Settings -> Preferences.
-  #
-  # Statement Vault + provenance tools back the wealth agent-harness workflow
-  # documented in docs/llm-guides/wealth-agent-harness.md. GetValuations is the
-  # read pair for RecordValuation; GetInsights reads the Insights feed, which is
-  # itself preview-gated app-wide.
-  #
-  # The bills tools back the preview-gated Bills subsystem.
+  # Extra household tools always available (statement vault, insights, bills).
   PREVIEW_FUNCTION_CLASSES = [
     Function::UploadAccountStatement,
     Function::ListAccountStatements,

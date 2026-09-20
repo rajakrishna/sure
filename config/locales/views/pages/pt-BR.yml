@@ -25,11 +25,6 @@ pt-BR:
         title: "Balanço Patrimonial"
         no_items: "Nenhuma %{name} ainda"
         add_accounts: "Adicione suas contas de %{name} para ver um detalhamento completo"
-      cashflow_sankey:
-        title: "Fluxo de Caixa"
-        no_data_title: "Sem dados de fluxo de caixa para este período"
-        no_data_description: "Adicione transações para exibir dados de fluxo de caixa ou expanda o período de tempo"
-        add_transaction: "Adicionar transação"
       no_accounts:
         title: "Nenhuma conta ainda"
         description: "Adicione contas para exibir dados de patrimônio líquido"

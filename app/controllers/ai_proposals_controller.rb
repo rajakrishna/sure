@@ -1,5 +1,5 @@
 class AiProposalsController < ApplicationController
-  before_action :set_proposal, only: %i[update approve dismiss]
+  before_action :set_proposal, only: %i[update approve dismiss restore]
 
   def index
     @kind = params[:kind].presence
@@ -29,7 +29,17 @@ class AiProposalsController < ApplicationController
 
   def dismiss
     @proposal.dismiss!(Current.user)
-    respond_to_card(notice: t(".dismissed"))
+    flash[:notice] = {
+      "message" => t(".dismissed"),
+      "undo_path" => restore_ai_proposal_path(@proposal),
+      "undo_label" => t(".undo")
+    }
+    respond_to_card
+  end
+
+  def restore
+    @proposal.restore!(Current.user)
+    respond_to_card(notice: t(".restored"))
   end
 
   def bulk_approve

@@ -62,15 +62,6 @@ class User < ApplicationRecord
 
   enum :role, { guest: "guest", member: "member", admin: "admin", super_admin: "super_admin" }, validate: true
 
-  # SQL counterpart to #preview_features_enabled?, for callers that filter
-  # users (or their families) in one query instead of loading and iterating.
-  # The `@>` containment operator uses index_users_on_preferences (GIN) and
-  # matches only a JSON boolean true, so it agrees with that predicate's
-  # strict `== true` — a stray "yes" enables neither.
-  # Preview features are generally available. The scope name is kept so
-  # existing job fan-out (`Family.with_preview_features.find_each`) still works.
-  scope :with_preview_features, -> { all }
-
   attribute :ui_layout, :string
   enum :ui_layout, { dashboard: "dashboard", intro: "intro" }, validate: true, prefix: true
 
@@ -677,10 +668,6 @@ class User < ApplicationRecord
   # Returns whether clicking outside a modal is prevented from closing it.
   def disable_modal_click_outside?
     preferences&.dig("disable_modal_click_outside") == true
-  end
-
-  def preview_features_enabled?
-    true
   end
 
   private

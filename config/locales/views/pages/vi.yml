@@ -66,12 +66,6 @@ vi:
         classifications:
           asset: "Tài sản"
           liability: "Nợ phải trả"
-      cashflow_sankey:
-        title: "Dòng tiền"
-        zoom_out: "Quay lại toàn bộ dòng tiền"
-        no_data_title: "Không có dữ liệu dòng tiền cho khoảng thời gian này"
-        no_data_description: "Thêm giao dịch để hiển thị dữ liệu dòng tiền hoặc mở rộng khoảng thời gian"
-        add_transaction: "Thêm giao dịch"
       no_accounts:
         title: "Chưa có tài khoản nào"
         description: "Thêm tài khoản để hiển thị dữ liệu tài sản ròng"

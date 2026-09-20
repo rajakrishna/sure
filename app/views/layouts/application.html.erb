@@ -38,13 +38,17 @@ end %>
         </div>
       <% end %>
 
-      <%= render(
-        "layouts/shared/app_sidebar",
-        family: Current.family,
-        user: Current.user,
-        active_tab: @account_group_tab,
-        mobile: true
-      ) %>
+      <% if content_for?(:sidebar) %>
+        <%= yield :sidebar %>
+      <% else %>
+        <%= render(
+          "layouts/shared/app_sidebar",
+          family: Current.family,
+          user: Current.user,
+          active_tab: @account_group_tab,
+          mobile: true
+        ) %>
+      <% end %>
     </div>
 
     <%# MOBILE - Top nav %>
@@ -162,7 +166,11 @@ end %>
         <%= yield :page_header %>
       <% end %>
 
-      <%= yield %>
+      <% if content_for?(:settings_body) %>
+        <%= yield :settings_body %>
+      <% else %>
+        <%= yield %>
+      <% end %>
     <% end %>
 
     <%= render "layouts/shared/chat_rail",

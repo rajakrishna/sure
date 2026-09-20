@@ -12,6 +12,11 @@ class TransactionsController < ApplicationController
     assign_mark_recurring_state
     @related_proposals = Current.family.ai_proposals.pending.where(target_type: "Transaction", target_id: @entry.entryable_id)
     @similar_entries = similar_entries_for(@entry)
+    @breadcrumbs = [
+      [ t("breadcrumbs.home"), root_path ],
+      [ t("breadcrumbs.transactions"), transactions_back_path ],
+      [ @entry.name, nil ]
+    ]
   end
 
   def new
@@ -741,6 +746,17 @@ class TransactionsController < ApplicationController
 
     def stored_params
       Current.session.prev_transaction_page_params
+    end
+
+    def transactions_back_path
+      stored = stored_params
+      return transactions_path if stored.blank?
+
+      transactions_path({
+        q: stored["q"].presence || stored[:q].presence,
+        page: stored["page"].presence || stored[:page].presence,
+        per_page: stored["per_page"].presence || stored[:per_page].presence
+      }.compact)
     end
 
     # Helper methods for convert_to_trade

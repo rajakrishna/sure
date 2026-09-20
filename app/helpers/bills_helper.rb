@@ -83,12 +83,7 @@ module BillsHelper
     }
   end
 
-  # Which bills a transaction paid, prepared for the transaction drawer.
-  # Preview-gated with the rest of the bills surface: bill links would
-  # dead-end for users without the flag.
   def entry_bill_allocations(entry)
-    return [] unless preview_features_enabled?
-
     entry.recurring_allocations
          .includes(recurring_occurrence: :recurring_transaction)
          .reject { |allocation| allocation.recurring_occurrence.nil? }

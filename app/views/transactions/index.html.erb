@@ -20,7 +20,7 @@
           <% menu.with_item(variant: "link", text: t(".edit_imports"), href: imports_path, icon: "hard-drive-upload", data: { turbo_frame: :_top }) %>
           <% menu.with_item(variant: "link", text: t(".import"), href: new_import_path, icon: "download", data: { turbo_frame: "modal", class_name: "md:!hidden" }) %>
           <% if @uncategorized_count > 0 %>
-            <% menu.with_item(variant: "link", text: t(".categorize_button", count: @uncategorized_count), href: transactions_categorize_path, icon: "tag", data: { turbo_frame: :_top }) %>
+            <% menu.with_item(variant: "link", text: t(".categorize_button", count: @uncategorized_count), href: ai_proposals_path, icon: "tag", data: { turbo_frame: :_top }) %>
           <% end %>
           <% menu.with_item(variant: "link", text: t(".ask_merchant"), href: ask_in_chat_href(t(".ask_merchant_hint")), icon: "sparkles", frame: :sidebar_chat, data: ask_link_data) %>
           <% menu.with_item(variant: "link", text: t(".ask_split"), href: ask_in_chat_href(t(".ask_split_hint")), icon: "sparkles", frame: :sidebar_chat, data: ask_link_data) %>

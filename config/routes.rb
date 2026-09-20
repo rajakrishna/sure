@@ -334,7 +334,6 @@ Rails.application.routes.draw do
   get "release_highlight", to: "release_highlights#show"
   patch "release_highlight/dismiss", to: "release_highlights#dismiss"
   get "feedback", to: "pages#feedback"
-  get "dashboard/cash_flow", to: "cash_flows#show", as: :dashboard_cash_flow
   patch "dashboard/preferences", to: "pages#update_preferences"
 
   resource :current_session, only: %i[update]
@@ -453,9 +452,6 @@ Rails.application.routes.draw do
   resource :wealth, only: :show, controller: :wealth do
     post :suggest
   end
-
-  resources :advisor_invites, only: %i[create destroy]
-  get "advisor/:id", to: "advisor_portals#show", as: :advisor_portal
 
   # Hub page fronting budgets + goals under a single "Plan" nav entry.
   resource :plan, only: :show
@@ -684,6 +680,7 @@ Rails.application.routes.draw do
     member do
       post :approve
       post :dismiss
+      post :restore
     end
   end
 

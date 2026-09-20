@@ -79,12 +79,6 @@ es:
           cash_flow: "Flujo de caja"
           surplus: "Superávit"
           deficit: "Déficit"
-      cashflow_sankey:
-        title: Flujo de caja
-        zoom_out: Volver al flujo de caja completo
-        no_data_title: No hay datos de flujo de caja para este período
-        no_data_description: Añade transacciones para mostrar datos de flujo de caja o amplía el período de tiempo
-        add_transaction: Añadir transacción
       no_accounts:
         title: Aún no hay cuentas
         description: Añade cuentas para mostrar datos de patrimonio neto

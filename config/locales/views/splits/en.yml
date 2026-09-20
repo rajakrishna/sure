@@ -7,6 +7,7 @@ en:
       submit: Split Transaction
       cancel: Cancel
       add_row: Add split
+      split_even: "%{count} equal"
       remove_row: Remove
       remaining: Remaining
       amounts_must_match: Split amounts must equal the original transaction amount.

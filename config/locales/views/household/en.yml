@@ -1,0 +1,223 @@
+en:
+  shared_views:
+    ours: Ours
+    label: Household view
+  budget_nudges:
+    over_title: '%{name} is over budget (%{percent}%)'
+    over_body: There are %{days} days left in this month.
+    ask_why: Why is %{name} over?
+    ask_adjust: Draft an adjustment
+    ask_adjust_hint: Why did %{name} go over budget, and draft an adjustment I can approve, edit, or dismiss.
+      Do not apply it.
+    near_title: '%{name} is near its limit (%{percent}%)'
+    near_body: There are %{days} days left in this month.
+    review: Review category
+  receipt_parser:
+    other: Other
+  forecast_explains:
+    template: You have %{cash} on hand. Upcoming bills total %{bills} over the next %{days} days, leaving
+      %{remainder}.
+  financial_health:
+    components:
+      emergency_fund: Emergency fund
+      savings_rate: Savings rate
+      debt_ratio: Debt ratio
+      budget_adherence: Budget adherence
+      net_worth_trend: Net worth trend
+    details:
+      emergency_fund: '%{months} months of expenses in cash'
+      savings_rate: '%{percent}% of income saved this month'
+      debt_ratio: Liabilities are %{percent}% of assets
+      budget_missing: No household budget is set for this month
+      budget_adherence: '%{percent}% of this month''s budget used'
+      net_worth_trend: Net worth over the last 30 days
+  saved_reports:
+    heading: Saved reports
+    help: Save this period and household view to reopen later.
+    empty: No saved views yet.
+    save_this: Save this view
+    name_placeholder: Report name
+    save: Save report
+    delete: Delete
+    created: Report saved
+    destroyed: Report deleted
+    ask_draft: Describe a report
+    ask_draft_hint: Draft a saved report from this description. Do not save it — leave it as a proposal
+      I can accept, edit, or dismiss.
+  wealth:
+    show:
+      title: Wealth
+      subtitle: One number, then the moves that would change it.
+      net_worth: Net worth
+      net_worth_trend: Net worth over the last 30 days
+      assets: Assets
+      liabilities: Liabilities
+      health_score: Health
+      allocation: Allocation
+      empty_allocation: Add accounts to see allocation.
+      health_components: What drives this score
+      forecast_title: Cash forecast
+      suggest: Suggest a move
+      suggest_done: Checked for idle cash. Review any new suggestions below.
+      ask_idle_cash: Why is cash sitting idle?
+      ask_idle_cash_hint: Which accounts have idle cash, and should any of it move toward a goal? Propose
+        a move as a draft I can accept, edit, or dismiss.
+      ask_allocation: Explain this allocation
+      ask_allocation_hint: Explain my current asset allocation and what looks off. Do not change anything.
+      ask_health: What would raise this score?
+      ask_health_hint: What is dragging my financial health score, and what should I do first?
+      ask_focus: What should I do?
+      ask_focus_hint: '%{detail} Propose the first move as a draft I can accept, edit, or dismiss.'
+      estimated: Estimated today
+  transactions:
+    index:
+      inbox: Review queue
+    parse_receipt:
+      queued: Receipt is being read. Approve the split draft when it appears.
+    attachments:
+      parse_receipt: Draft splits from receipt
+    inbox:
+      show:
+        title: Transaction inbox
+        subtitle:
+          one: '%{count} assigned to you'
+          other: '%{count} assigned to you'
+        all_transactions: All transactions
+        assignee: Assignee
+        anyone: Anyone
+        filter: Filter
+        unassigned: Unassigned
+        empty_title: Inbox is clear
+        empty_body: Uncategorized transactions you can review will show up here.
+        ask_categorize: Suggest categories
+        ask_categorize_hint: Suggest categories for the transactions in my inbox. Leave each as a proposal
+          I can accept, edit, or dismiss.
+        ask_rules: Draft rules for repeats
+        ask_rules_hint: Draft rules from repeated inbox merchants. Do not apply them — leave each as a
+          proposal.
+        ask_bulk: Help me review these
+        ask_bulk_hint: Help me bulk-review uncategorized transactions. Propose categories and rules only.
+      mark_reviewed: Mark reviewed
+    reviews:
+      create:
+        success:
+          one: Marked 1 transaction reviewed
+          other: Marked %{count} transactions reviewed
+      mark_reviewed: Mark reviewed
+    show:
+      explain: Explain this
+      explain_hint: Explain this transaction. Do not change it.
+      intelligence: Categorized by Intelligence
+    transaction:
+      intelligence: Intelligence
+  settings:
+    api_keys:
+      new:
+        scope_draft_write: Draft write
+        scope_draft_write_description: Read data and create approval drafts. Live writes still need a
+          person to Approve.
+  ai_proposals:
+    kinds:
+      split: Split
+      budget_adjust: Budget
+    sources:
+      draft_tool: Draft tool
+      receipt_vision: Receipt
+      mcp: MCP
+      idle_cash: Idle cash
+    summaries:
+      split: Split %{name} into %{count} lines
+      budget_adjust: Adjust this month's budget
+    index:
+      title: Review
+      subtitle: Accept, edit, or dismiss every pending suggestion.
+      empty: Nothing waiting
+      filter_kind: Type
+      filter_source: Source
+      all: All
+      apply: Filter
+      bulk_approve: Accept selected
+      bulk_dismiss: Dismiss selected
+      select: Select
+    quality:
+      title: Suggestion quality
+      counts: '%{accepted} accepted · %{dismissed} dismissed'
+      accept_rate: '%{percent}% accepted'
+      pending:
+        one: '%{count} waiting'
+        other: '%{count} waiting'
+      empty: No reviewed suggestions yet
+    reasons:
+      bayes: Learned from your past categories for similar payees
+      llm: Suggested from the transaction description
+    card:
+      confidence: '%{percent}% confident'
+      why: 'Why: %{reason}'
+      alternative: Also consider %{name}
+    bulk_approve:
+      success:
+        one: Accepted 1 suggestion
+        other: Accepted %{count} suggestions
+    bulk_dismiss:
+      dismissed:
+        one: Dismissed 1 suggestion
+        other: Dismissed %{count} suggestions
+  insights:
+    types:
+      subscription_watch: Subscriptions
+      household_nudge: Household
+    titles:
+      subscription_watch: '%{name} renews soon'
+      household_nudge: '%{name} has %{count} transactions to review'
+    templates:
+      subscription_watch: '%{name} (%{amount}) is due on %{due_on} (%{days} days). Cancel playbook: %{cancel_url}'
+      household_nudge: '%{name} has %{count} uncategorized transactions assigned.'
+      idle_cash_goal: '%{account} holds %{balance} with no activity in the last %{idle_days} days. %{goal}
+        still needs %{suggested_move}.'
+    actions:
+      subscription_watch: Review subscription
+      household_nudge: Open inbox
+    card:
+      helpful: Helpful
+      unhelpful: Not helpful
+  recurring_transactions:
+    board:
+      title: This month's recurrings
+      empty: No expected charges this month
+      due: Due
+  onboardings:
+    header:
+      recurrings: Recurrings
+    recurrings:
+      title: Review detected recurrings
+      subtitle: Confirm the bills and subscriptions we found. You can skip this.
+      continue: Continue
+      skip: Skip for now
+  pages:
+    dashboard:
+      home:
+        recap: Weekly recap
+        recap_empty: Your next briefing arrives Monday.
+      spending_trend:
+        ideal: Ideal pace
+  plans:
+    show:
+      tabs:
+        cash_flow: Cash flow
+    cash_flow:
+      title: Cash flow
+      income: Income
+      spending: Spending
+      net: Net
+      vs_prior: vs prior month
+  reports:
+    investment_performance:
+      benchmark: '%{symbol} benchmark'
+      no_benchmark: No local price history for %{symbol}
+  categories:
+    form:
+      emoji: Emoji
+      exclude_from_budget: Exclude from budget
+  ds:
+    skeleton:
+      loading: Loading

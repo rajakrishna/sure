@@ -1,4 +1,4 @@
-<%# locals: (message:, description: nil) %>
+<%# locals: (message:, description: nil, undo_path: nil, undo_label: nil) %>
 
 <%= tag.div class: "relative flex gap-3 rounded-lg bg-container p-4 group w-full md:max-w-80 shadow-border-xs",
             data: {
@@ -17,6 +17,11 @@
 
       <% if description %>
         <%= tag.p description, class: "text-secondary text-sm line-clamp-3", title: description %>
+      <% end %>
+      <% if undo_path.present? %>
+        <%= link_to undo_label.presence || t("shared.undo"), undo_path,
+              class: "text-sm font-medium text-link hover:underline",
+              data: { turbo_method: :post } %>
       <% end %>
     </div>
   </div>

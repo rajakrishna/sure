@@ -891,15 +891,6 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  # Preview features preference tests
-  test "preview_features_enabled? is always true" do
-    @user.update!(preferences: {})
-    assert @user.preview_features_enabled?
-
-    @user.update!(preferences: { "preview_features_enabled" => false })
-    assert @user.preview_features_enabled?
-  end
-
   # ActiveStorage attachment cleanup tests
   test "purging a user removes attached profile image" do
     user = users(:family_admin)

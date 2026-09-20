@@ -133,15 +133,6 @@ en:
         feedback_thanks: "Thanks for helping improve the chart!"
         feedback_privacy: "Your response is sent to PostHog. Describe the issue without account numbers, balances, or other private financial details."
         feedback_submit: "Send feedback"
-      cashflow_sankey:
-        loading: "Loading cash flow…"
-        load_error: "Cash flow could not be loaded. Please try again."
-        retry: "Try again"
-        title: "Cashflow"
-        zoom_out: "Back to full cashflow"
-        no_data_title: "No cash flow data for this time period"
-        no_data_description: "Add transactions to display cash flow data or expand the time period"
-        add_transaction: "Add transaction"
       no_accounts:
         title: "No accounts yet"
         description: "Add accounts to display net worth data"
