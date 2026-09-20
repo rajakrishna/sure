@@ -16,10 +16,12 @@ class AdminUserRemovalsTest < ApplicationSystemTestCase
     sign_in @admin
     visit admin_users_path
 
-    find("details", text: @target.family.name).find("summary").click
+    within "#main" do
+      find("details", text: @target.family.name).find("summary").click
 
-    within find("tr", text: @target_email) do
-      find("button[aria-haspopup='dialog']").click
+      within find("tr", text: @target_email) do
+        find("button[aria-haspopup='dialog']").click
+      end
     end
     click_on "Delete User"
 
