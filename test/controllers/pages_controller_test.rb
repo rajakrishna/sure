@@ -117,19 +117,34 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
   end
 
-  test "intro page requires guest role" do
+  test "intro page redirects home" do
     get intro_path
 
     assert_redirected_to root_path
-    assert_equal "Intro is only available to guest users.", flash[:alert]
   end
 
-  test "intro page is accessible for guest users" do
+  test "intro page redirects guest users home" do
     sign_in @intro_user
 
     get intro_path
 
+    assert_redirected_to root_path
+  end
+
+  test "home review transactions goes to the review inbox" do
+    get root_path
+
     assert_response :ok
+    assert_select "a[href=?]", ai_proposals_path, text: I18n.t("pages.dashboard.home.review_transactions")
+    assert_select "a[href=?]", transactions_categorize_path, count: 0
+  end
+
+  test "command palette closes on backdrop click and traps focus" do
+    get root_path
+
+    assert_response :ok
+    assert_select "[data-testid=command-palette][data-action*='command-palette#clickOutside']"
+    assert_select "[data-testid=command-palette][aria-modal=true]"
   end
 
   test "dashboard renders money flow widget" do
@@ -336,7 +351,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get changelog_path
     assert_response :ok
     assert_select "h2", text: "Release notes unavailable"
-    assert_select "a[href='https://github.com/we-promise/sure/releases']"
+    assert_select "a[href='https://github.com/rajakrishna/sure/releases']"
   end
 
   test "changelog with incomplete release notes" do

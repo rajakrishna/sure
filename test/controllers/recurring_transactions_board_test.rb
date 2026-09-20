@@ -5,9 +5,8 @@ class RecurringTransactionsBoardTest < ActionDispatch::IntegrationTest
     sign_in users(:family_admin)
   end
 
-  test "board renders this month's recurrings" do
+  test "board redirects to the Plan bills hub" do
     get board_recurring_transactions_url
-    assert_response :success
-    assert_select "h1", text: I18n.t("recurring_transactions.board.title")
+    assert_redirected_to plan_path(tab: "bills")
   end
 end

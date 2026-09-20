@@ -103,7 +103,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
 
   test "should get trial" do
     get trial_onboarding_url
-    assert_response :success
+    assert_redirected_to root_path
   end
 
   test "preferences page shows currency formatting example" do
@@ -194,7 +194,7 @@ end
     assert_response :success
 
     get trial_onboarding_url
-    assert_response :success
+    assert_redirected_to root_path
   end
 
   test "onboarding pages require authentication" do

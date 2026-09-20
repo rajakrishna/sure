@@ -1,6 +1,12 @@
+<% expanded_sidebar_class = "w-full" %>
+<% collapsed_sidebar_class = "w-0 overflow-hidden" %>
+
 <%= render "layouts/shared/htmldoc", sidebar_aware: true do %>
   <div class="flex flex-col md:flex-row h-full bg-surface pt-[env(safe-area-inset-top)]"
-       data-controller="command-palette">
+       data-controller="command-palette app-layout sidebar-resize"
+       data-app-layout-expanded-sidebar-class="<%= expanded_sidebar_class %>"
+       data-app-layout-collapsed-sidebar-class="<%= collapsed_sidebar_class %>"
+       data-app-layout-user-id-value="<%= Current.user.id %>">
     <%= link_to t("layouts.application.skip_to_main"), "#main",
         class: "sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-3 focus:py-2 focus:rounded-lg focus:bg-container focus:text-primary focus:shadow-border-xs" %>
 
@@ -49,6 +55,9 @@
         </div>
       </div>
     </main>
+    <%= render "layouts/shared/chat_rail",
+          expanded_sidebar_class: expanded_sidebar_class,
+          collapsed_sidebar_class: collapsed_sidebar_class %>
     <%= render "layouts/shared/command_palette_dialog" %>
   </div>
 <% end %>

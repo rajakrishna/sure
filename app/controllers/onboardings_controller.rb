@@ -15,6 +15,7 @@ class OnboardingsController < ApplicationController
   end
 
   def trial
+    redirect_to root_path
   end
 
   private

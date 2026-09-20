@@ -26,6 +26,6 @@ class Assistant::Function::PresentableTest < ActiveSupport::TestCase
     result = Assistant::Function::ListUncategorizedTransactions.new(@user).call
 
     assert result[:deep_links].present?
-    assert result[:deep_links].any? { |link| link[:path].to_s.include?("/categorize") }
+    assert result[:deep_links].any? { |link| link[:path].to_s.include?("/ai_proposals") }
   end
 end

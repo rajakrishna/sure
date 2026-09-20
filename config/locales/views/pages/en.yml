@@ -28,7 +28,7 @@ en:
       title: What's new
     release_notes_unavailable:
       name: Release notes unavailable
-      body_html: "<p>Unable to fetch the latest release notes at this time. Please check back later or visit our <a href='https://github.com/we-promise/sure/releases' target='_blank' rel='noopener noreferrer'>GitHub releases page</a> directly.</p>"
+      body_html: "<p>Unable to fetch the latest release notes at this time. Please check back later or visit our <a href='https://github.com/rajakrishna/sure/releases' target='_blank' rel='noopener noreferrer'>GitHub releases page</a> directly.</p>"
     privacy:
       title: Privacy Policy
       heading: Privacy Policy
@@ -73,6 +73,10 @@ en:
         ask_unusual_hint: What looks unusual in my spending this week? Point me at the transactions or bills I should review.
         ask_start: How should I start?
         ask_start_hint: I have no accounts yet. What should I add first so the home briefing is useful?
+        recap: Weekly recap
+        recap_empty: Your next briefing arrives Monday.
+        ask_about_week: Ask about this week
+        ask_about_week_hint: Ask about this week's recap. Use the briefing items as context. Do not change any transactions.
       priority_aria_label: "What needs attention"
       analytics: Charts
       sections_aria_label: "Dashboard sections"

@@ -8,18 +8,17 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
     ensure_tailwind_build
   end
 
-  test "index renders visible insights and marks them read" do
+  test "index redirects to the home insights feed" do
     get insights_url
 
-    assert_response :success
-    assert_match CGI.escapeHTML(@insight.title), response.body
-    assert @insight.reload.read?
+    assert_redirected_to root_path(anchor: "insights-feed")
+    assert @insight.reload.active?
   end
 
   test "turbo prefetch requests do not mark insights read" do
     get insights_url, headers: { "X-Sec-Purpose" => "prefetch" }
 
-    assert_response :success
+    assert_redirected_to root_path(anchor: "insights-feed")
     assert @insight.reload.active?
   end
 
@@ -41,7 +40,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
   test "feedback records a helpful thumb" do
     patch feedback_insight_url(@insight, value: "helpful")
 
-    assert_redirected_to insights_url
+    assert_redirected_to root_path(anchor: "insights-feed")
     assert_equal "helpful", @insight.reload.feedback
   end
 
@@ -67,7 +66,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "the live region is present before any stream updates it" do
-    get insights_url
+    get root_url
 
     assert_response :success
     assert_select "#aria-announcer[role=status][aria-live=polite]", 1,
@@ -114,11 +113,11 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
 
   # Acknowledging used to be reachable only from /insights, so the dashboard —
   # the surface people actually look at — could show an insight but not clear it.
-  test "insights index rows carry an acknowledge control" do
-    get insights_url
+  test "home insights feed rows carry an acknowledge control" do
+    get root_url
 
     assert_response :success
-    assert_select "form[action=?]", acknowledge_insight_path(@insight)
+    assert_select "#insights-feed form[action=?]", acknowledge_insight_path(@insight)
   end
 
   test "acknowledge re-renders the insights list so the next insight backfills" do
@@ -175,7 +174,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
       post refresh_insights_url
     end
 
-    assert_redirected_to insights_path
+    assert_redirected_to root_path(anchor: "insights-feed")
   end
 
   # Preview gate. Insights is opt-in via Settings → Preferences, so a user
@@ -187,7 +186,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
 
     get insights_url
 
-    assert_response :success
+    assert_redirected_to root_path(anchor: "insights-feed")
   end
 
   test "refresh still enqueues generation when the preview preference is off" do
@@ -197,7 +196,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
       post refresh_insights_url
     end
 
-    assert_redirected_to insights_path
+    assert_redirected_to root_path(anchor: "insights-feed")
   end
 
   test "acknowledge still works when the preview preference is off" do
@@ -216,7 +215,7 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "#insights-feed"
-    assert_select "a[href=?]", insights_path
+    assert_select "a[href=?]", insights_path, count: 0
   end
 
   private

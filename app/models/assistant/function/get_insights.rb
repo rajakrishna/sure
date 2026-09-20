@@ -77,7 +77,7 @@ class Assistant::Function::GetInsights < Assistant::Function
           }.compact
         }
       },
-      deep_links: [ deep_link(I18n.t("assistant.deep_links.insights"), insights_path) ]
+      deep_links: [ deep_link(I18n.t("assistant.deep_links.insights"), root_path(anchor: "insights-feed")) ]
     )
   end
 end

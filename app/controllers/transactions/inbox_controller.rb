@@ -1,8 +1,6 @@
 class Transactions::InboxController < ApplicationController
   include SharedViewFilterable
 
-  before_action :require_preview_features!
-
   def show
     @assignee_id = params[:assignee_id]
     @inbox = Transaction::Inbox.new(

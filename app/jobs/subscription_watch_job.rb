@@ -6,7 +6,7 @@ class SubscriptionWatchJob < ApplicationJob
     if family_id.present?
       generate_for_family(family_id)
     else
-      Family.with_preview_features.find_each do |family|
+      Family.find_each do |family|
         SubscriptionWatchJob.perform_later(family_id: family.id)
       rescue => e
         Rails.logger.error("Failed to enqueue subscription watch for family #{family.id}: #{e.message}")
@@ -17,7 +17,6 @@ class SubscriptionWatchJob < ApplicationJob
   private
     def generate_for_family(family_id)
       family = Family.find_by(id: family_id)
-      return unless family&.preview_features_enabled?
       return if family.accounts.none? || family.recurring_transactions_disabled?
 
       I18n.with_locale(family.locale) do

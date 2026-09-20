@@ -10,6 +10,7 @@ en:
       accounts: Open accounts
       recurring: Open recurring
       categorize: Review uncategorized
+      transaction: Open transaction
     charts:
       spending: Spending
       budget: Budget

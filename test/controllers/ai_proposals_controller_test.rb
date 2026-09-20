@@ -21,7 +21,7 @@ class AiProposalsControllerTest < ActionDispatch::IntegrationTest
 
   test "approve writes the category" do
     post approve_ai_proposal_url(@proposal)
-    assert_redirected_to ai_proposals_url
+    assert_redirected_to transaction_path(@transaction.entry)
     assert_equal @category, @transaction.reload.category
     assert_equal "approved", @proposal.reload.status
   end

@@ -31,10 +31,10 @@
              variant: "link",
              text: t("bills.show.ask_in_chat"),
              icon: "sparkles",
-             href: new_chat_path(
-               message_hint: t("bills.show.ask_hint", name: @series.display_name),
-               composer_context: [ { type: "bill", id: @series.id } ].to_json
-             )) %>
+             href: ask_in_chat_href(t("bills.show.ask_hint", name: @series.display_name), [ { type: "bill", id: @series.id } ]),
+             frame: :sidebar_chat,
+             data: ask_link_data
+           ) %>
         <% menu.with_item(
              variant: "link",
              text: t("bills.show.edit"),

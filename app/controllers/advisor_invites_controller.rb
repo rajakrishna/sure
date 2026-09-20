@@ -1,5 +1,4 @@
 class AdvisorInvitesController < ApplicationController
-  before_action :require_preview_features!
   before_action :require_admin!
 
   def create

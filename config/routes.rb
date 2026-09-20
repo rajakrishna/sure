@@ -528,7 +528,7 @@ Rails.application.routes.draw do
     resources :mappings, only: :update, module: :import
   end
 
-  resources :holdings, only: %i[index new show update destroy] do
+  resources :holdings, only: %i[index show update destroy] do
     member do
       post :unlock_cost_basis
       patch :remap_security
@@ -578,6 +578,9 @@ Rails.application.routes.draw do
       patch :tags, action: :update_tags
       post :parse_receipt
     end
+
+    resource :explain, only: :show, controller: "transactions/explains"
+    resource :ai_action, only: :create, controller: "transactions/ai_actions"
   end
 
   resources :bills, only: %i[index show] do

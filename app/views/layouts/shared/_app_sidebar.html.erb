@@ -32,9 +32,9 @@
   <div class="shrink-0 px-2 py-3 border-t border-primary">
     <%= render "layouts/shared/app_sidebar_item", item: {
       name: t("users.user_menu.settings"),
-      path: accounts_path,
+      path: settings_profile_path,
       icon: "settings",
-      active: request.path.start_with?("/settings") || page_active?(accounts_path)
+      active: request.path.start_with?("/settings") || page_active?(settings_profile_path)
     } %>
   </div>
 </nav>

@@ -97,19 +97,30 @@ module ApplicationHelper
     }
   end
 
-  def ask_in_chat_href(hint, context = [])
-    new_chat_path(message_hint: hint, composer_context: Array(context).to_json)
+  def ask_in_chat_href(hint, context = [], auto_submit: true)
+    new_chat_path(
+      message_hint: hint,
+      composer_context: Array(context).to_json,
+      auto_submit: auto_submit ? "1" : nil
+    )
   end
 
-  def ask_chip(text, hint: nil, context: [], variant: "ghost", size: "sm")
+  def ask_link_data
+    {
+      controller: "ask-link",
+      action: "click->app-layout#openRightSidebar click->ask-link#open"
+    }
+  end
+
+  def ask_chip(text, hint: nil, context: [], variant: "ghost", size: "sm", auto_submit: true)
     render DS::Link.new(
       text: text,
-      href: ask_in_chat_href(hint.presence || text, context),
+      href: ask_in_chat_href(hint.presence || text, context, auto_submit: auto_submit),
       icon: "sparkles",
       variant: variant,
       size: size,
       frame: :sidebar_chat,
-      data: { action: "click->app-layout#openRightSidebar" }
+      data: ask_link_data
     )
   end
 

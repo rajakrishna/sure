@@ -74,7 +74,7 @@ class Assistant::Function::GetRecurringTransactions < Assistant::Function
         totals_by_currency: totals_by_currency(scope)
       },
       deep_links: [
-        deep_link(I18n.t("assistant.deep_links.recurring"), bills_path)
+        deep_link(I18n.t("assistant.deep_links.recurring"), plan_path(tab: "bills"))
       ]
     )
   end

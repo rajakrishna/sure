@@ -10,7 +10,7 @@ class DeliverInsightNotificationJob < ApplicationJob
     return unless Apns::Client.available? && insight.priority_high? && insight.active?
 
     insight.family.users.includes(:push_subscriptions).find_each do |user|
-      next unless user.active? && user.preview_features_enabled?
+      next unless user.active?
 
       user.push_subscriptions.recent.find_each do |subscription|
         perform_later(insight_id: insight.id, push_subscription_id: subscription.id)
@@ -24,7 +24,7 @@ class DeliverInsightNotificationJob < ApplicationJob
     insight = Insight.find(insight_id)
     subscription = PushSubscription.find(push_subscription_id)
     return unless subscription.user.family_id == insight.family_id
-    return unless subscription.eligible? && subscription.user.preview_features_enabled?
+    return unless subscription.eligible?
     return unless insight.priority_high? && insight.active?
 
     PushSubscription::Delivery.new(subscription).call do |client|

@@ -36,7 +36,8 @@
           href: approve_ai_proposal_path(proposal),
           method: :post,
           variant: "primary",
-          icon: "check"
+          icon: "check",
+          data: { turbo_frame: "_top" }
         ) %>
         <% if proposal.kind == "categorize" && proposal.suggested_rule? %>
           <%= render DS::Button.new(
@@ -44,7 +45,8 @@
             href: approve_ai_proposal_path(proposal, create_rule: 1),
             method: :post,
             variant: "secondary",
-            icon: "git-branch"
+            icon: "git-branch",
+            data: { turbo_frame: "_top" }
           ) %>
         <% end %>
         <%= render DS::Button.new(
@@ -52,7 +54,8 @@
           href: dismiss_ai_proposal_path(proposal),
           method: :post,
           variant: "ghost",
-          icon: "x"
+          icon: "x",
+          data: { turbo_frame: "_top" }
         ) %>
       </div>
 

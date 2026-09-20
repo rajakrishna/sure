@@ -11,6 +11,7 @@ class Settings::ProfilesControllerTest < ActionDispatch::IntegrationTest
     sign_in @admin
     get settings_profile_path
     assert_response :success
+    assert_select "#chat-container turbo-frame#sidebar_chat"
   end
 
   test "intro user sees profile without settings navigation" do

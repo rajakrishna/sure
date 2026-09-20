@@ -13,7 +13,6 @@ class PagesController < ApplicationController
     # masonry can't backfill (dense placement needs a later card short enough
     # to fit beside it, and none is). Users who pair it manually can go half.
     "insights_feed"      => { col_span: "full",   grow: false, min_height: 0, width_toggle: true },
-    "cashflow_sankey"    => { col_span: "full",   grow: false, min_height: 384, width_toggle: true },
     "money_flow"         => { col_span: "single", grow: false, min_height: 0,   width_toggle: true },
     "spending_trend"     => { col_span: "single", grow: true,  min_height: 208, width_toggle: true },
     "outflows_donut"     => { col_span: "single", grow: false, min_height: 0 },
@@ -31,7 +30,6 @@ class PagesController < ApplicationController
   DEFAULT_HEIGHT_PRESET = "auto"
 
   skip_authentication only: %i[redis_configuration_error privacy terms]
-  before_action :ensure_intro_guest!, only: :intro
 
   def dashboard
     if Current.user&.ui_layout_intro?
@@ -66,7 +64,7 @@ class PagesController < ApplicationController
   end
 
   def intro
-    @breadcrumbs = [ [ t("breadcrumbs.home"), chats_path ], [ t("breadcrumbs.intro"), nil ] ]
+    redirect_to root_path
   end
 
   def update_preferences

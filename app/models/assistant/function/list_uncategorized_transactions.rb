@@ -79,7 +79,7 @@ class Assistant::Function::ListUncategorizedTransactions < Assistant::Function
         page_size: page_size,
         total_pages: pagy.pages
       },
-      deep_links: [ deep_link(I18n.t("assistant.deep_links.categorize"), transactions_categorize_path) ]
+      deep_links: [ deep_link(I18n.t("assistant.deep_links.categorize"), ai_proposals_path) ]
     )
   end
 

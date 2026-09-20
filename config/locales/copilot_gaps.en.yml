@@ -16,6 +16,13 @@ en:
     settings: Settings
     ask: Ask the Assistant
     ask_hint: Open a ready composer
+    ask_query: "Ask:"
+    ask_run: Runs now
+    open_in_chat: Open in chat
+    categorize_inbox: Review inbox
+    categorize_inbox_hint: Pending suggestions
+    biggest_expense: Biggest expense this month
+    biggest_expense_hint: Filtered transactions
     open: Search or Ask
   ai_proposals:
     index:

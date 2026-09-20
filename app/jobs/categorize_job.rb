@@ -15,7 +15,7 @@ class CategorizeJob < ApplicationJob
 
   private
     def fan_out
-      Family.with_preview_features.find_each do |family|
+      Family.find_each do |family|
         CategorizeJob.perform_later(family_id: family.id)
       rescue => e
         Rails.logger.error("Failed to enqueue categorize job for family #{family.id}: #{e.message}")
@@ -24,7 +24,6 @@ class CategorizeJob < ApplicationJob
 
     def run_for_family(family_id)
       family = Family.find_by(id: family_id)
-      return unless family&.preview_features_enabled?
       return if family.accounts.none?
 
       ApplyAllRulesJob.perform_now(family, execution_type: "scheduled")

@@ -41,6 +41,7 @@
                text: I18n.l(month, format: :month_year).capitalize,
                href: root_path({ spending_month: month.iso8601 }),
                frame: "dashboard_sections",
+               data: { turbo_action: "advance" },
                selected: month == data[:month]
              ) %>
         <% end %>

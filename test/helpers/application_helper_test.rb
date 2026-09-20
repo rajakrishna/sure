@@ -108,11 +108,19 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal [ "SGD", "USD", "EUR" ], currency_picker_options_for_family(family, extra: "EUR")
   end
 
-  test "#ask_in_chat_href seeds the right-rail composer without persisting a chat" do
+  test "#ask_in_chat_href seeds the right-rail composer and auto-submits" do
     href = ask_in_chat_href("What's unusual?", [ { type: "transaction", id: "tx-1" } ])
 
     assert_includes href, "message_hint="
     assert_includes href, "composer_context="
+    assert_includes href, "auto_submit=1"
     assert_match(%r{/chats/new}, href)
+  end
+
+  test "#ask_in_chat_href can skip auto-submit for open-in-chat" do
+    href = ask_in_chat_href("What's unusual?", [], auto_submit: false)
+
+    assert_includes href, "message_hint="
+    assert_no_match(/auto_submit=1/, href)
   end
 end

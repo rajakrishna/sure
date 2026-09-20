@@ -1,4 +1,4 @@
-<%# locals: (chat: nil, message_hint: nil, composer_seed: nil) %>
+<%# locals: (chat: nil, message_hint: nil, composer_seed: nil, auto_submit: false) %>
 
 <% catalog = chat_composer_catalog %>
 <% seed_items = Array(composer_seed) %>
@@ -8,7 +8,7 @@
 
   <%= form_with model: model,
                 class: "flex lg:flex-col gap-2 bg-container px-2 py-1.5 rounded-full lg:rounded-lg shadow-border-xs",
-                data: { chat_target: "form" },
+                data: { chat_target: "form", auto_submit: auto_submit ? "true" : nil },
                 multipart: true do |f| %>
 
     <%= f.hidden_field :ai_model, value: default_ai_model %>

@@ -11,10 +11,9 @@
        variant: "link",
        text: t(".ask_in_chat"),
        icon: "sparkles",
-       href: new_chat_path(
-         message_hint: t(".ask_hint", name: account.name),
-         composer_context: [ { type: "account", id: account.id } ].to_json
-       )
+       href: ask_in_chat_href(t(".ask_hint", name: account.name), [ { type: "account", id: account.id } ]),
+       frame: :sidebar_chat,
+       data: ask_link_data
      ) %>
 
   <% if permission.in?([ :owner, :full_control ]) %>

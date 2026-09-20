@@ -125,7 +125,7 @@ class DS::Dialog < DesignSystemComponent
     end
 
     class_names(
-      "flex flex-col bg-container rounded-xl shadow-border-xs mx-3 lg:mx-0 w-full",
+      "flex flex-col bg-container rounded-xl shadow-border-xs mx-3 lg:mx-0 w-full motion-safe:transition-transform motion-safe:duration-150",
       variant_classes,
       content_class
     )
