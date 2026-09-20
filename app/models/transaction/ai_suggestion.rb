@@ -103,5 +103,4 @@ class Transaction::AiSuggestion
         Transaction.none
       end
     end
-
 end
