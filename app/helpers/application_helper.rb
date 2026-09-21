@@ -92,7 +92,7 @@ module ApplicationHelper
   end
 
   def more_nav_active?
-    page_active?(wealth_path) || page_active?(reports_path)
+    page_active?(wealth_path) || page_active?(reports_path) || page_active?(chats_path)
   end
 
   def uncategorized_transactions_filter_path

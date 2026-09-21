@@ -24,6 +24,8 @@
     </div>
   <% end %>
 
+  <% menu.with_item(variant: :link, text: t("layouts.application.nav.assistant"), href: chats_path, icon: "sparkles") %>
+  <% menu.with_item(variant: :divider) %>
   <% menu.with_item(variant: :link, text: t("layouts.application.nav.wealth"), href: wealth_path, icon: "wallet") %>
   <% menu.with_item(variant: :link, text: t("layouts.application.nav.reports"), href: reports_path, icon: "chart-bar") %>
 <% end %>
