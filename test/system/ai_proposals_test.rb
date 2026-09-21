@@ -21,19 +21,25 @@ class AiProposalsTest < ApplicationSystemTestCase
 
   test "accepting one proposal from the card writes the category" do
     visit ai_proposals_url
+    assert_text @proposal.summary
 
-    find("[data-testid=proposal-accept]").click
+    within("##{dom_id(@proposal)}") do
+      find("button[data-testid=proposal-accept]").click
+    end
 
+    assert_no_selector "button[data-testid=proposal-accept]", wait: 10
     assert_equal @category, @transaction.reload.category
     assert_equal "approved", @proposal.reload.status
   end
 
   test "bulk accept writes selected proposals" do
     visit ai_proposals_url
+    assert_text @proposal.summary
 
-    find("input[name='proposal_ids[]'][value='#{@proposal.id}']").set(true)
+    find("input[name='proposal_ids[]'][value='#{@proposal.id}']", visible: :all).set(true)
     click_button I18n.t("ai_proposals.index.bulk_approve")
 
+    assert_no_selector "button[data-testid=proposal-accept]", wait: 10
     assert_equal @category, @transaction.reload.category
     assert_equal "approved", @proposal.reload.status
   end
