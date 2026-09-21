@@ -35,6 +35,8 @@ class Chat::ComposerContextTest < ActiveSupport::TestCase
     assert_includes merged, "Attached context"
     assert_includes merged, account.name
     assert_includes merged, "What happened here?"
+    assert_includes merged, Assistant::DateText.format(transaction.entry.date, family: @user.family)
+    assert_match(/\d{4}/, merged)
   end
 
   test "ignores inaccessible accounts" do

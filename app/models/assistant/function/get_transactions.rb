@@ -202,7 +202,7 @@ class Assistant::Function::GetTransactions < Assistant::Function
       {
         id: txn.id,
         name: entry.name,
-        date: entry.date,
+        **Assistant::DateText.payload(entry.date, family: family),
         amount: entry.amount.abs,
         currency: entry.currency,
         formatted_amount: entry.amount_money.abs.format,

@@ -57,6 +57,7 @@ module Assistant::Configurable
     - Do NOT apologize or explain limitations
     - Format all responses in markdown
     - Format monetary values in the user's preferred currency and dates in the user's preferred format, both given in Session context below. When no currency is specified, use the preferred currency.
+    - Copy dates from tool results (`date_display` or ISO `date`) exactly. Never rewrite, shorten, or drop digits from a year.
 
     ### Rules about financial advice
 
@@ -130,8 +131,8 @@ module Assistant::Configurable
         <<~PROMPT
           ## Session context
 
-          - Today's date: #{Date.current}. For functions that require dates, use it as your reference point.
-          - Date format: #{preferred_date_format}
+          - Today's date: #{Date.current.iso8601}. Copy `date_display` or ISO `date` from tool results exactly. Never drop digits from a year (2026 must not become 206).
+          - Date format: #{preferred_date_format} (today: #{Assistant::DateText.format(Date.current, family: user&.family)})
           - Preferred currency: #{preferred_currency.iso_code} (symbol #{preferred_currency.symbol}, precision #{preferred_currency.default_precision}, format #{preferred_currency.default_format}, separator "#{preferred_currency.separator}", delimiter "#{preferred_currency.delimiter}")
           - Ranking reminder: biggest/largest/top/max/smallest/min transaction questions require get_transactions with sort_by amount, order desc or asc, page_size 5, month or start/end dates, and types expense or income. Answer #1 only with merchant, amount, date, and account. Never quote an unsorted page row.
           #{accounts_context(user)}#{categories_context(user)}#{briefing_context(user)}

@@ -20,25 +20,24 @@
   <% end %>
 
   <% if @ai_proposals.any? %>
-    <%= form_with url: bulk_approve_ai_proposals_path, method: :post, class: "space-y-4" do %>
-      <div class="flex flex-wrap gap-2">
-        <%= render DS::Button.new(text: t(".bulk_approve"), type: :submit, variant: "primary") %>
-        <%= render DS::Button.new(text: t(".bulk_dismiss"), type: :submit, variant: "ghost", formaction: bulk_dismiss_ai_proposals_path) %>
-      </div>
-      <div class="space-y-3">
-        <% @ai_proposals.each do |proposal| %>
-          <div class="flex items-start gap-3">
-            <label class="mt-4">
-              <span class="sr-only"><%= t(".select") %></span>
-              <%= check_box_tag "proposal_ids[]", proposal.id, false, class: "checkbox" %>
-            </label>
-            <div class="min-w-0 flex-1">
-              <%= render "ai_proposals/card", proposal: proposal %>
-            </div>
-          </div>
-        <% end %>
-      </div>
+    <% bulk_form_id = "bulk-ai-proposals" %>
+    <%= form_with url: bulk_approve_ai_proposals_path, method: :post, id: bulk_form_id, class: "flex flex-wrap gap-2", data: { testid: "bulk-approve-proposals" } do %>
+      <%= render DS::Button.new(text: t(".bulk_approve"), type: :submit, variant: "primary") %>
+      <%= render DS::Button.new(text: t(".bulk_dismiss"), type: :submit, variant: "ghost", formaction: bulk_dismiss_ai_proposals_path) %>
     <% end %>
+    <div class="space-y-3">
+      <% @ai_proposals.each do |proposal| %>
+        <div class="flex items-start gap-3">
+          <label class="mt-4 inline-flex items-center justify-center min-w-11 min-h-11">
+            <span class="sr-only"><%= t(".select") %></span>
+            <%= check_box_tag "proposal_ids[]", proposal.id, false, class: "checkbox", form: bulk_form_id %>
+          </label>
+          <div class="min-w-0 flex-1">
+            <%= render "ai_proposals/card", proposal: proposal %>
+          </div>
+        </div>
+      <% end %>
+    </div>
   <% else %>
     <%= render DS::EmptyState.new(icon: "sparkles", title: t(".empty")) %>
   <% end %>

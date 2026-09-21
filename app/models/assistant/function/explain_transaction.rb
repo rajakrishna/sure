@@ -48,7 +48,7 @@ class Assistant::Function::ExplainTransaction < Assistant::Function
       success: true,
       transaction_id: transaction.id,
       name: entry&.name,
-      date: entry&.date&.iso8601,
+      **Assistant::DateText.payload(entry&.date, family: family),
       amount: entry&.amount,
       currency: entry&.currency,
       category: transaction.category&.display_name,

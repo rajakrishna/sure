@@ -1,0 +1,51 @@
+<%
+  percentage = total.zero? ? 0 : (item[:total].to_f / total * 100).round(1)
+  is_sub = level == :subcategory
+  row_start_date = local_assigns[:start_date]
+  row_end_date = local_assigns[:end_date]
+  clickable = item[:has_transactions] && row_start_date.present? && row_end_date.present?
+  transactions_href = clickable ? transactions_path(q: { categories: [ item[:category_filter_value] ], start_date: row_start_date, end_date: row_end_date }) : nil
+%>
+
+<% card = capture do %>
+  <div class="flex items-center gap-3 min-w-0 w-full <%= is_sub ? "pl-4" : "" %>">
+    <% if item[:category_icon] %>
+      <%= render DS::FilledIcon.new(
+        icon: item[:category_icon],
+        hex_color: item[:category_color],
+        size: "md",
+        rounded: true
+      ) %>
+    <% else %>
+      <%= render DS::FilledIcon.new(
+        variant: :text,
+        hex_color: item[:category_color],
+        text: item[:category_name],
+        size: "md",
+        rounded: true
+      ) %>
+    <% end %>
+    <div class="min-w-0 flex-1">
+      <p class="text-sm font-medium text-primary truncate"><%= item[:category_name] %></p>
+      <p class="text-xs text-subdued">
+        <%= t("reports.transactions_breakdown.table.entries", count: item[:count]) %>
+      </p>
+    </div>
+    <div class="text-right shrink-0">
+      <p class="text-sm <%= color_class %> privacy-sensitive"><%= Money.new(item[:total], Current.family.currency).format %></p>
+      <p class="text-xs text-secondary"><%= percentage %>%</p>
+    </div>
+  </div>
+<% end %>
+
+<% if clickable %>
+  <%= link_to transactions_href,
+        class: "block bg-container rounded-xl shadow-border-xs px-3 py-3",
+        data: { turbo_frame: "_top", turbo_prefetch: false, category: "category-#{item[:category_id]}" } do %>
+    <%= card %>
+  <% end %>
+<% else %>
+  <div class="bg-container rounded-xl shadow-border-xs px-3 py-3" data-category="category-<%= item[:category_id] %>">
+    <%= card %>
+  </div>
+<% end %>

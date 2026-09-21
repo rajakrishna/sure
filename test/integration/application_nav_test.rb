@@ -21,14 +21,19 @@ class ApplicationNavTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "mobile bottom nav includes wealth and a command palette trigger" do
+  test "mobile bottom nav keeps five primary tabs and overflows wealth and reports into More" do
     get root_path
     assert_response :ok
 
-    wealth_label = I18n.t("layouts.application.nav.wealth")
+    assert_select "nav.fixed.bottom-0 a[href=?]", root_path
+    assert_select "nav.fixed.bottom-0 a[href=?]", transactions_path
+    assert_select "nav.fixed.bottom-0 a[href=?]", chats_path
+    assert_select "nav.fixed.bottom-0 [data-testid=mobile-more-nav]"
     assert_select "nav.fixed.bottom-0 a[href=?]", wealth_path do |links|
-      assert links.any? { |link| link.text.include?(wealth_label) },
-        "expected mobile bottom nav to include #{wealth_label}"
+      assert links.any? { |link| link.text.include?(I18n.t("layouts.application.nav.wealth")) }
+    end
+    assert_select "nav.fixed.bottom-0 a[href=?]", reports_path do |links|
+      assert links.any? { |link| link.text.include?(I18n.t("layouts.application.nav.reports")) }
     end
     assert_select "[data-testid=command-palette-trigger-mobile]"
     assert_select "[data-testid=command-palette]"

@@ -20,14 +20,13 @@
         </div>
       <% end %>
       <% if item[:category_icon] %>
-        <div class="h-7 w-7 flex-shrink-0 rounded-full flex justify-center items-center <%= clickable ? "group-hover/category-row:scale-105 transition-all duration-300" : "" %>"
-          style="
-            background-color: color-mix(in oklab, <%= item[:category_color] %> 10%, transparent);
-            border-color: color-mix(in oklab, <%= item[:category_color] %> 10%, transparent);
-            color: <%= item[:category_color] %>;
-          ">
-          <%= icon(item[:category_icon], color: "current", size: "sm") %>
-        </div>
+        <%= render DS::FilledIcon.new(
+          icon: item[:category_icon],
+          hex_color: item[:category_color],
+          size: "md",
+          rounded: true,
+          class_name: clickable ? "group-hover/category-row:scale-105 transition-all duration-300" : nil
+        ) %>
       <% else %>
         <%= render DS::FilledIcon.new(
           variant: :text,

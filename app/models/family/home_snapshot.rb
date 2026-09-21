@@ -20,8 +20,9 @@ class Family::HomeSnapshot
   end
 
   def needs_review_count
-    @needs_review_count ||= Transaction::Inbox.uncategorized_for(family, account_ids: user.accessible_accounts.select(:id)).count
+    @needs_review_count ||= Entry.accessible_uncategorized_count(user)
   end
+
 
   def pending_proposal_count
     @pending_proposal_count ||= family.ai_proposals.pending.count
@@ -101,10 +102,6 @@ class Family::HomeSnapshot
 
   private
     attr_reader :family, :user
-
-    def accessible_entries
-      family.entries.joins(:account).merge(Account.accessible_by(user))
-    end
 
     def paycheck_remaining_money
       return @paycheck_remaining_money if defined?(@paycheck_remaining_money)

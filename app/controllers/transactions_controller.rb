@@ -83,7 +83,7 @@ class TransactionsController < ApplicationController
     end
 
     @uncategorized_count = Rails.cache.fetch(uncategorized_count_cache_key) do
-      Current.accessible_entries.uncategorized_transactions.count
+      Entry.accessible_uncategorized_count(Current.user)
     end
 
     @projected_recurring = load_projected_recurring

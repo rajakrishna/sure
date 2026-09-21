@@ -23,6 +23,38 @@ class EntryTest < ActiveSupport::TestCase
     assert_equal entry_ids.sort.reverse, Entry.where(id: entry_ids).reverse_chronological.pluck(:id)
   end
 
+  test "accessible_uncategorized_count is not inflated by multiple account shares" do
+    user = users(:family_admin)
+    account = accounts(:depository)
+    AccountShare.create!(account: account, user: family_guest, permission: "read_only", include_in_finances: true)
+    create_transaction(account: account, name: "Count-stable uncategorized")
+
+    canonical = Entry.accessible_uncategorized_count(user)
+    joined = user.family.entries
+      .joins(:account)
+      .merge(Account.accessible_by(user))
+      .uncategorized_transactions
+      .count
+
+    assert_operator canonical, :>=, 1
+    assert_equal canonical, user.family.entries
+      .where(account_id: user.accessible_accounts.select(:id))
+      .uncategorized_transactions
+      .distinct
+      .count("entries.id")
+    assert_operator joined, :>=, canonical
+  end
+
+  test "accessible_uncategorized_count is zero when nothing is uncategorized" do
+    user = users(:family_admin)
+    category = categories(:food_and_drink)
+    user.family.entries.uncategorized_transactions.find_each do |entry|
+      entry.entryable.update!(category: category)
+    end
+
+    assert_equal 0, Entry.accessible_uncategorized_count(user)
+  end
+
   test "bulk_update! touches the assigned category's last_used_at" do
     entry = create_transaction(account: accounts(:depository))
     category = categories(:income)

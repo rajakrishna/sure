@@ -53,7 +53,7 @@ module Assistant::Function::CategorizeSupport
       transaction ||= entry.transaction
       {
         id: transaction.id,
-        date: entry.date,
+        **Assistant::DateText.payload(entry.date, family: family),
         name: entry.name,
         amount: entry.amount.abs,
         currency: entry.currency,
