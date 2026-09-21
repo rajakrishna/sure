@@ -17,10 +17,13 @@
       <% insights.each do |insight| %>
         <div class="relative flex items-center mx-3 px-3 py-2.5 rounded-lg gap-3 group/insight">
 
-          <div class="h-7 w-7 shrink-0 rounded-full flex justify-center items-center motion-safe:group-hover/insight:scale-105 motion-safe:transition-all motion-safe:duration-150">
-               style="background-color: color-mix(in oklab, <%= insight_icon_css_color(insight) %> 10%, transparent); color: <%= insight_icon_css_color(insight) %>;">
-            <%= icon(insight_icon_key(insight), color: "current", size: "sm") %>
-          </div>
+          <%= render DS::FilledIcon.new(
+            icon: insight_icon_key(insight),
+            hex_color: insight_icon_css_color(insight),
+            size: "md",
+            rounded: true,
+            class_name: "motion-safe:group-hover/insight:scale-105 motion-safe:transition-all motion-safe:duration-150"
+          ) %>
 
           <div class="min-w-0 grow">
             <%# No per-row "New" pill: the well's header already counts the

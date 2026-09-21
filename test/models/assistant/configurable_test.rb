@@ -27,6 +27,7 @@ class AssistantConfigurableTest < ActiveSupport::TestCase
     assert instructions.start_with?(Assistant::Configurable::STATIC_INSTRUCTIONS)
     assert_operator instructions.index("## Session context"), :>, instructions.index("### Rules about financial advice")
     assert_includes instructions, "Today's date: #{Date.current}"
+    assert_includes instructions, "Never drop digits from a year"
   end
 
   test "a family's chat_system override replaces the static block but keeps session context" do

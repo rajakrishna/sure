@@ -20,6 +20,9 @@ class Assistant::Function::GetTransactionsTest < ActiveSupport::TestCase
 
     assert_not_nil transaction
     assert_equal @transaction.entry.notes, transaction[:notes]
+    assert_equal @transaction.entry.date.iso8601, transaction[:date]
+    assert_equal Assistant::DateText.format(@transaction.entry.date, family: @user.family), transaction[:date_display]
+    assert_match(/\d{4}/, transaction[:date_display])
   end
 
   test "excludes transactions from inaccessible accounts" do

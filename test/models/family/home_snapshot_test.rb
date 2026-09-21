@@ -1,6 +1,8 @@
 require "test_helper"
 
 class Family::HomeSnapshotTest < ActiveSupport::TestCase
+  include EntriesTestHelper
+
   setup do
     @user = users(:family_admin)
     @family = @user.family
@@ -8,8 +10,30 @@ class Family::HomeSnapshotTest < ActiveSupport::TestCase
   end
 
   test "counts uncategorized transactions as needs review" do
-    expected = @family.entries.joins(:account).merge(Account.accessible_by(@user)).uncategorized_transactions.count
+    expected = Entry.accessible_uncategorized_count(@user)
     assert_equal expected, @snapshot.needs_review_count
+  end
+
+  test "needs_review_count is not inflated by multiple shares on one account" do
+    account = accounts(:depository)
+    AccountShare.create!(account: account, user: family_guest, permission: "read_only", include_in_finances: true)
+    create_transaction(account: account, name: "Share-inflated uncategorized")
+
+    snapshot = Family::HomeSnapshot.new(@family.reload, user: @user.reload)
+    canonical = Entry.accessible_uncategorized_count(@user)
+
+    assert_equal canonical, snapshot.needs_review_count
+    assert_operator snapshot.needs_review_count, :>=, 1
+  end
+
+  test "needs_review_count is zero when every transaction is categorized" do
+    category = categories(:food_and_drink)
+    @family.entries.uncategorized_transactions.find_each do |entry|
+      entry.entryable.update!(category: category)
+    end
+
+    snapshot = Family::HomeSnapshot.new(@family.reload, user: @user.reload)
+    assert_equal 0, snapshot.needs_review_count
   end
 
   test "shows bills when recurring is on and hides briefing until one exists" do

@@ -1,0 +1,29 @@
+<%# locals: (snapshot:) %>
+<div class="mb-6" data-testid="home-hero">
+  <%= render DS::Card.new(class: "gap-4") do %>
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div class="min-w-0 space-y-1">
+        <p class="text-xs font-medium uppercase tracking-wide text-secondary">
+          <%= snapshot.safe_to_spend_from_paycheck? ? t("pages.dashboard.home.safe_to_spend") : t("pages.dashboard.home.left_to_allocate") %>
+        </p>
+        <p class="text-3xl font-medium text-primary privacy-sensitive">
+          <%= snapshot.safe_to_spend_money ? format_money(snapshot.safe_to_spend_money) : t("pages.dashboard.home.not_enough_data") %>
+        </p>
+        <% if snapshot.budget_pace_percent %>
+          <p class="text-sm text-secondary">
+            <%= t("pages.dashboard.home.budget_pace",
+                  percent: snapshot.budget_pace_percent.round,
+                  days: snapshot.budget_days_remaining) %>
+          </p>
+        <% end %>
+      </div>
+      <% if snapshot.show_briefing? && snapshot.weekly_briefing.suggested_prompts.any? %>
+        <div class="flex flex-wrap gap-2">
+          <% snapshot.weekly_briefing.suggested_prompts.first(2).each do |prompt| %>
+            <%= ask_chip prompt["text"], hint: prompt["text"] %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

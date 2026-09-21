@@ -10,9 +10,7 @@ else
     { name: t(".nav.home"), path: root_path, icon: "home", icon_custom: false, active: page_active?(root_path) },
     { name: t(".nav.transactions"), path: transactions_path, icon: "credit-card", icon_custom: false, active: page_active?(transactions_path) },
     plan_nav_item,
-    { name: t(".nav.wealth"), path: wealth_path, icon: "wallet", icon_custom: false, active: page_active?(wealth_path) },
-    { name: t(".nav.reports"), path: reports_path, icon: "chart-bar", icon_custom: false, active: page_active?(reports_path) },
-    { name: t(".nav.assistant"), path: chats_path, icon: "icon-assistant", icon_custom: true, active: page_active?(chats_path), mobile_only: true }
+    { name: t(".nav.more"), path: nil, icon: "more-horizontal", icon_custom: false, active: more_nav_active?, menu: true }
   ]
 end %>
 
@@ -178,10 +176,16 @@ end %>
           collapsed_sidebar_class: collapsed_sidebar_class %>
 
     <%# MOBILE - Bottom Nav %>
-    <%= tag.nav class: "lg:hidden fixed bottom-0 left-0 right-0 bg-surface z-10 border-t border-tertiary flex justify-around pb-[env(safe-area-inset-bottom)]",
+    <%= tag.nav class: "lg:hidden fixed bottom-0 left-0 right-0 bg-surface z-10 border-t border-tertiary flex pb-[env(safe-area-inset-bottom)]",
       data: { viewport_target: "bottomNav" } do %>
       <% mobile_nav_items.each do |nav_item| %>
-        <%= render "layouts/shared/nav_item", **nav_item %>
+        <div class="flex-1 min-w-0">
+          <% if nav_item[:menu] %>
+            <%= render "layouts/shared/nav_more", **nav_item.except(:menu, :path, :icon_custom) %>
+          <% else %>
+            <%= render "layouts/shared/nav_item", **nav_item.except(:menu) %>
+          <% end %>
+        </div>
       <% end %>
     <% end %>
     <%# "What's new" release highlight: one centered popover per deployed

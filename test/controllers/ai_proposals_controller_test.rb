@@ -72,6 +72,17 @@ class AiProposalsControllerTest < ActionDispatch::IntegrationTest
     assert_match I18n.t("ai_proposals.quality.empty"), response.body
   end
 
+  test "index does not nest per-row accept forms inside the bulk form" do
+    get ai_proposals_url
+    assert_response :success
+
+    assert_select "form[data-testid=bulk-approve-proposals]", count: 1
+    assert_select "form[data-testid=bulk-approve-proposals] form", count: 0
+    assert_select "##{dom_id(@proposal)} form[action=?]", approve_ai_proposal_path(@proposal)
+    assert_select "[data-testid=proposal-accept]"
+    assert_select "input[name='proposal_ids[]'][form=bulk-ai-proposals][value=?]", @proposal.id
+  end
+
   test "bulk approve writes selected proposals" do
     post bulk_approve_ai_proposals_url, params: { proposal_ids: [ @proposal.id ] }
     assert_redirected_to ai_proposals_url

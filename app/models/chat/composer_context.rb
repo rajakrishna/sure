@@ -62,7 +62,8 @@ class Chat::ComposerContext
 
       entry = transaction.entry
       merchant = transaction.merchant&.name.presence || entry.name
-      "- Transaction: #{merchant} — #{entry.amount_money.abs.format} on #{entry.date} (#{entry.account.name})"
+      date_text = Assistant::DateText.format(entry.date, family: user.family)
+      "- Transaction: #{merchant} — #{entry.amount_money.abs.format} on #{date_text} (#{entry.account.name})"
     end
 
     def format_bill(id)

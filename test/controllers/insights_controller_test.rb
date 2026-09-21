@@ -31,6 +31,9 @@ class InsightsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "#insights-feed"
     assert_match CGI.escapeHTML(@insight.title), response.body
+    assert_select "#insights-feed [style*='color-mix']"
+    assert_no_match %r{>\s*style="background-color:}, response.body
+    assert_no_match(/style="background-color: color-mix/, css_select("#insights-feed *").map(&:text).join)
   end
 
   # Acknowledging is a quiet action — no undo toast. Acknowledgement only covers

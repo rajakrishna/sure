@@ -1,35 +1,5 @@
 <%# locals: (snapshot:) %>
-<div class="space-y-4 mb-6" data-testid="home-hero">
-  <%= render DS::Card.new(class: "gap-4") do %>
-    <div class="flex flex-wrap items-start justify-between gap-4">
-      <div class="min-w-0 space-y-1">
-        <p class="text-xs font-medium uppercase tracking-wide text-secondary">
-          <%= snapshot.safe_to_spend_from_paycheck? ? t("pages.dashboard.home.safe_to_spend") : t("pages.dashboard.home.left_to_allocate") %>
-        </p>
-        <p class="text-3xl font-medium text-primary privacy-sensitive">
-          <%= snapshot.safe_to_spend_money ? format_money(snapshot.safe_to_spend_money) : t("pages.dashboard.home.not_enough_data") %>
-        </p>
-        <% if snapshot.budget_pace_percent %>
-          <p class="text-sm text-secondary">
-            <%= t("pages.dashboard.home.budget_pace",
-                  percent: snapshot.budget_pace_percent.round,
-                  days: snapshot.budget_days_remaining) %>
-          </p>
-        <% end %>
-        <% if snapshot.show_briefing? %>
-          <p class="text-sm text-primary"><%= snapshot.weekly_briefing.headline %></p>
-        <% end %>
-      </div>
-      <% if snapshot.show_briefing? && snapshot.weekly_briefing.suggested_prompts.any? %>
-        <div class="flex flex-wrap gap-2">
-          <% snapshot.weekly_briefing.suggested_prompts.first(2).each do |prompt| %>
-            <%= ask_chip prompt["text"], hint: prompt["text"] %>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
-
+<div class="space-y-4 mb-6" data-testid="home-actions">
   <% if snapshot.show_briefing? %>
     <%= render DS::Card.new(class: "gap-3", id: "weekly-recap") do %>
       <p class="text-xs font-medium uppercase tracking-wide text-secondary"><%= t("pages.dashboard.home.recap") %></p>
@@ -48,35 +18,33 @@
   <% end %>
 
   <div class="bg-container rounded-xl shadow-border-xs divide-y divide-subdued">
-    <div class="flex items-center gap-3 px-4 py-3">
-      <div class="min-w-0 flex-1">
+    <div class="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center" data-testid="needs-review">
+      <div class="min-w-0 sm:flex-1">
         <p class="text-sm font-medium text-primary"><%= t("pages.dashboard.home.needs_review") %></p>
         <p class="text-sm text-secondary privacy-sensitive">
           <%= t("pages.dashboard.home.needs_review_count", count: snapshot.needs_review_count) %>
         </p>
       </div>
-      <div class="flex flex-wrap items-center justify-end gap-2">
-        <%= render DS::Link.new(
-          text: t("pages.dashboard.home.review_transactions"),
-          href: ai_proposals_path,
-          size: "sm"
-        ) %>
+      <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+        <% if snapshot.needs_review_count.positive? %>
+          <%= render DS::Link.new(
+            text: t("pages.dashboard.home.review_transactions"),
+            href: uncategorized_transactions_filter_path
+          ) %>
+          <%= ask_chip t("pages.dashboard.home.ask_review"), hint: t("pages.dashboard.home.ask_review_hint") %>
+        <% end %>
         <% if snapshot.pending_proposal_count.positive? %>
           <%= render DS::Link.new(
             text: t("pages.dashboard.home.pending_proposals", count: snapshot.pending_proposal_count),
-            href: ai_proposals_path,
-            size: "sm"
+            href: ai_proposals_path
           ) %>
-        <% end %>
-        <% if snapshot.needs_review_count.positive? %>
-          <%= ask_chip t("pages.dashboard.home.ask_review"), hint: t("pages.dashboard.home.ask_review_hint") %>
         <% end %>
       </div>
     </div>
 
     <% if snapshot.show_bills? %>
-      <div class="flex items-center gap-3 px-4 py-3">
-        <div class="min-w-0 flex-1">
+      <div class="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center">
+        <div class="min-w-0 sm:flex-1">
           <p class="text-sm font-medium text-primary"><%= t("pages.dashboard.home.bills_next_seven") %></p>
           <% if snapshot.upcoming_bills.any? %>
             <p class="text-sm text-secondary truncate">
@@ -86,15 +54,15 @@
             <p class="text-sm text-secondary"><%= t("pages.dashboard.home.no_bills") %></p>
           <% end %>
         </div>
-        <div class="flex flex-wrap items-center justify-end gap-2">
-          <%= render DS::Link.new(text: t("pages.dashboard.home.view_bills"), href: plan_path(tab: "bills"), size: "sm") %>
+        <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+          <%= render DS::Link.new(text: t("pages.dashboard.home.view_bills"), href: plan_path(tab: "bills")) %>
           <%= ask_chip t("pages.dashboard.home.ask_bills"), hint: t("pages.dashboard.home.ask_bills_hint") %>
         </div>
       </div>
     <% end %>
 
-    <div class="flex items-center gap-3 px-4 py-3">
-      <div class="min-w-0 flex-1">
+    <div class="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center">
+      <div class="min-w-0 sm:flex-1">
         <p class="text-sm font-medium text-primary"><%= t("pages.dashboard.home.budget_hot") %></p>
         <% if snapshot.budget_chips.any? %>
           <div class="flex flex-wrap gap-2 mt-1">

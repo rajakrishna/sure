@@ -1,0 +1,31 @@
+<%# locals: (name:, icon:, active:) %>
+
+<%= render DS::Menu.new(variant: :button, placement: "top-end", testid: "mobile-more-nav") do |menu| %>
+  <% menu.with_button(
+       type: "button",
+       class: "space-y-1 group block relative pb-1 focus-ring rounded-lg w-full",
+       aria: { current: ("page" if active), label: name }
+     ) do %>
+    <div class="grow flex flex-col lg:flex-row gap-1 items-center">
+      <%= tag.div class: class_names("w-4 h-1 lg:w-1 lg:h-4 rounded-bl-sm rounded-br-sm lg:rounded-tr-sm lg:rounded-br-sm lg:rounded-bl-none", "bg-nav-indicator" => active) %>
+
+      <%= tag.div class: class_names(
+        "w-11 h-11 flex items-center justify-center mx-auto rounded-lg relative",
+        active ? "bg-container shadow-xs text-primary" : "group-hover:bg-surface-hover text-secondary"
+      ) do %>
+        <%= icon(icon, color: active ? "current" : "default") %>
+      <% end %>
+    </div>
+
+    <div class="grow flex justify-center lg:pl-2">
+      <%= tag.p class: class_names("font-medium text-[11px]", active ? "text-primary" : "text-secondary") do %>
+        <%= name %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% menu.with_item(variant: :link, text: t("layouts.application.nav.assistant"), href: chats_path, icon: "sparkles") %>
+  <% menu.with_item(variant: :divider) %>
+  <% menu.with_item(variant: :link, text: t("layouts.application.nav.wealth"), href: wealth_path, icon: "wallet") %>
+  <% menu.with_item(variant: :link, text: t("layouts.application.nav.reports"), href: reports_path, icon: "chart-bar") %>
+<% end %>

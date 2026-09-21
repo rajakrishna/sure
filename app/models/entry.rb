@@ -119,6 +119,16 @@ class Entry < ApplicationRecord
       .where(entries: { excluded: false })
   }
 
+  def self.accessible_uncategorized_count(user)
+    return 0 unless user&.family
+
+    user.family.entries
+      .where(account_id: user.accessible_accounts.select(:id))
+      .uncategorized_transactions
+      .distinct
+      .count("entries.id")
+  end
+
   # Returns uncategorized entries whose name matches the given filter string.
   # Used by the Quick Categorize Wizard to preview which transactions a rule would affect.
   # @param entries [ActiveRecord::Relation] pre-scoped entries (caller controls authorization)

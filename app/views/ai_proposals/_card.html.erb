@@ -49,7 +49,7 @@
           method: :post,
           variant: "primary",
           icon: "check",
-          data: { turbo_frame: "_top" }
+          data: { turbo_frame: "_top", testid: "proposal-accept" }
         ) %>
         <% if proposal.kind == "categorize" && proposal.suggested_rule? %>
           <%= render DS::Button.new(

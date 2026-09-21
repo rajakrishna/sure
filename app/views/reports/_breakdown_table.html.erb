@@ -14,7 +14,30 @@
     <span class="font-medium text-secondary <%= color_class %> privacy-sensitive"> <%= Money.new(total, Current.family.currency).format %></span>
   </div>
 
-  <div class="bg-container-inset rounded-xl p-1 overflow-x-auto">
+  <div class="lg:hidden space-y-2">
+    <% groups.each do |group| %>
+      <%= render "reports/category_card",
+        item: group,
+        total: total,
+        color_class: color_class,
+        level: :category,
+        start_date: start_date,
+        end_date: end_date %>
+      <% if group[:subcategories].present? && group[:subcategories].any? %>
+        <% group[:subcategories].each do |subcategory| %>
+          <%= render "reports/category_card",
+            item: subcategory,
+            total: total,
+            color_class: color_class,
+            level: :subcategory,
+            start_date: start_date,
+            end_date: end_date %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="hidden lg:block bg-container-inset rounded-xl p-1">
     <div class="rounded-lg shadow-border-xs bg-container overflow-hidden">
     <table class="w-full">
       <thead class="bg-container-inset">
@@ -41,7 +64,6 @@
             start_date: start_date,
             end_date: end_date,
             show_border: idx < groups.size - 1 || group[:subcategories].present? %>
-          <%# Render subcategories if present %>
           <% if group[:subcategories].present? && group[:subcategories].any? %>
             <% group[:subcategories].each_with_index do |subcategory, sub_idx| %>
               <%= render "reports/category_row",

@@ -12,6 +12,8 @@ class Assistant::Function::ExplainTransactionTest < ActiveSupport::TestCase
 
     assert result[:success]
     assert_equal "Explain Me", result[:name]
+    assert_equal entry.date.iso8601, result[:date]
+    assert_equal Assistant::DateText.format(entry.date, family: user.family), result[:date_display]
     assert_nil entry.transaction.reload.category
   end
 end

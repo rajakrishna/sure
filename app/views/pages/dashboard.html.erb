@@ -31,7 +31,7 @@
 
 <%= turbo_frame_tag "dashboard_sections", target: "_top" do %>
   <% if accessible_accounts.any? && @home_snapshot %>
-    <%= render "pages/dashboard/home_overview", snapshot: @home_snapshot %>
+    <%= render "pages/dashboard/home_hero", snapshot: @home_snapshot %>
   <% end %>
 
   <% if accessible_accounts.any? %>
@@ -45,18 +45,12 @@
   <% insight_sections = visible_sections.select { |section| section[:key] == "insights_feed" } %>
   <% chart_sections = visible_sections.reject { |section| section[:key] == "insights_feed" } %>
 
-  <div class="grid grid-cols-1 gap-4 pb-4" role="list" aria-label="<%= t("pages.dashboard.priority_aria_label") %>">
-    <% insight_sections.each do |section| %>
-      <%= render "pages/dashboard/section", section: section, two_column: false %>
-    <% end %>
-  </div>
-
   <% if accessible_accounts.any? && chart_sections.any? %>
     <%= render DS::Disclosure.new(
           title: t("pages.dashboard.analytics"),
           align: "left",
           variant: :card,
-          open: false,
+          open: true,
           id: "home-analytics",
           data: { testid: "home-analytics" }
         ) do %>
@@ -71,4 +65,14 @@
       <%= render "pages/dashboard/no_accounts_graph_placeholder" %>
     </section>
   <% end %>
+
+  <% if accessible_accounts.any? && @home_snapshot %>
+    <%= render "pages/dashboard/home_overview", snapshot: @home_snapshot %>
+  <% end %>
+
+  <div class="grid grid-cols-1 gap-4 pb-4" role="list" aria-label="<%= t("pages.dashboard.priority_aria_label") %>">
+    <% insight_sections.each do |section| %>
+      <%= render "pages/dashboard/section", section: section, two_column: false %>
+    <% end %>
+  </div>
 <% end %>

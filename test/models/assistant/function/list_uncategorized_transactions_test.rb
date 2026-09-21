@@ -30,7 +30,8 @@ class Assistant::Function::ListUncategorizedTransactionsTest < ActiveSupport::Te
     row = result[:transactions].find { |item| item[:id] == entry.entryable_id }
 
     assert_not_nil row
-    assert_equal entry.date, row[:date]
+    assert_equal entry.date.iso8601, row[:date]
+    assert_equal Assistant::DateText.format(entry.date, family: @family), row[:date_display]
     assert_equal "Starbucks", row[:name]
     assert_equal entry.amount.abs, row[:amount]
     assert_equal "expense", row[:classification]

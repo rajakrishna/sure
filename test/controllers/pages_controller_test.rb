@@ -14,12 +14,40 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_match I18n.t("pages.dashboard.home.needs_review"), response.body
     assert_select "[data-testid=home-hero]"
+    assert_select "[data-testid=home-actions]"
     assert_select "[data-testid=command-palette-trigger]"
-    assert_select "#home-analytics"
+    assert_select "#home-analytics[open]"
     assert_select "#cashflow-preview", count: 0
     assert_select "[data-controller='sankey-chart']", count: 0
     assert_select "[data-section-key='cashflow_sankey']", count: 0
     assert_select "#netWorthChart"
+  end
+
+  test "dashboard shows all clear instead of a phantom needs-review count" do
+    category = categories(:food_and_drink)
+    @family.entries.uncategorized_transactions.find_each do |entry|
+      entry.entryable.update!(category: category)
+    end
+    @family.ai_proposals.pending.update_all(status: "dismissed")
+
+    assert_equal 0, Entry.accessible_uncategorized_count(@user)
+
+    get root_path
+    assert_response :ok
+    assert_select "[data-testid=needs-review]"
+    assert_match I18n.t("pages.dashboard.home.needs_review_count", count: 0), response.body
+    assert_no_match(/1 transaction needs a category/, response.body)
+    assert_select "[data-testid=needs-review] a", text: I18n.t("pages.dashboard.home.review_transactions"), count: 0
+  end
+
+  test "dashboard review CTA deep-links to uncategorized transactions" do
+    create_transaction(account: accounts(:depository), name: "Needs a category on home")
+
+    get root_path
+    assert_response :ok
+    assert_select "[data-testid=needs-review] a[href=?]",
+      transactions_path(q: { categories: [ Category::UNCATEGORIZED_FILTER_VALUE ] }),
+      text: I18n.t("pages.dashboard.home.review_transactions")
   end
 
   test "dashboard weekly recap lists briefing items" do
@@ -131,11 +159,15 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
   end
 
-  test "home review transactions goes to the review inbox" do
+  test "home review transactions goes to uncategorized transactions" do
+    create_transaction(account: accounts(:depository), name: "Uncategorized for review CTA")
+
     get root_path
 
     assert_response :ok
-    assert_select "a[href=?]", ai_proposals_path, text: I18n.t("pages.dashboard.home.review_transactions")
+    assert_select "a[href=?]",
+      transactions_path(q: { categories: [ Category::UNCATEGORIZED_FILTER_VALUE ] }),
+      text: I18n.t("pages.dashboard.home.review_transactions")
     assert_select "a[href=?]", transactions_categorize_path, count: 0
   end
 
